@@ -9,6 +9,6 @@
 
 <style>
 body{
-  background-color: black;
+  background-color: #0077be;
 }
 </style>

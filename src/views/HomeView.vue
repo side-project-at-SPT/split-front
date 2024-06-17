@@ -284,19 +284,22 @@ console.log(TuxImage)
     height: 100px;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   }
+
   .ice {
     background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3);
   }
+
   .tux {
     background-image: url('@/assets/images/tux.png');
-    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
   }
+
   .gunter {
     background-image: url('@/assets/images/gunter.png');
-    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
   }
 </style>

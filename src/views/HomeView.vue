@@ -14,15 +14,24 @@ let originAmount = 0
 let targetAmount = 0
 const handleClick = (pasture) => {
   if (!originPasure.value) {
+    if (pasture.amount < 2) return
     originPasure.value = pasture
     originAmount = pasture.amount
     pasture.selected = !pasture.selected
+    // 顯示合法目的地
+    showAllowedTarget()
+    return
+  }
+  if (originPasure.value === pasture && !targetPasure.value) {
+    handleCancel()
     return
   }
   if (!targetPasure.value) {
     targetPasure.value = pasture
     targetAmount = pasture.amount
     pasture.selected = !pasture.selected
+    // 取消顯示合法目的地
+    hideAllowedTarget()
     return
   }
   // 如果有選擇來源的牧場，且來源牧場有羊，則移動羊到目標牧場
@@ -40,30 +49,83 @@ const handleClick = (pasture) => {
     }
   }
 }
+const showAllowedTarget = () => {
+  // 六個方向
+  const directions = [
+    {
+      x: 1, y: 0 
+    },
+    {
+      x: 1, y: -1 
+    },
+    {
+      x: 0, y: -1 
+    },
+    {
+      x: -1, y: 0 
+    },
+    {
+      x: -1, y: 1 
+    },
+    {
+      x: 0, y: 1 
+    }
+  ]
+  directions.forEach(direction => {
+    let tempTarget
+    let directionAddX = direction.x
+    let directionAddY = direction.y
+    while (true) {
+      const target = pastures.value.find(pasture => pasture.x === originPasure.value.x + directionAddX && pasture.y === originPasure.value.y + directionAddY)
+      if (!target || target.amount > 0) {
+        break
+      }
+      tempTarget = target
+      directionAddX += direction.x
+      directionAddY += direction.y
+    }
+    if (tempTarget) {
+      tempTarget.isAllowTarget = true
+      tempTarget = null
+    }
+  })
+}
+const hideAllowedTarget = () => {
+  pastures.value.forEach(pasture => pasture.isAllowTarget = false)
+}
 const handleConfirm = () => {
-  // const selectedPastures = pastures.value.filter(pasture => pasture.selected)
-  // console.log(selectedPastures)
+  originPasure.value.selected = false
+  targetPasure.value.selected = false
+  originPasure.value = null
+  targetPasure.value = null
+  originAmount = 0
+  targetAmount = 0
 }
 const handleCancel = () => {
   // 還原數字
-  originPasure.value.selected = false
-  targetPasure.value.selected = false
-  originPasure.value.amount = originAmount
-  targetPasure.value.amount = targetAmount
-  originPasure.value = null
-  targetPasure.value = null
+  if (originPasure.value) {
+    originPasure.value.selected = false
+    originPasure.value.amount = originAmount
+    originPasure.value = null
+  }
+  if (targetPasure.value) {
+    targetPasure.value.selected = false
+    targetPasure.value.amount = targetAmount
+    targetPasure.value = null
+  }
+  hideAllowedTarget()
 }
 </script>
 
 <template>
   <span
-    class="bg-blue-400 p-2 m-5"
+    class="bg-blue-400 p-2 m-5 cursor-pointer"
     @click="handleConfirm"
   >
     確定移動
   </span>
   <span
-    class="bg-blue-400 p-2 m-5"
+    class="bg-blue-400 p-2 m-5 cursor-pointer"
     @click="handleCancel"
   >
     取消選取
@@ -73,10 +135,11 @@ const handleCancel = () => {
       v-for="pasture in pastures"
       :key="`${pasture.x}-${pasture.y}`"
       class="hexagon flex flex-col justify-center items-center text-black cursor-pointer"
-      :class="{ 'bg-green-500': pasture.selected }"
+      :class="{ 'bg-green-500': pasture.selected,
+                'bg-green-400': pasture.isAllowTarget }"
       :style="{ left: `calc(${pasture.x * 105}px + ${pasture.y * 105}px * sin(30deg))`,
                 top: `calc(${pasture.y * 105 / 2}px * sqrt(3) * cos(30deg))` }"
-      @click="handleClick(pasture)"
+      @click="()=>handleClick(pasture)"
     >
       <div>
         {{ `${pasture.x},${pasture.y}` }}

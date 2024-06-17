@@ -333,12 +333,14 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
     background-position: center;
     background-size: contain;
   }
+
   .abc {
     background-image: url('@/assets/images/abc.png');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
   }
+
   .sin {
     background-image: url('@/assets/images/sin.png');
     background-repeat: no-repeat;

@@ -30,6 +30,7 @@ const handleClick = (pasture) => {
     return
   }
   if (!targetPasure.value) {
+    if (!pasture.isAllowTarget) return
     targetPasure.value = pasture
     targetAmount = pasture.amount
     pasture.selected = !pasture.selected

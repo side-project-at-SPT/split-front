@@ -8,6 +8,9 @@ for (let x = 0; x < 5; x++)
       x, y, amount: 0, selected: false
     })
 pastures.value[0].amount = 16
+pastures.value[0].color = 'red'
+pastures.value[24].amount = 16
+pastures.value[24].color = 'blue'
 const originPasure = ref(null)
 const targetPasure = ref(null)
 let originAmount = 0
@@ -96,6 +99,7 @@ const hideAllowedTarget = () => {
 const handleConfirm = () => {
   originPasure.value.selected = false
   targetPasure.value.selected = false
+  targetPasure.value.color = originPasure.value.color
   originPasure.value = null
   targetPasure.value = null
   originAmount = 0
@@ -144,7 +148,7 @@ const handleCancel = () => {
       <div>
         {{ `${pasture.x},${pasture.y}` }}
       </div>
-      <div class="text-red">
+      <div :style="{ color: pasture.color }">
         {{ pasture.amount }}
       </div>
     </div>

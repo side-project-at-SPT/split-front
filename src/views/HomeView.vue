@@ -2,7 +2,6 @@
 import {
   ref, computed 
 } from 'vue'
-import TuxImage from '@/assets/images/tux.png'
 const pastures = ref([])
 // initialize pastures
 for (let x = 0; x < 5; x++)
@@ -10,18 +9,26 @@ for (let x = 0; x < 5; x++)
     pastures.value.push({
       x, y, amount: 0, selected: false
     })
-const players = [ {
-  name: 'Tux', color: '#ae0000', itemStyle: 'tux'
+const players = ref([ {
+  name: 'Tux', color: '#ae0000', itemStyle: 'tux', isEnd: false
 }, {
-  name: '阿鵝', color: '#2563eb', itemStyle: 'gunter'
-} ]
+  name: '阿鵝', color: '#2563eb', itemStyle: 'gunter', isEnd: false
+}, {
+  name: 'abc', color: '#d321a9', itemStyle: 'abc', isEnd: false
+}, {
+  name: 'sin', color: '#d38021', itemStyle: 'sin', isEnd: false
+} ])
 pastures.value[0].amount = 16
-pastures.value[0].owner = players[0]
+pastures.value[0].owner = players.value[0]
+pastures.value[20].amount = 16
+pastures.value[20].owner = players.value[2]
+pastures.value[4].amount = 16
+pastures.value[4].owner = players.value[3]
 pastures.value[pastures.value.length - 1].amount = 16
-pastures.value[pastures.value.length - 1].owner = players[1]
+pastures.value[pastures.value.length - 1].owner = players.value[1]
 //
 const currentPlayerIndex = ref(0)
-const currentPlayer = computed(() => players[currentPlayerIndex.value])
+const currentPlayer = computed(() => players.value[currentPlayerIndex.value])
 const originPasure = ref(null)
 const targetPasure = ref(null)
 let originAmount = 0
@@ -150,7 +157,11 @@ const handleConfirm = () => {
   nextPlayer()
 }
 const nextPlayer = () => {
-  currentPlayerIndex.value = (currentPlayerIndex.value + 1) % players.length
+  if (players.value.every(player => player.isEnd)) {
+    alert('遊戲結束')
+    return
+  }
+  currentPlayerIndex.value = (currentPlayerIndex.value + 1) % players.value.length
   // 判斷還可不可以移動
   const ownerPastures = pastures.value.filter(pasture => pasture.owner?.name === currentPlayer.value.name)
   ownerPastures.forEach(pasture => {
@@ -198,10 +209,16 @@ const nextPlayer = () => {
     if (!isAlive) pasture.isBlocked = true
   })
   if (ownerPastures.every(pasture => pasture.isBlocked)) {
-    alert('無法移動，換下一位玩家')
+    currentPlayer.value.isEnd = true
     nextPlayer()
   }
 }
+const finalPlayers = computed(() => players.value.map(player => {
+  return {
+    name: player.name,
+    score: pastures.value.filter(pasture => pasture.owner?.name === player.name).length
+  }
+}).sort((a, b) => b.score - a.score))
 const handleCancel = () => {
   // 還原數字
   if (originPasure.value) {
@@ -217,7 +234,7 @@ const handleCancel = () => {
   }
   hideAllowedTarget()
 }
-console.log(TuxImage)
+const gameOver = computed(() => players.value.every(player => player.isEnd))
 </script>
 
 <template>
@@ -249,6 +266,20 @@ console.log(TuxImage)
     >
       取消選取
     </span>
+  </div>
+  <div
+    v-if="gameOver"
+    class="w-[500px] flex flex-col items-center"
+  >
+    <div>遊戲結束</div>
+    <div
+      v-for="player in finalPlayers"
+      :key="player.name"
+      class="flex items-center justify-center gap-2"
+    >
+      <div>{{ player.name }}:</div>
+      <div>{{ player.score }}分</div>
+    </div>
   </div>
   <div class="text-white relative mt-10 pasture-table">
     <div
@@ -298,6 +329,18 @@ console.log(TuxImage)
 
   .gunter {
     background-image: url('@/assets/images/gunter.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+  .abc {
+    background-image: url('@/assets/images/abc.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+  .sin {
+    background-image: url('@/assets/images/sin.png');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;

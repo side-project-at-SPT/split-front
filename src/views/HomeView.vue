@@ -90,10 +90,10 @@ const handleCancel = () => {
 
 <style>
   .hexagon {
+    position: absolute;
     width: 100px;
     height: 100px;
-    background-color: green;
-    position: absolute;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background-color: #008000;
   }
 </style>

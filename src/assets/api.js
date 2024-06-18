@@ -20,7 +20,15 @@ const api = {
       axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + response.data.token
       return response.data
     } catch (error) {
-      return error
+      throw error.response.data
+    }
+  },
+  getUserInfo: async () => {
+    try {
+      const response = await axiosInstance.get('/api/v1/me')
+      return response.data
+    } catch (error) {
+      throw error.response.data
     }
   },
   getRooms: async () => {
@@ -29,6 +37,56 @@ const api = {
       return response.data
     } catch (error) {
       return error.response.data
+    }
+  },
+  getRoomInfo: async (id) => {
+    try {
+      const response = await axiosInstance.get('/api/v1/rooms/' + id)
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  },
+  createRoom: async (name) => {
+    try {
+      const response = await axiosInstance.post('/api/v1/rooms', {
+        name
+      })
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  },
+  joinRoom: async (id) => {
+    try {
+      const response = await axiosInstance.put('/api/v1/rooms/' + id)
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  },
+  leaveRoom: async (id) => {
+    try {
+      const response = await axiosInstance.delete('/api/v1/rooms/' + id)
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  },
+  closeRoom: async (id) => {
+    try {
+      const response = await axiosInstance.post('/api/v1/rooms/' + id + '/close')
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  },
+  startGame: async (id) => {
+    try {
+      const response = await axiosInstance.post('/api/v1/rooms/' + id + '/game')
+      return response.data
+    } catch (error) {
+      throw error.response.data
     }
   },
 }

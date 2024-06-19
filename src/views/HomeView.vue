@@ -3,7 +3,7 @@ import {
   onMounted, ref 
 } from 'vue'
 import api from '@/assets/api'
-import { Client } from '@stomp/stompjs'
+// import { Client } from '@stomp/stompjs'
 import {
   RouterLink, useRouter 
 } from 'vue-router'
@@ -106,8 +106,8 @@ const showErrorMessage = (message) => {
 const handleCreateRoom = async () => {
   showCreateRoomModal.value = true
 }
-let socketClient = null
-const isConnected = ref(false)
+// let socketClient = null
+// const isConnected = ref(false)
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -115,24 +115,24 @@ onMounted(() => {
     getRooms()
     getUserInfo()
     console.log('token', token)
-    socketClient = new Client({
-      brokerURL: 'wss://spt-games-split.zeabur.app/cable',
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    })
-    socketClient.onConnect = (frame) => {
-      isConnected.value = true
-      console.log('Connected: ' + frame)
-      socketClient.subscribe(
-        '/LobbyChannel',
-        async (greeting) => {
-          const res = JSON.parse(greeting.body)
-          console.log(res)
-        },
-      )
-    }
-    socketClient.activate()
+    // socketClient = new Client({
+    //   brokerURL: 'wss://spt-games-split.zeabur.app/cable',
+    //   reconnectDelay: 5000,
+    //   heartbeatIncoming: 4000,
+    //   heartbeatOutgoing: 4000,
+    // })
+    // socketClient.onConnect = (frame) => {
+    //   isConnected.value = true
+    //   console.log('Connected: ' + frame)
+    //   socketClient.subscribe(
+    //     '/LobbyChannel',
+    //     async (greeting) => {
+    //       const res = JSON.parse(greeting.body)
+    //       console.log(res)
+    //     },
+    //   )
+    // }
+    // socketClient.activate()
   }
 })
 </script>

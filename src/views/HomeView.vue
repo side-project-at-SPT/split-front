@@ -3,7 +3,6 @@ import {
   onMounted, ref 
 } from 'vue'
 import api from '@/assets/api'
-import { Client } from '@stomp/stompjs'
 import {
   RouterLink, useRouter 
 } from 'vue-router'
@@ -17,6 +16,10 @@ const roomId = ref('')
 const roomInfo = ref({})
 const roomName = ref('')
 const errorMessage = ref('')
+const onlineUsers = ref({
+  online_users: [], online_users_count: 0 
+})
+let token = localStorage.getItem('token')
 const createRoom = async () => {
   const data = await api.createRoom(roomName.value)
   showCreateRoomModal.value = false
@@ -33,9 +36,8 @@ const getRooms = async () => {
 const login = async () => {
   const data = await api.login(userName.value, password.value)
   if (data.token) {
-    isLogin.value = true
-    getRooms()
-    getUserInfo()
+    token = data.token
+    doAfterLogin()
   }
   return
 }
@@ -91,7 +93,7 @@ const handleBackRooms = async () => {
 const handleStartGame = async () => {
   try {
     const data = await api.startGame(roomId.value)
-    router.push(`/game/${ roomId.value }`)
+    router.push(`/game/?roomId=${ roomId.value }`)
     return data
   } catch (error) {
     showErrorMessage(error.error)
@@ -103,42 +105,48 @@ const showErrorMessage = (message) => {
     errorMessage.value = ''
   }, 3000)
 }
+const getOnlineUsers = async () => {
+  const data = await api.getOnlineUsers()
+  onlineUsers.value = data
+}
 const handleCreateRoom = async () => {
   showCreateRoomModal.value = true
 }
-let socketClient = null
-const isConnected = ref(false)
+let socket = null
+const doAfterLogin = () => {
+  isLogin.value = true
+  getRooms()
+  getUserInfo()
+  const socketUrl = `wss://spt-games-split.zeabur.app/cable?token=${ token }`
+  socket = new WebSocket(socketUrl)
+  socket.onopen = () => {
+    console.log('WebSocket is open now.')
+    // 訂閱
+    const authMessage = {
+      command: 'subscribe',
+      identifier: JSON.stringify({ channel: 'LobbyChannel' })
+    }
+    socket.send(JSON.stringify(authMessage))
+  }
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data)
+    if (data.type === 'ping'){
+      return
+    }
+    if (data.identifier?.includes('LobbyChannel')){
+      if (data.type === 'confirm_subscription'){
+        getOnlineUsers()
+        console.log('訂閱成功')
+      }
+      console.log(data.message)
+    }
+    // console.log('Received:', event.data)
+  }
+}
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token) {
-    isLogin.value = true
-    getRooms()
-    getUserInfo()
-    console.log('token', token)
-    socketClient = new Client({
-      brokerURL: 'wss://spt-games-split.zeabur.app/cable',
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      connectHeaders: {
-        Authorization: `Bearer ${ token }`
-      },
-    })
-    socketClient.onConnect = (frame) => {
-      isConnected.value = true
-      console.log('Connected: ' + frame)
-      socketClient.subscribe(
-        '/LobbyChannel',
-        async (greeting) => {
-          const res = JSON.parse(greeting.body)
-          console.log(res)
-        },
-      )
-    }
-    const headers = {
-      Authorization: `Bearer ${ token }`
-    }
-    socketClient.activate(headers)
+    doAfterLogin()
   }
 })
 </script>
@@ -243,6 +251,9 @@ onMounted(() => {
     <div v-if="isLogin">
       <div>
         您好: {{ name }}
+      </div>
+      <div @click="getOnlineUsers">
+        在線人數: {{ onlineUsers.online_users_count }}
       </div>
       <div
         v-if="!roomId"

@@ -117,9 +117,9 @@ onMounted(() => {
     console.log('token', token)
     socketClient = new Client({
       brokerURL: 'wss://spt-games-split.zeabur.app/cable',
-      // reconnectDelay: 5000,
-      // heartbeatIncoming: 4000,
-      // heartbeatOutgoing: 4000,
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       connectHeaders: {
         Authorization: `Bearer ${ token }`
       },

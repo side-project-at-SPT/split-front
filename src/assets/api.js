@@ -36,7 +36,7 @@ const api = {
       throw error.response.data
     }
   },
-  getOnlineUsers: async () => {
+  getUsers: async () => {
     try {
       const response = await axiosInstance.get('/api/v1/users')
       return response.data

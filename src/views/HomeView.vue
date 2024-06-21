@@ -8,11 +8,11 @@ import { createConsumer } from '@rails/actioncable'
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const { rooms, roomInfo } = toRefs(roomStore)
-const { user } = toRefs(userStore)
+const { user, onlineUsers } = toRefs(userStore)
 const {
   getRooms, createRoom, joinRoom, leaveRoom, closeRoom, getRoomInfo, clearRoomInfo 
 } = roomStore
-const { getUserInfo, setNickname } = userStore
+const { getUsers, getUserInfo, setNickname } = userStore
 const router = useRouter()
 const isLogin = ref(false)
 const userName = ref('')
@@ -20,7 +20,7 @@ const password = ref('')
 const roomId = ref('')
 const roomName = ref('')
 const errorMessage = ref('')
-const onlineUsers = ref({ online_users: [], online_users_count: 0 })
+// const onlineUsers = ref({ online_users: [], online_users_count: 0 })
 const showCreateRoomModal = ref(false)
 const showChangeNicknameModal = ref(false)
 const newNickname = ref('')
@@ -80,10 +80,6 @@ const showErrorMessage = (message) => {
     errorMessage.value = ''
   }, 3000)
 }
-const getOnlineUsers = async () => {
-  const data = await api.getOnlineUsers()
-  onlineUsers.value = data
-}
 const openCreateRoomModal = async () => {
   showCreateRoomModal.value = true
 }
@@ -96,7 +92,7 @@ const doAfterLogin = () => {
   consumer = createConsumer(socketUrl)
   consumer.subscriptions.create({ channel: 'LobbyChannel' }, {
     connected () {
-      getOnlineUsers()
+      getUsers()
       console.log('connected')
     },
     disconnected () {
@@ -104,7 +100,7 @@ const doAfterLogin = () => {
     },
     received (data) {
       if (data.event === 'user preferences updated') {
-        getOnlineUsers()
+        getUsers()
       }
       console.log(data, 'data')
     }
@@ -262,13 +258,13 @@ onMounted(() => {
         </button>
       </div>
       <div class="flex gap-3 items-center">
-        <div>在線人數: {{ onlineUsers.online_users_count }} 人:</div>
+        <div>在線人數: {{ onlineUsers.length }} 人:</div>
         <div
-          v-for="onlineUser in onlineUsers.online_users"
+          v-for="onlineUser in onlineUsers"
           :key="onlineUser.id"
           class=""
         >
-          {{ onlineUser.name }}
+          {{ onlineUser.nickname }}
         </div>
       </div>
       <div
@@ -278,11 +274,18 @@ onMounted(() => {
         <div
           v-for="room in rooms"
           :key="room.id"
-          class="text-center border-2 shrink-0 border-blue-300 w-[150px] h-[150px] bg-blue-50 rounded-md cursor-pointer flex justify-center hexagon-ice items-center hover:scale-105 transition-transform duration-300"
+          class="text-center border-2 shrink-0 border-blue-300 w-[150px] h-[150px] bg-blue-50 rounded-md cursor-pointer flex flex-col justify-center hexagon-ice items-center hover:scale-105 transition-transform duration-300"
           @click="handleSeeRoom(room)"
         >
           <div class="py-2">
             {{ room.name }}
+          </div>
+          <div
+            v-for="player in room.players"
+            :key="player.id"
+            class="text-sm"
+          >
+            {{ player.nickname }}
           </div>
         </div>
         <div

@@ -2,8 +2,14 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import api from '@/assets/api'
 export const useUserStore = defineStore('useUserStore', () => {
+  const users = ref([])
   const userInfo = ref({})
   const userUserPreferences = ref({})
+  const getUsers = () => {
+    return api.getUsers().then(res => {
+      users.value = res.users
+    })
+  }
   const getUserInfo = () => {
     return api.getUserInfo().then(res => {
       getUserPreferences()
@@ -31,9 +37,14 @@ export const useUserStore = defineStore('useUserStore', () => {
       ...userUserPreferences.value
     }
   })
+  const onlineUsers = computed(() => { 
+    return users.value.filter(user => user.is_online)
+  })
   return {
     userInfo,
     user,
+    onlineUsers,
+    getUsers,
     getUserInfo,
     setNickname
   }

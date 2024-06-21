@@ -55,6 +55,15 @@ const api = {
       throw error.response.data
     }
   },
+  setUserPreferences: async (preferences) => {
+    try {
+      const response = await axiosInstance.patch('/api/v1/preferences', preferences)
+      return response.data
+    }
+    catch (error) {
+      throw error.response.data
+    }
+  },
   getRooms: async () => {
     try {
       const response = await axiosInstance.get('/api/v1/rooms')

@@ -15,7 +15,7 @@ const { user } = toRefs(userStore)
 const {
   getRooms, createRoom, joinRoom, leaveRoom, closeRoom, getRoomInfo, clearRoomInfo 
 } = roomStore
-const { getUserInfo } = userStore
+const { getUserInfo, setNickname } = userStore
 const router = useRouter()
 const isLogin = ref(false)
 const userName = ref('')
@@ -23,10 +23,10 @@ const password = ref('')
 const roomId = ref('')
 const roomName = ref('')
 const errorMessage = ref('')
-const onlineUsers = ref({
-  online_users: [], online_users_count: 0 
-})
+const onlineUsers = ref({ online_users: [], online_users_count: 0 })
 const showCreateRoomModal = ref(false)
+const showChangeNicknameModal = ref(false)
+const newNickname = ref('')
 let token = localStorage.getItem('token')
 const handleCreateRoom = async () => {
   const data = await createRoom(roomName.value)
@@ -121,6 +121,12 @@ const doAfterLogin = () => {
     // console.log('Received:', event.data)
   }
 }
+const handleCreateNickname = () => {
+  setNickname(newNickname.value).then(() => {
+    showChangeNicknameModal.value = false
+    newNickname.value = ''
+  })
+}
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -156,6 +162,37 @@ onMounted(() => {
           <button
             class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             @click="showCreateRoomModal = false"
+          >
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="showChangeNicknameModal"
+      class="absolute w-svw h-dvh bg-black bg-opacity-50 flex items-center justify-center z-10"
+    >
+      <div class="hexagon-ice w-[300px] h-[300px] flex flex-col items-center justify-center">
+        <div class="text-center text-white text-2xl font-semibold">
+          修改暱稱
+        </div>
+        <div class="mt-5">
+          <input
+            v-model="newNickname"
+            class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-2"
+            placeholder="暱稱"
+          >
+        </div>
+        <div class="mt-5 flex gap-2">
+          <button
+            class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            @click="handleCreateNickname"
+          >
+            修改
+          </button>
+          <button
+            class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            @click="showChangeNicknameModal = false, newNickname = ''"
           >
             取消
           </button>
@@ -227,8 +264,13 @@ onMounted(() => {
       </div>
     </div>
     <div v-if="isLogin">
-      <div>
-        您好: {{ user.nickname }}
+      <div class="flex gap-2">
+        <div>您好: {{ user.nickname }}</div><button
+          class="bg-blue-300 rounded-md px-2 text-xs hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          @click="showChangeNicknameModal = true, newNickname = user.nickname"
+        >
+          修改暱稱
+        </button>
       </div>
       <div @click="getOnlineUsers">
         在線人數: {{ onlineUsers.online_users_count }}

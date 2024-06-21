@@ -15,6 +15,15 @@ export const useUserStore = defineStore('useUserStore', () => {
       userUserPreferences.value = res
     })
   }
+  const setNickname = async (nickname) => {
+    const params = {
+      nickname
+    }
+    return api.setUserPreferences(params).then(res => {
+      getUserPreferences()
+      return res
+    })
+  }
   const user = computed(() => {
     return {
       ...userInfo.value,
@@ -24,6 +33,7 @@ export const useUserStore = defineStore('useUserStore', () => {
   return {
     userInfo,
     user,
-    getUserInfo
+    getUserInfo,
+    setNickname
   }
 })

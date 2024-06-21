@@ -19,7 +19,8 @@ const api = {
       localStorage.setItem('token', response.data.token)
       axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + response.data.token
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },
@@ -27,7 +28,8 @@ const api = {
     try {
       const response = await axiosInstance.get('/api/v1/users')
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },
@@ -35,7 +37,8 @@ const api = {
     try {
       const response = await axiosInstance.get('/api/v1/me')
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       if (error.response.status === 401) {
         localStorage.removeItem('token')
         token.value = ''
@@ -47,7 +50,8 @@ const api = {
     try {
       const response = await axiosInstance.get('/api/v1/preferences')
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },
@@ -55,7 +59,8 @@ const api = {
     try {
       const response = await axiosInstance.get('/api/v1/rooms')
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       return error.response.data
     }
   },
@@ -63,7 +68,8 @@ const api = {
     try {
       const response = await axiosInstance.get('/api/v1/rooms/' + id)
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },
@@ -73,7 +79,8 @@ const api = {
         name
       })
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },
@@ -81,7 +88,8 @@ const api = {
     try {
       const response = await axiosInstance.put('/api/v1/rooms/' + id)
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },
@@ -89,7 +97,8 @@ const api = {
     try {
       const response = await axiosInstance.delete('/api/v1/rooms/' + id)
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },
@@ -97,7 +106,8 @@ const api = {
     try {
       const response = await axiosInstance.post('/api/v1/rooms/' + id + '/close')
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },
@@ -105,7 +115,8 @@ const api = {
     try {
       const response = await axiosInstance.post('/api/v1/rooms/' + id + '/game')
       return response.data
-    } catch (error) {
+    }
+    catch (error) {
       throw error.response.data
     }
   },

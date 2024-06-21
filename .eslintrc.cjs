@@ -30,7 +30,7 @@ module.exports = {
     'object-curly-spacing': [ 'error', 'always' ],
     // 物件換行
     'object-curly-newline': [ 'error', {
-      'multiline': true, 'minProperties': 2, 'consistent': true 
+      'multiline': true, 'minProperties': 5, 'consistent': true 
     } ],
     // 括號去除空格 foo(   'bar'   ) =>  foo('bar');
     'space-in-parens': [ 'error', 'never' ],
@@ -43,7 +43,7 @@ module.exports = {
     // array 内使用空格 [ 1,2   ] => [ 1,2 ]
     'array-bracket-spacing': [ 'error', 'always' ],
     // if else 風格
-    'brace-style': [ 'error', '1tbs' ],
+    'brace-style': [ 'error', 'stroustrup', { 'allowSingleLine': true } ],
     // function 後面要空格 
     'space-before-function-paren': [ 'error', 'always' ],
     // call 函数空格 fn  () => fn()

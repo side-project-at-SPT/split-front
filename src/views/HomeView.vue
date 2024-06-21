@@ -1,38 +1,40 @@
 <script setup>
 import {
-  onMounted, ref 
+  onMounted, ref, toRefs
 } from 'vue'
 import api from '@/assets/api'
 import {
   RouterLink, useRouter 
 } from 'vue-router'
+import { useRoomStore } from '../stores/room'
+import { useUserStore } from '../stores/user'
+const roomStore = useRoomStore()
+const userStore = useUserStore()
+const { rooms, roomInfo } = toRefs(roomStore)
+const { user } = toRefs(userStore)
+const {
+  getRooms, createRoom, joinRoom, leaveRoom, closeRoom, getRoomInfo, clearRoomInfo 
+} = roomStore
+const { getUserInfo } = userStore
 const router = useRouter()
 const isLogin = ref(false)
 const userName = ref('')
 const password = ref('')
-const name = ref('')
-const rooms = ref([])
 const roomId = ref('')
-const roomInfo = ref({})
 const roomName = ref('')
 const errorMessage = ref('')
 const onlineUsers = ref({
   online_users: [], online_users_count: 0 
 })
+const showCreateRoomModal = ref(false)
 let token = localStorage.getItem('token')
-const createRoom = async () => {
-  const data = await api.createRoom(roomName.value)
+const handleCreateRoom = async () => {
+  const data = await createRoom(roomName.value)
   showCreateRoomModal.value = false
-  getRooms()
   roomName.value = ''
   return data
 }
-const showCreateRoomModal = ref(false)
-const getRooms = async () => {
-  const data = await api.getRooms()
-  rooms.value = data.rooms
-  return
-}
+
 const login = async () => {
   const data = await api.login(userName.value, password.value)
   if (data.token) {
@@ -41,61 +43,37 @@ const login = async () => {
   }
   return
 }
-const getUserInfo = async () => {
-  try {
-    const data = await api.getUserInfo()
-    name.value = data.name
-    return 
-  } catch (error) {
-    showErrorMessage(error.error)
-  }
-}
-const getRoomInfo = async (roomId) => {
-  try {
-    const data = await api.getRoomInfo(roomId)
-    roomInfo.value = data.room
-    return 
-  } catch (error) {
-    showErrorMessage(error.error)
-  }
-}
+
 const handleSeeRoom = async (room) => {
-  await getRoomInfo(room.id)
-  roomId.value = room.id
+  getRoomInfo(room.id).catch((error) => {
+    showErrorMessage(error.error)
+  })
 }
 const handleJoinRoom = async () => {
-  try {
-    await api.joinRoom(roomId.value)
-  } catch (error) {
+  joinRoom().catch((error) => {
     showErrorMessage(error.error)
-  }
+  })
 }
 const handleLeaveRoom = async () => {
-  try {
-    await api.leaveRoom(roomId.value)
-  } catch (error) {
+  leaveRoom().catch((error) => {
     showErrorMessage(error.error)
-  }
+  })
 }
 const handleCloseRoom = async () => {
-  try {
-    await api.closeRoom(roomId.value)
-    await getRooms()
-    roomId.value = ''
-  } catch (error) {
+  closeRoom().catch((error) => {
     showErrorMessage(error.error)
-  }
+  })
 }
 const handleBackRooms = async () => {
-  roomId.value = ''
-  getRooms()
+  clearRoomInfo()
 }
 const handleStartGame = async () => {
   try {
     const data = await api.startGame(roomId.value)
     router.push(`/game/?roomId=${ roomId.value }`)
     return data
-  } catch (error) {
+  }
+  catch (error) {
     showErrorMessage(error.error)
   }
 }
@@ -109,7 +87,7 @@ const getOnlineUsers = async () => {
   const data = await api.getOnlineUsers()
   onlineUsers.value = data
 }
-const handleCreateRoom = async () => {
+const openCreateRoomModal = async () => {
   showCreateRoomModal.value = true
 }
 let socket = null
@@ -171,7 +149,7 @@ onMounted(() => {
         <div class="mt-5 flex gap-2">
           <button
             class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            @click="createRoom"
+            @click="handleCreateRoom"
           >
             新增
           </button>
@@ -250,13 +228,13 @@ onMounted(() => {
     </div>
     <div v-if="isLogin">
       <div>
-        您好: {{ name }}
+        您好: {{ user.nickname }}
       </div>
       <div @click="getOnlineUsers">
         在線人數: {{ onlineUsers.online_users_count }}
       </div>
       <div
-        v-if="!roomId"
+        v-if="!roomInfo.id"
         class="flex gap-2 flex-wrap"
       >
         <div
@@ -271,7 +249,7 @@ onMounted(() => {
         </div>
         <div
           class="w-[150px] h-[150px] new-room flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-          @click="handleCreateRoom"
+          @click="openCreateRoomModal"
         >
           新增房間
         </div>

@@ -36,6 +36,18 @@ const api = {
       const response = await axiosInstance.get('/api/v1/me')
       return response.data
     } catch (error) {
+      if (error.response.status === 401) {
+        localStorage.removeItem('token')
+        token.value = ''
+      }
+      throw error.response.data
+    }
+  },
+  getUserPreferences: async () => {
+    try {
+      const response = await axiosInstance.get('/api/v1/preferences')
+      return response.data
+    } catch (error) {
       throw error.response.data
     }
   },

@@ -1,13 +1,10 @@
 <script setup>
-import {
-  onMounted, ref, toRefs
-} from 'vue'
+import { onMounted, ref, toRefs } from 'vue'
 import api from '@/assets/api'
-import {
-  RouterLink, useRouter 
-} from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useRoomStore } from '../stores/room'
 import { useUserStore } from '../stores/user'
+import { createConsumer } from '@rails/actioncable'
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const { rooms, roomInfo } = toRefs(roomStore)
@@ -90,36 +87,28 @@ const getOnlineUsers = async () => {
 const openCreateRoomModal = async () => {
   showCreateRoomModal.value = true
 }
-let socket = null
+let consumer = null
 const doAfterLogin = () => {
   isLogin.value = true
   getRooms()
   getUserInfo()
   const socketUrl = `wss://spt-games-split.zeabur.app/cable?token=${ token }`
-  socket = new WebSocket(socketUrl)
-  socket.onopen = () => {
-    console.log('WebSocket is open now.')
-    // 訂閱
-    const authMessage = {
-      command: 'subscribe',
-      identifier: JSON.stringify({ channel: 'LobbyChannel' })
-    }
-    socket.send(JSON.stringify(authMessage))
-  }
-  socket.onmessage = (event) => {
-    const data = JSON.parse(event.data)
-    if (data.type === 'ping'){
-      return
-    }
-    if (data.identifier?.includes('LobbyChannel')){
-      if (data.type === 'confirm_subscription'){
+  consumer = createConsumer(socketUrl)
+  consumer.subscriptions.create({ channel: 'LobbyChannel' }, {
+    connected () {
+      getOnlineUsers()
+      console.log('connected')
+    },
+    disconnected () {
+      console.log('disconnected')
+    },
+    received (data) {
+      if (data.event === 'user preferences updated') {
         getOnlineUsers()
-        console.log('訂閱成功')
       }
-      console.log(data.message)
+      console.log(data, 'data')
     }
-    // console.log('Received:', event.data)
-  }
+  })
 }
 const handleCreateNickname = () => {
   setNickname(newNickname.value).then(() => {
@@ -272,8 +261,15 @@ onMounted(() => {
           修改暱稱
         </button>
       </div>
-      <div @click="getOnlineUsers">
-        在線人數: {{ onlineUsers.online_users_count }}
+      <div class="flex gap-3 items-center">
+        <div>在線人數: {{ onlineUsers.online_users_count }} 人:</div>
+        <div
+          v-for="onlineUser in onlineUsers.online_users"
+          :key="onlineUser.id"
+          class=""
+        >
+          {{ onlineUser.name }}
+        </div>
       </div>
       <div
         v-if="!roomInfo.id"

@@ -14,6 +14,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@rails/actioncable": "^7.1.3-4",
     "@vueuse/core": "^10.1.2",
     "axios": "^1.3.5",
     "normalize.css": "^8.0.1",

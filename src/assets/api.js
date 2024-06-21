@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { ref } from 'vue'
+const errorMessage = ref({})
 const token = ref(localStorage.getItem('token') || 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQsImV4cCI6MTcxODc2OTMyNH0.4foZU9X0ztp4m8UVeXXUSi4h0_RrFH1l8oRVFV_EF6k')
 const axiosInstance = axios.create({
   baseURL: 'https://spt-games-split.zeabur.app/',
@@ -8,7 +9,18 @@ const axiosInstance = axios.create({
     'Authorization': 'Bearer ' + token.value
   },
 })
+axiosInstance.interceptors.response.use(response => {
+  return response
+}, error => {
+  errorMessage.value = error.response.data
+  if (error.response.status === 401) {
+    localStorage.removeItem('token')
+    token.value = ''
+  }
+  return Promise.reject(error)
+})
 const api = {
+  errorMessage,
   login: async (name, password) => {
     try {
       const response = await axiosInstance.post('/api/v1/users', {
@@ -61,6 +73,9 @@ const api = {
       return response.data
     }
     catch (error) {
+      if (error.response.status === 304) {
+        return { status: 304 }
+      }
       throw error.response.data
     }
   },

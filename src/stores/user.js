@@ -20,8 +20,9 @@ export const useUserStore = defineStore('useUserStore', () => {
       nickname
     }
     return api.setUserPreferences(params).then(res => {
-      getUserPreferences()
-      return res
+      if (res.status === 304) return
+      userUserPreferences.value.nickname = res.nickname
+      return 
     })
   }
   const user = computed(() => {

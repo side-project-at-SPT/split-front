@@ -5,12 +5,13 @@ import { RouterLink, useRouter } from 'vue-router'
 import { useRoomStore } from '../stores/room'
 import { useUserStore } from '../stores/user'
 import { createConsumer } from '@rails/actioncable'
+import CreateRoomModal from '@/components/CreateRoomModal.vue'
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const { rooms, roomInfo } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 const {
-  getRooms, createRoom, joinRoom, leaveRoom, closeRoom, getRoomInfo, clearRoomInfo 
+  getRooms, joinRoom, leaveRoom, closeRoom, getRoomInfo, clearRoomInfo 
 } = roomStore
 const { getUsers, getUserInfo, setNickname } = userStore
 const router = useRouter()
@@ -18,19 +19,11 @@ const isLogin = ref(false)
 const userName = ref('')
 const password = ref('')
 const roomId = ref('')
-const roomName = ref('')
 const errorMessage = ref('')
-// const onlineUsers = ref({ online_users: [], online_users_count: 0 })
 const showCreateRoomModal = ref(false)
 const showChangeNicknameModal = ref(false)
 const newNickname = ref('')
 let token = localStorage.getItem('token')
-const handleCreateRoom = async () => {
-  const data = await createRoom(roomName.value)
-  showCreateRoomModal.value = false
-  roomName.value = ''
-  return data
-}
 
 const login = async () => {
   const data = await api.login(userName.value, password.value)
@@ -102,11 +95,14 @@ const doAfterLogin = () => {
       if (data.event === 'user preferences updated') {
         getUsers()
       }
+      if (data.event === 'create_room') {
+        getRooms()
+      }
       console.log(data, 'data')
     }
   })
 }
-const handleCreateNickname = () => {
+const handleSetNickname = () => {
   setNickname(newNickname.value).then(() => {
     showChangeNicknameModal.value = false
     newNickname.value = ''
@@ -122,37 +118,7 @@ onMounted(() => {
 
 <template>
   <div class="relative">
-    <div
-      v-if="showCreateRoomModal"
-      class="absolute w-svw h-dvh bg-black bg-opacity-50 flex items-center justify-center z-10"
-    >
-      <div class="hexagon-ice w-[300px] h-[300px] flex flex-col items-center justify-center">
-        <div class="text-center text-white text-2xl font-semibold">
-          新增房間
-        </div>
-        <div class="mt-5">
-          <input
-            v-model="roomName"
-            class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-2"
-            placeholder="房間名稱"
-          >
-        </div>
-        <div class="mt-5 flex gap-2">
-          <button
-            class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            @click="handleCreateRoom"
-          >
-            新增
-          </button>
-          <button
-            class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            @click="showCreateRoomModal = false"
-          >
-            取消
-          </button>
-        </div>
-      </div>
-    </div>
+    <CreateRoomModal v-model="showCreateRoomModal" />
     <div
       v-if="showChangeNicknameModal"
       class="absolute w-svw h-dvh bg-black bg-opacity-50 flex items-center justify-center z-10"
@@ -171,7 +137,7 @@ onMounted(() => {
         <div class="mt-5 flex gap-2">
           <button
             class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            @click="handleCreateNickname"
+            @click="handleSetNickname"
           >
             修改
           </button>

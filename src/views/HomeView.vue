@@ -11,7 +11,7 @@ const userStore = useUserStore()
 const { rooms, roomInfo } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 const {
-  getRooms, joinRoom, leaveRoom, closeRoom, getRoomInfo, clearRoomInfo 
+  getRooms, updateRoomPlayers, closeRoom, clearRoomInfo, joinRoom
 } = roomStore
 const { getUsers, getUserInfo, setNickname } = userStore
 const router = useRouter()
@@ -33,21 +33,31 @@ const login = async () => {
   }
   return
 }
-
+let roomChannel = null
 const handleSeeRoom = async (room) => {
-  getRoomInfo(room.id).catch((error) => {
-    showErrorMessage(error.error)
+  joinRoom(room)
+  roomChannel = consumer.subscriptions.create({ channel: 'RoomChannel', room_id: room.id }, {
+    connected () {
+      console.log('connected room channel', room.id)
+    },
+    disconnected () {
+      console.log('disconnected room channel', room.id)
+    },
+    received (data) {
+      if (data.event === 'room updated') {
+        getRoomInfo(room.id)
+      }
+      console.log(data, 'data room channel', room.id)
+    }
   })
 }
-const handleJoinRoom = async () => {
-  joinRoom().catch((error) => {
-    showErrorMessage(error.error)
-  })
+const handleReady = async () => {
+  console.log('ready')
+  roomChannel.send({ action: 'ready' }) 
 }
 const handleLeaveRoom = async () => {
-  leaveRoom().catch((error) => {
-    showErrorMessage(error.error)
-  })
+  consumer.subscriptions.remove(roomChannel)
+  clearRoomInfo()
 }
 const handleCloseRoom = async () => {
   closeRoom().catch((error) => {
@@ -97,6 +107,9 @@ const doAfterLogin = () => {
       }
       if (data.event === 'create_room') {
         getRooms()
+      }
+      if (data.event === 'join_room' || data.event === 'leave_room'){
+        updateRoomPlayers(data.room)
       }
       console.log(data, 'data')
     }
@@ -270,6 +283,13 @@ onMounted(() => {
             {{ roomInfo.name }}
           </div>
           <div
+            v-for="player in roomInfo.players"
+            :key="player.id"
+            class="text-sm"
+          >
+            {{ player.nickname }}
+          </div>
+          <div
             class="hexagon-ice w-[70px] h-[70px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
             @click="handleStartGame"
           >
@@ -278,9 +298,9 @@ onMounted(() => {
           <div class="flex items-center justify-center gap-1">
             <div
               class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              @click="handleJoinRoom"
+              @click="handleReady"
             >
-              加入
+              準備
             </div>
             <div
               class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"

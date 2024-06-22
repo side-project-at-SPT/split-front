@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '@/assets/api'
 export const useRoomStore = defineStore('useRoomStore', () => {
   const rooms = ref([])
-  const roomInfo = ref({})
+  const joinedRoomId = ref('')
+  const roomInfo = computed(() => {
+    return rooms.value.find((room) => room.id === joinedRoomId.value) || {}
+  })
   const getRooms = () => {
     return api.getRooms().then((res) => {
       rooms.value = res.rooms
@@ -14,13 +17,20 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     getRooms()
     return data
   }
-  const getRoomInfo = (roomId) => {
-    return api.getRoomInfo(roomId).then((res) => {
-      roomInfo.value = res.room
-    })
+  // const getRoomInfo = (roomId) => {
+  //   return api.getRoomInfo(roomId).then((res) => {
+  //     roomInfo.value = res.room
+  //   })
+  // }
+  const updateRoomPlayers = (roomData) => {
+    const room = rooms.value.find((room) => room.id === roomData.id)
+    if (room) {
+      room.players = roomData.players
+    }
   }
-  const joinRoom = () => {
-    return api.joinRoom(roomInfo.value.id)
+  const joinRoom = (room) => {
+    joinedRoomId.value = room.id
+    // return api.joinRoom(roomInfo.value.id)
   }
   const leaveRoom = () => {
     return api.leaveRoom(roomInfo.value.id)
@@ -31,15 +41,15 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     })
   }
   const clearRoomInfo = () => {
-    getRooms()
-    roomInfo.value = {}
+    joinedRoomId.value = ''
   }
   return {
     rooms,
     roomInfo,
     getRooms,
-    getRoomInfo,
+    // getRoomInfo,
     joinRoom,
+    updateRoomPlayers,
     leaveRoom,
     closeRoom,
     createRoom,

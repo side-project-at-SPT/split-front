@@ -132,7 +132,6 @@ module.exports = {
         html: {
           void: 'never',
           normal: 'never',
-          component: 'never'
         },
         svg: 'never',
         math: 'never'

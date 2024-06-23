@@ -6,14 +6,20 @@ import { useRoomStore } from '../stores/room'
 import { useUserStore } from '../stores/user'
 import { createConsumer } from '@rails/actioncable'
 import CreateRoomModal from '@/components/CreateRoomModal.vue'
+import ChangeNicknameModal from '../components/ChangeNicknameModal.vue'
+import Tux from '@/assets/images/tux.png'
+import Gunter from '@/assets/images/gunter.png'
+import Sin from '@/assets/images/sin.png'
+import Abc from '@/assets/images/abc.png'
+const penguins = [ Tux, Gunter, Sin, Abc ]
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const { rooms, roomInfo } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 const {
-  getRooms, updateRoomPlayers, closeRoom, clearRoomInfo, joinRoom
+  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom
 } = roomStore
-const { getUsers, getUserInfo, setNickname } = userStore
+const { getUsers, getUserInfo } = userStore
 const router = useRouter()
 const isLogin = ref(false)
 const userName = ref('')
@@ -59,14 +65,14 @@ const handleLeaveRoom = async () => {
   consumer.subscriptions.remove(roomChannel)
   clearRoomInfo()
 }
-const handleCloseRoom = async () => {
-  closeRoom().catch((error) => {
-    showErrorMessage(error.error)
-  })
-}
-const handleBackRooms = async () => {
-  clearRoomInfo()
-}
+// const handleCloseRoom = async () => {
+//   closeRoom().catch((error) => {
+//     showErrorMessage(error.error)
+//   })
+// }
+// const handleBackRooms = async () => {
+//   clearRoomInfo()
+// }
 const handleStartGame = async () => {
   try {
     const data = await api.startGame(roomId.value)
@@ -115,12 +121,7 @@ const doAfterLogin = () => {
     }
   })
 }
-const handleSetNickname = () => {
-  setNickname(newNickname.value).then(() => {
-    showChangeNicknameModal.value = false
-    newNickname.value = ''
-  })
-}
+
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -132,37 +133,7 @@ onMounted(() => {
 <template>
   <div class="relative">
     <CreateRoomModal v-model="showCreateRoomModal" />
-    <div
-      v-if="showChangeNicknameModal"
-      class="absolute w-svw h-dvh bg-black bg-opacity-50 flex items-center justify-center z-10"
-    >
-      <div class="hexagon-ice w-[300px] h-[300px] flex flex-col items-center justify-center">
-        <div class="text-center text-white text-2xl font-semibold">
-          修改暱稱
-        </div>
-        <div class="mt-5">
-          <input
-            v-model="newNickname"
-            class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-2"
-            placeholder="暱稱"
-          >
-        </div>
-        <div class="mt-5 flex gap-2">
-          <button
-            class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            @click="handleSetNickname"
-          >
-            修改
-          </button>
-          <button
-            class="hexagon-div flex  justify-center rounded-md bg-blue-300 h-[50px] w-[50px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            @click="showChangeNicknameModal = false, newNickname = ''"
-          >
-            取消
-          </button>
-        </div>
-      </div>
-    </div>
+    <ChangeNicknameModal v-model="showChangeNicknameModal" />
     <div class="flex gap-2">
       <RouterLink to="/game">
         Game
@@ -260,11 +231,19 @@ onMounted(() => {
             {{ room.name }}
           </div>
           <div
-            v-for="player in room.players"
+            v-for="(player, index) in room.players"
             :key="player.id"
-            class="text-sm"
+            class="text-sm flex items-center"
           >
-            {{ player.nickname }}
+            <div class="h-5 w-5">
+              <img
+                :src="penguins[index]"
+                class="w-full h-full object-contain"
+              >
+            </div>
+            <div>
+              {{ player.nickname }}
+            </div> 
           </div>
         </div>
         <div
@@ -278,24 +257,33 @@ onMounted(() => {
         v-else
         class="flex justify-center"
       >
-        <div class="flex flex-col justify-center items-center hexagon-ice w-[300px] h-[300px]">
+        <div class="flex flex-col gap-2 justify-center items-center hexagon-ice w-[300px] h-[300px]">
           <div class="p-2">
             {{ roomInfo.name }}
           </div>
-          <div
-            v-for="player in roomInfo.players"
-            :key="player.id"
-            class="text-sm"
-          >
-            {{ player.nickname }}
+          <div class="grid grid-cols-2 gap-2 items-center justify-center">
+            <div
+              v-for="(player, index) in roomInfo.players"
+              :key="player.id"
+              class="text-sm flex items-center justify-center gap-1"
+            >
+              <div class="h-8 w-8">
+                <img
+                  :src="penguins[index % 4]"
+                  class="w-full h-full object-contain"
+                >
+              </div>
+              <div>{{ player.nickname }}</div>
+            </div>
           </div>
-          <div
-            class="hexagon-ice w-[70px] h-[70px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-            @click="handleStartGame"
-          >
-            開始遊戲
-          </div>
+
           <div class="flex items-center justify-center gap-1">
+            <div
+              class="hexagon-ice w-[70px] h-[70px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+              @click="handleStartGame"
+            >
+              開始遊戲
+            </div>
             <div
               class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleReady"
@@ -308,7 +296,7 @@ onMounted(() => {
             >
               離開
             </div>
-            <div
+            <!-- <div
               class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleCloseRoom"
             >
@@ -319,7 +307,7 @@ onMounted(() => {
               @click="handleBackRooms"
             >
               返回
-            </div>
+            </div> -->
           </div>
         </div>
       </div>

@@ -17,7 +17,7 @@ const userStore = useUserStore()
 const { rooms, roomInfo } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 const {
-  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom
+  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, closeRoom, updateRoomData
 } = roomStore
 const { getUsers, getUserInfo } = userStore
 const router = useRouter()
@@ -53,6 +53,17 @@ const handleSeeRoom = async (room) => {
       if (data.event === 'room updated') {
         getRoomInfo(room.id)
       }
+      else if (data.event === 'game_start_in_seconds') {
+        const roomData = {
+          id: room.id,
+          gameStartInSeconds: data.seconds,
+          status: 'starting'
+        }
+        updateRoomData(roomData)
+      }
+      else if (data.event === 'game_started') {
+        router.push(`/game/?roomId=${ room.id }`)
+      }
       console.log(data, 'data room channel', room.id)
     }
   })
@@ -65,11 +76,11 @@ const handleLeaveRoom = async () => {
   consumer.subscriptions.remove(roomChannel)
   clearRoomInfo()
 }
-// const handleCloseRoom = async () => {
-//   closeRoom().catch((error) => {
-//     showErrorMessage(error.error)
-//   })
-// }
+const handleCloseRoom = async () => {
+  closeRoom().catch((error) => {
+    showErrorMessage(error.error)
+  })
+}
 // const handleBackRooms = async () => {
 //   clearRoomInfo()
 // }
@@ -122,6 +133,11 @@ const doAfterLogin = () => {
   })
 }
 
+const roomStatus = {
+  'waiting': '等待中',
+  'starting': '即將開始',
+  'playing': '進行中',
+}
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -229,7 +245,11 @@ onMounted(() => {
         >
           <div class="py-2">
             {{ room.name }}
+            <div class="text-sm">
+              {{ roomStatus[room.status] }}
+            </div>
           </div>
+
           <div
             v-for="(player, index) in room.players"
             :key="player.id"
@@ -260,6 +280,12 @@ onMounted(() => {
         <div class="flex flex-col gap-2 justify-center items-center hexagon-ice w-[300px] h-[300px]">
           <div class="p-2">
             {{ roomInfo.name }}
+            <div
+              v-if="roomInfo.status === 'starting'"
+              class="text-red"
+            >
+              {{ roomInfo.gameStartInSeconds }}秒後即將開始
+            </div>
           </div>
           <div class="grid grid-cols-2 gap-2 items-center justify-center">
             <div
@@ -296,12 +322,13 @@ onMounted(() => {
             >
               離開
             </div>
-            <!-- <div
+            <div
               class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleCloseRoom"
             >
               關閉
             </div>
+            <!-- 
             <div
               class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleBackRooms"

@@ -28,6 +28,13 @@ export const useRoomStore = defineStore('useRoomStore', () => {
       room.players = roomData.players
     }
   }
+  const updateRoomData = (roomData) => {
+    const room = rooms.value.find((room) => room.id === roomData.id)
+    if (room) {
+      room.status = roomData.status
+      room.gameStartInSeconds = roomData.gameStartInSeconds
+    }
+  }
   const joinRoom = (room) => {
     joinedRoomId.value = room.id
     // return api.joinRoom(roomInfo.value.id)
@@ -48,6 +55,7 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     roomInfo,
     getRooms,
     // getRoomInfo,
+    updateRoomData,
     joinRoom,
     updateRoomPlayers,
     leaveRoom,

@@ -1,14 +1,124 @@
 <script setup>
-import {
-  ref, computed 
-} from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+console.log(route.query.roomId)
 const pastures = ref([])
 // initialize pastures
-for (let x = 0; x < 5; x++)
-  for (let y = 0; y < 5; y++)
-    pastures.value.push({
-      x, y, amount: 0, selected: false
-    })
+// for (let x = 0; x < 5; x++)
+//   for (let y = 0; y < 5; y++)
+//     pastures.value.push({
+//       x, y, amount: 0, selected: false
+//     })
+onMounted(() => {
+  const users = ref(Number(route.query.users || 2))
+  console.log(users.value)
+  const pastureAmount = users.value * 16
+  initPastures(pastureAmount)
+  for (let i = 0; i < users.value; i++){
+    let pasture = getAEdgePasture()
+    while (pasture.owner){
+      pasture = getAEdgePasture()
+    }
+    pasture.amount = 16
+    pasture.owner = players.value[i]
+  }
+})
+const initPastures = (pastureAmount) => {
+  for (let i = 0; i < pastureAmount; i++) {
+    if (pastures.value.length === 0){
+      addPasture({ x: 0, y: 0, isEdge: true })
+      continue
+    }
+    setEdgePasture()
+    checkAllIsEdge()
+  }
+  const topX = Math.min(...pastures.value.map(pasture => pasture.x))
+  const topY = Math.min(...pastures.value.map(pasture => pasture.y))
+  console.log(topX, topY)
+  pastures.value.forEach(pasture => {
+    pasture.x -= topX
+    pasture.y -= topY
+  })
+}
+const setEdgePasture = () => {
+  const edgePasture = getAEdgePasture()
+  if (!edgePasture){
+    console.log(pastures.value)
+    return
+  }
+  const directions = [
+    {
+      x: 1, y: 0 
+    },
+    {
+      x: 1, y: -1 
+    },
+    {
+      x: 0, y: -1 
+    },
+    {
+      x: -1, y: 0 
+    },
+    {
+      x: -1, y: 1 
+    },
+    {
+      x: 0, y: 1 
+    } ]
+  const randomIndex = Math.floor(Math.random() * directions.length)
+  for (let i = 0; i < directions.length; i++){
+    const x = edgePasture.x + directions[(randomIndex + i) % directions.length].x
+    const y = edgePasture.y + directions[(randomIndex + i) % directions.length].y
+    if (!pastures.value.find(pasture => pasture.x === x && pasture.y === y)){
+      addPasture({ x, y })
+      break
+    }
+  }
+}
+const checkAllIsEdge = () => {
+  const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
+  edgePastures.forEach(pasture => {
+    pasture.isEdge = checkIsEdge({ x: pasture.x, y: pasture.y })
+  })
+}
+const addPasture = ({ x, y }) => {
+  const isEdge = checkIsEdge({ x, y })
+  pastures.value.push({
+    x, y, amount: 0, selected: false, isAllowTarget: false, isBlocked: false, isEdge
+  })
+}
+const checkIsEdge = ({ x, y }) => {
+  const directions = [
+    {
+      x: 1, y: 0 
+    },
+    {
+      x: 1, y: -1 
+    },
+    {
+      x: 0, y: -1 
+    },
+    {
+      x: -1, y: 0 
+    },
+    {
+      x: -1, y: 1 
+    },
+    {
+      x: 0, y: 1 
+    } ]
+  for (let i = 0; i < directions.length; i++){
+    const target = pastures.value.find(pasture => pasture.x === x + directions[i].x && pasture.y === y + directions[i].y)
+    if (!target) return true
+  }
+  return false
+}
+const getAEdgePasture = () => {
+  const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
+  const randomIndex = Math.floor(Math.random() * edgePastures.length)
+  return edgePastures[randomIndex]
+}
 const players = ref([ {
   name: 'Tux', color: '#ae0000', itemStyle: 'tux', isEnd: false
 }, {
@@ -18,14 +128,15 @@ const players = ref([ {
 }, {
   name: 'sin', color: '#d38021', itemStyle: 'sin', isEnd: false
 } ])
-pastures.value[0].amount = 16
-pastures.value[0].owner = players.value[0]
-pastures.value[20].amount = 16
-pastures.value[20].owner = players.value[2]
-pastures.value[4].amount = 16
-pastures.value[4].owner = players.value[3]
-pastures.value[pastures.value.length - 1].amount = 16
-pastures.value[pastures.value.length - 1].owner = players.value[1]
+
+// pastures.value[0].amount = 16
+// pastures.value[0].owner = players.value[0]
+// pastures.value[20].amount = 16
+// pastures.value[20].owner = players.value[2]
+// pastures.value[4].amount = 16
+// pastures.value[4].owner = players.value[3]
+// pastures.value[pastures.value.length - 1].amount = 16
+// pastures.value[pastures.value.length - 1].owner = players.value[1]
 //
 const currentPlayerIndex = ref(0)
 const currentPlayer = computed(() => players.value[currentPlayerIndex.value])
@@ -296,7 +407,10 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       <!-- <div>
         {{ `${pasture.x},${pasture.y}` }}
       </div> -->
-      <div :style="{ color: pasture.owner?.color }">
+      <div
+        v-if="pasture.owner"
+        :style="{ color: pasture.owner?.color }"
+      >
         {{ pasture.amount }}
       </div>
       <div

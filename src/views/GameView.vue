@@ -1,28 +1,86 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
+import { usePublicStore } from '../stores/public'
+const publicStore = usePublicStore()
+const { consumer } = toRefs(publicStore)
 const route = useRoute()
 console.log(route.query.roomId)
 const pastures = ref([])
+const players = ref([ {
+  name: 'Tux', color: '#ae0000', itemStyle: 'tux', isEnd: false, id: 1, nickname: 'Tux'
+}, {
+  name: '阿鵝', color: '#2563eb', itemStyle: 'gunter', isEnd: false, id: 2, nickname: '阿鵝'
+}, {
+  name: 'abc', color: '#d321a9', itemStyle: 'abc', isEnd: false, id: 3, nickname: 'abc'
+}, {
+  name: 'sin', color: '#d38021', itemStyle: 'sin', isEnd: false, id: 4, nickname: 'sin'
+} ])
 // initialize pastures
 // for (let x = 0; x < 5; x++)
 //   for (let y = 0; y < 5; y++)
 //     pastures.value.push({
 //       x, y, amount: 0, selected: false
 //     })
+// let gameChannel = null
 onMounted(() => {
   const users = ref(Number(route.query.users || 2))
-  console.log(users.value)
-  const pastureAmount = users.value * 16
-  initPastures(pastureAmount)
-  for (let i = 0; i < users.value; i++){
-    let pasture = getAEdgePasture()
-    while (pasture.owner){
-      pasture = getAEdgePasture()
+  const gameId = ref(route.query.game_id)
+  console.log(users.value, gameId.value)
+  gameChannel = consumer.value.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
+    connected () {
+      console.log('connected game channel', gameId.value)
+    },
+    disconnected () {
+      console.log('disconnected game channel', gameId.value)
+    },
+    received (data) {
+      if (data.event === 'player_joined_game') {
+        players.value = data.player_state
+        console.log(data, 'game player_joined_game')
+        if (pastures.value.length === 0){
+          const pastureAmount = players.value.length * 16
+          initPastures(pastureAmount)
+          console.log(players.value, 'players') 
+          for (let i = 0; i < players.value.length; i++){
+            let pasture = getAEdgePasture()
+            while (pasture.owner){
+              pasture = getAEdgePasture()
+            }
+            pasture.amount = 16
+            pasture.owner = players.value[i]
+          }
+        }
+      }
+      // if (data.event === 'game updated') {
+      //   getgameInfo(gameId)
+      // }
+      // else if (data.event === 'game_start_in_seconds') {
+      //   const gameData = {
+      //     id: gameId,
+      //     gameStartInSeconds: data.seconds,
+      //     status: 'starting'
+      //   }
+      //   updategameData(gameData)
+      // }
+      // else if (data.event === 'game_started') {
+      //   const gameId = data.game_id
+      //   router.push(`/game/?game_id=${ gameId }`)
+      // }
+      console.log(data, 'data game channel', gameId.value)
     }
-    pasture.amount = 16
-    pasture.owner = players.value[i]
-  }
+  })
+  // console.log(users.value)
+  // const pastureAmount = users.value * 16
+  // initPastures(pastureAmount)
+  // for (let i = 0; i < users.value; i++){
+  //   let pasture = getAEdgePasture()
+  //   while (pasture.owner){
+  //     pasture = getAEdgePasture()
+  //   }
+  //   pasture.amount = 16
+  //   pasture.owner = players.value[i]
+  // }
 })
 const initPastures = (pastureAmount) => {
   for (let i = 0; i < pastureAmount; i++) {
@@ -119,15 +177,6 @@ const getAEdgePasture = () => {
   const randomIndex = Math.floor(Math.random() * edgePastures.length)
   return edgePastures[randomIndex]
 }
-const players = ref([ {
-  name: 'Tux', color: '#ae0000', itemStyle: 'tux', isEnd: false
-}, {
-  name: '阿鵝', color: '#2563eb', itemStyle: 'gunter', isEnd: false
-}, {
-  name: 'abc', color: '#d321a9', itemStyle: 'abc', isEnd: false
-}, {
-  name: 'sin', color: '#d38021', itemStyle: 'sin', isEnd: false
-} ])
 
 // pastures.value[0].amount = 16
 // pastures.value[0].owner = players.value[0]
@@ -146,7 +195,8 @@ let originAmount = 0
 let targetAmount = 0
 const handleClick = (pasture) => {
   if (!originPasure.value) {
-    if (pasture.owner?.name !== currentPlayer.value.name) return
+    console.log(pasture, currentPlayer.value)
+    if (pasture.owner?.id !== currentPlayer.value.id) return
     if (pasture.amount < 2) return
     originPasure.value = pasture
     originAmount = pasture.amount
@@ -274,7 +324,7 @@ const nextPlayer = () => {
   }
   currentPlayerIndex.value = (currentPlayerIndex.value + 1) % players.value.length
   // 判斷還可不可以移動
-  const ownerPastures = pastures.value.filter(pasture => pasture.owner?.name === currentPlayer.value.name)
+  const ownerPastures = pastures.value.filter(pasture => pasture.owner?.id === currentPlayer.value.id)
   ownerPastures.forEach(pasture => {
     if (pasture.isBlocked) return
     if (pasture.amount < 2) pasture.isBlocked = true
@@ -326,8 +376,8 @@ const nextPlayer = () => {
 }
 const finalPlayers = computed(() => players.value.map(player => {
   return {
-    name: player.name,
-    score: pastures.value.filter(pasture => pasture.owner?.name === player.name).length
+    name: player.nickname,
+    score: pastures.value.filter(pasture => pasture.owner?.id === player.id).length
   }
 }).sort((a, b) => b.score - a.score))
 const handleCancel = () => {
@@ -358,7 +408,7 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
         class="p-3 flex items-center"
         :style="{ background: currentPlayer.color }"
       >
-        {{ currentPlayer.name }}
+        {{ currentPlayer.nickname }}
         <div
           :class="currentPlayer.itemStyle"
           class="h-6 w-6"
@@ -407,6 +457,9 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       <!-- <div>
         {{ `${pasture.x},${pasture.y}` }}
       </div> -->
+      <div>
+        ({{ pasture.x }},{{ pasture.y }})
+      </div>
       <div
         v-if="pasture.owner"
         :style="{ color: pasture.owner?.color }"

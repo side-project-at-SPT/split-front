@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, ref, toRefs } from 'vue'
+import { computed, onMounted, ref, toRefs } from 'vue'
 import api from '@/assets/api'
 import { RouterLink, useRouter } from 'vue-router'
 import { useRoomStore } from '../stores/room'
 import { useUserStore } from '../stores/user'
-import { createConsumer } from '@rails/actioncable'
+import { usePublicStore } from '../stores/public'
+// import { createConsumer } from '@rails/actioncable'
 import CreateRoomModal from '@/components/CreateRoomModal.vue'
 import ChangeNicknameModal from '../components/ChangeNicknameModal.vue'
 import Tux from '@/assets/images/tux.png'
@@ -14,21 +15,27 @@ import Abc from '@/assets/images/abc.png'
 const penguins = [ Tux, Gunter, Sin, Abc ]
 const roomStore = useRoomStore()
 const userStore = useUserStore()
+const publicStore = usePublicStore()
 const { rooms, roomInfo } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
+const { consumer } = toRefs(publicStore)
 const {
   getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, closeRoom, updateRoomData
 } = roomStore
 const { getUsers, getUserInfo } = userStore
+const { initConnection } = publicStore
 const router = useRouter()
 const isLogin = ref(false)
 const userName = ref('')
 const password = ref('')
-const roomId = ref('')
+// const roomId = ref('')
 const errorMessage = ref('')
 const showCreateRoomModal = ref(false)
 const showChangeNicknameModal = ref(false)
 const newNickname = ref('')
+const roomMe = computed(() => {
+  return roomInfo.value.players.find((player) => player.id === user.value.id) || {}
+})
 let token = localStorage.getItem('token')
 
 const login = async () => {
@@ -42,7 +49,7 @@ const login = async () => {
 let roomChannel = null
 const handleSeeRoom = async (room) => {
   joinRoom(room)
-  roomChannel = consumer.subscriptions.create({ channel: 'RoomChannel', room_id: room.id }, {
+  roomChannel = consumer.value.subscriptions.create({ channel: 'RoomChannel', room_id: room.id }, {
     connected () {
       console.log('connected room channel', room.id)
     },
@@ -61,8 +68,17 @@ const handleSeeRoom = async (room) => {
         }
         updateRoomData(roomData)
       }
+      else if (data.event === 'ready' || data.event === 'cancel_ready') {
+        roomInfo.value.players.forEach((player) => {
+          if (player.id === data.player.id
+          ) {
+            player.is_ready = data.player.is_ready
+          }
+        })
+      }
       else if (data.event === 'game_started') {
-        router.push(`/game/?roomId=${ room.id }`)
+        const gameId = data.game_id
+        router.push(`/game/?game_id=${ gameId }`)
       }
       console.log(data, 'data room channel', room.id)
     }
@@ -72,8 +88,12 @@ const handleReady = async () => {
   console.log('ready')
   roomChannel.send({ action: 'ready' }) 
 }
+const handleCancelReady = async () => {
+  console.log('cancel ready')
+  roomChannel.send({ action: 'cancel_ready' }) 
+}
 const handleLeaveRoom = async () => {
-  consumer.subscriptions.remove(roomChannel)
+  consumer.value.subscriptions.remove(roomChannel)
   clearRoomInfo()
 }
 const handleCloseRoom = async () => {
@@ -84,16 +104,16 @@ const handleCloseRoom = async () => {
 // const handleBackRooms = async () => {
 //   clearRoomInfo()
 // }
-const handleStartGame = async () => {
-  try {
-    const data = await api.startGame(roomId.value)
-    router.push(`/game/?roomId=${ roomId.value }`)
-    return data
-  }
-  catch (error) {
-    showErrorMessage(error.error)
-  }
-}
+// const handleStartGame = async () => {
+//   try {
+//     const data = await api.startGame(roomId.value)
+//     router.push(`/game/?roomId=${ roomId.value }`)
+//     return data
+//   }
+//   catch (error) {
+//     showErrorMessage(error.error)
+//   }
+// }
 const showErrorMessage = (message) => {
   errorMessage.value = message
   setTimeout(() => {
@@ -103,14 +123,15 @@ const showErrorMessage = (message) => {
 const openCreateRoomModal = async () => {
   showCreateRoomModal.value = true
 }
-let consumer = null
+// let consumer = null
 const doAfterLogin = () => {
   isLogin.value = true
   getRooms()
   getUserInfo()
-  const socketUrl = `wss://spt-games-split.zeabur.app/cable?token=${ token }`
-  consumer = createConsumer(socketUrl)
-  consumer.subscriptions.create({ channel: 'LobbyChannel' }, {
+  initConnection(token)
+  // const socketUrl = `wss://spt-games-split.zeabur.app/cable?token=${ token }`
+  // consumer = createConsumer(socketUrl)
+  consumer.value.subscriptions.create({ channel: 'LobbyChannel' }, {
     connected () {
       getUsers()
       console.log('connected')
@@ -277,8 +298,8 @@ onMounted(() => {
         v-else
         class="flex justify-center"
       >
-        <div class="flex flex-col gap-2 justify-center items-center hexagon-ice w-[300px] h-[300px]">
-          <div class="p-2">
+        <div class="flex flex-col gap-2 justify-center items-center hexagon-ice w-[360px] h-[360px]">
+          <div class="p-4 text-2xl">
             {{ roomInfo.name }}
             <div
               v-if="roomInfo.status === 'starting'"
@@ -293,6 +314,15 @@ onMounted(() => {
               :key="player.id"
               class="text-sm flex items-center justify-center gap-1"
             >
+              <div
+                v-if="player.is_ready"
+                class="text-red"
+              >
+                <img
+                  src="/src/assets/vue.svg"
+                  class="w-6 h-6 object-contain"
+                >
+              </div>
               <div class="h-8 w-8">
                 <img
                   :src="penguins[index % 4]"
@@ -304,26 +334,34 @@ onMounted(() => {
           </div>
 
           <div class="flex items-center justify-center gap-1">
-            <div
+            <!-- <div
               class="hexagon-ice w-[70px] h-[70px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleStartGame"
             >
               開始遊戲
-            </div>
+            </div> -->
             <div
-              class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+              v-if="!roomMe.is_ready"
+              class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleReady"
             >
               準備
             </div>
             <div
-              class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+              v-else
+              class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+              @click="handleCancelReady"
+            >
+              取消準備
+            </div>
+            <div
+              class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleLeaveRoom"
             >
               離開
             </div>
             <div
-              class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+              class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleCloseRoom"
             >
               關閉

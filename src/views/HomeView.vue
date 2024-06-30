@@ -13,6 +13,7 @@ import Gunter from '@/assets/images/gunter.png'
 import Sin from '@/assets/images/sin.png'
 import Abc from '@/assets/images/abc.png'
 const penguins = [ Tux, Gunter, Sin, Abc ]
+const roles = [ 'tux', 'gunter', 'sin', 'abc' ]
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const publicStore = usePublicStore()
@@ -68,6 +69,14 @@ const handleSeeRoom = async (room) => {
         }
         updateRoomData(roomData)
       }
+      else if (data.event === 'starting_game_is_cancelled'){
+        const roomData = {
+          id: room.id,
+          gameStartInSeconds: 5,
+          status: 'waiting'
+        }
+        updateRoomData(roomData)
+      }
       else if (data.event === 'ready' || data.event === 'cancel_ready') {
         roomInfo.value.players.forEach((player) => {
           if (player.id === data.player.id
@@ -75,6 +84,13 @@ const handleSeeRoom = async (room) => {
             player.is_ready = data.player.is_ready
           }
         })
+      }
+      else if (data.event === 'set_character'){
+        const roomData = {
+          id: room.id,
+          players: data.players
+        }
+        updateRoomPlayers(roomData)
       }
       else if (data.event === 'game_started') {
         const gameId = data.game_id
@@ -158,6 +174,9 @@ const roomStatus = {
   'waiting': '等待中',
   'starting': '即將開始',
   'playing': '進行中',
+}
+const handleChangeRole = (index) => {
+  roomChannel.send({ action: 'set_character', character: roles[index] }) 
 }
 onMounted(() => {
   const token = localStorage.getItem('token')
@@ -276,7 +295,19 @@ onMounted(() => {
             :key="player.id"
             class="text-sm flex items-center"
           >
-            <div class="h-5 w-5">
+            <div
+              v-if="roles.indexOf(player.character) != -1"
+              class="h-5 w-5"
+            >
+              <img
+                :src="penguins[roles.indexOf(player.character)]"
+                class="w-full h-full object-contain"
+              >
+            </div>
+            <div
+              v-else
+              class="h-5 w-5"
+            >
               <img
                 :src="penguins[index]"
                 class="w-full h-full object-contain"
@@ -323,7 +354,19 @@ onMounted(() => {
                   class="w-6 h-6 object-contain"
                 >
               </div>
-              <div class="h-8 w-8">
+              <div
+                v-if="roles.indexOf(player.character) != -1"
+                class="h-8 w-8"
+              >
+                <img
+                  :src="penguins[roles.indexOf(player.character)]"
+                  class="w-full h-full object-contain"
+                >
+              </div>
+              <div
+                v-else
+                class="h-8 w-8"
+              >
                 <img
                   :src="penguins[index % 4]"
                   class="w-full h-full object-contain"
@@ -332,7 +375,22 @@ onMounted(() => {
               <div>{{ player.nickname }}</div>
             </div>
           </div>
-
+          <div>
+            <div>選擇角色</div>
+            <div class="flex">
+              <div
+                v-for="index in 4"
+                :key="index"
+                class="h-8 w-8"
+                @click="handleChangeRole(index - 1)"
+              >
+                <img
+                  :src="penguins[index - 1]"
+                  class="w-6 h-6 object-contain"
+                >
+              </div>
+            </div>
+          </div>
           <div class="flex items-center justify-center gap-1">
             <!-- <div
               class="hexagon-ice w-[70px] h-[70px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"

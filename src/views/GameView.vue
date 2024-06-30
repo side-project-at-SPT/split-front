@@ -8,13 +8,13 @@ const route = useRoute()
 console.log(route.query.roomId)
 const pastures = ref([])
 const players = ref([ {
-  name: 'Tux', color: '#ae0000', itemStyle: 'tux', isEnd: false, id: 1, nickname: 'Tux'
+  name: 'Tux', color: '#ae0000', character: 'tux', isEnd: false, id: 1, nickname: 'Tux'
 }, {
-  name: '阿鵝', color: '#2563eb', itemStyle: 'gunter', isEnd: false, id: 2, nickname: '阿鵝'
+  name: '阿鵝', color: '#2563eb', character: 'gunter', isEnd: false, id: 2, nickname: '阿鵝'
 }, {
-  name: 'abc', color: '#d321a9', itemStyle: 'abc', isEnd: false, id: 3, nickname: 'abc'
+  name: 'abc', color: '#d321a9', character: 'abc', isEnd: false, id: 3, nickname: 'abc'
 }, {
-  name: 'sin', color: '#d38021', itemStyle: 'sin', isEnd: false, id: 4, nickname: 'sin'
+  name: 'sin', color: '#d38021', character: 'sin', isEnd: false, id: 4, nickname: 'sin'
 } ])
 // initialize pastures
 // for (let x = 0; x < 5; x++)
@@ -27,7 +27,8 @@ onMounted(() => {
   const users = ref(Number(route.query.users || 2))
   const gameId = ref(route.query.game_id)
   console.log(users.value, gameId.value)
-  gameChannel = consumer.value.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
+  // gameChannel = 
+  consumer.value.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
     connected () {
       console.log('connected game channel', gameId.value)
     },
@@ -225,7 +226,7 @@ const handleClick = (pasture) => {
       // targetPasure.value.amount++
       originPasure.value.amount--
       moveItem({
-        from: originPasure.value, to: targetPasure.value, itemStyle: originPasure.value.owner.itemStyle
+        from: originPasure.value, to: targetPasure.value, character: originPasure.value.owner.character
       })
     }
     return
@@ -235,13 +236,13 @@ const handleClick = (pasture) => {
       // originPasure.value.amount++
       targetPasure.value.amount--
       moveItem({
-        from: targetPasure.value, to: originPasure.value, itemStyle: originPasure.value.owner.itemStyle
+        from: targetPasure.value, to: originPasure.value, character: originPasure.value.owner.character
       })
     }
   }
 }
 const moveItem = ({
-  from, to, itemStyle
+  from, to, character
 }) => {
   // 在 pasture-table 新增一個羊
   const newDiv = document.createElement('div')
@@ -252,7 +253,7 @@ const moveItem = ({
   newDiv.style.height = '50px'
   // newDiv.style.backgroundColor = color
   newDiv.style.transition = 'left 0.5s, top 0.5s'
-  newDiv.className = itemStyle
+  newDiv.className = character
   document.querySelector('.pasture-table').appendChild(newDiv)
   setTimeout(() => {
     newDiv.style.left = `calc(${ to.x * 105 }px + ${ to.y * 105 }px * sin(30deg) + 25px)`
@@ -410,7 +411,7 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       >
         {{ currentPlayer.nickname }}
         <div
-          :class="currentPlayer.itemStyle"
+          :class="currentPlayer.character"
           class="h-6 w-6"
         ></div>
       </div>
@@ -468,7 +469,7 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       </div>
       <div
         v-if="pasture.amount"
-        :class="pasture.owner?.itemStyle"
+        :class="pasture.owner?.character"
         class="h-12 w-12"
       ></div>
     </div>

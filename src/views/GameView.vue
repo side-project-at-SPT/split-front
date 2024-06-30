@@ -2,10 +2,12 @@
 import { ref, computed, onMounted, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePublicStore } from '../stores/public'
+import api from '@/assets/api'
 const publicStore = usePublicStore()
 const { consumer } = toRefs(publicStore)
 const route = useRoute()
 console.log(route.query.roomId)
+const gameId = ref(route.query.game_id)
 const pastures = ref([])
 const players = ref([ {
   name: 'Tux', color: '#ae0000', character: 'tux', isEnd: false, id: 1, nickname: 'Tux'
@@ -16,6 +18,8 @@ const players = ref([ {
 }, {
   name: 'sin', color: '#d38021', character: 'sin', isEnd: false, id: 4, nickname: 'sin'
 } ])
+const gameStatus = ref(null)
+const initing = ref(false)
 // initialize pastures
 // for (let x = 0; x < 5; x++)
 //   for (let y = 0; y < 5; y++)
@@ -23,9 +27,14 @@ const players = ref([ {
 //       x, y, amount: 0, selected: false
 //     })
 // let gameChannel = null
+const getGameStatus = async () => {
+  const data = await api.getGameStatus(gameId.value)
+  gameStatus.value = data
+  return data
+}
 onMounted(() => {
   const users = ref(Number(route.query.users || 2))
-  const gameId = ref(route.query.game_id)
+  
   console.log(users.value, gameId.value)
   // gameChannel = 
   consumer.value.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
@@ -39,18 +48,25 @@ onMounted(() => {
       if (data.event === 'player_joined_game') {
         players.value = data.player_state
         console.log(data, 'game player_joined_game')
-        if (pastures.value.length === 0){
-          const pastureAmount = players.value.length * 16
-          initPastures(pastureAmount)
-          console.log(players.value, 'players') 
-          for (let i = 0; i < players.value.length; i++){
-            let pasture = getAEdgePasture()
-            while (pasture.owner){
-              pasture = getAEdgePasture()
+        if (pastures.value.length === 0 && !initing.value){
+          initing.value = true
+          // const pastureAmount = players.value.length * 16
+          // initPastures(pastureAmount)
+          // console.log(players.value, 'players')
+          getGameStatus().then(() => {
+            gameStatus.value.game.game_data.pastures.forEach(pasture => {
+              addPasture({ x: pasture.x, y: pasture.y })
+            })
+            // 放置初始位置
+            for (let i = 0; i < players.value.length; i++){
+              let pasture = getAEdgePasture()
+              while (pasture.owner){
+                pasture = getAEdgePasture()
+              }
+              pasture.amount = 16
+              pasture.owner = players.value[i]
             }
-            pasture.amount = 16
-            pasture.owner = players.value[i]
-          }
+          })
         }
       }
       // if (data.event === 'game updated') {
@@ -82,65 +98,66 @@ onMounted(() => {
   //   pasture.amount = 16
   //   pasture.owner = players.value[i]
   // }
+  getGameStatus()
 })
-const initPastures = (pastureAmount) => {
-  for (let i = 0; i < pastureAmount; i++) {
-    if (pastures.value.length === 0){
-      addPasture({ x: 0, y: 0, isEdge: true })
-      continue
-    }
-    setEdgePasture()
-    checkAllIsEdge()
-  }
-  const topX = Math.min(...pastures.value.map(pasture => pasture.x))
-  const topY = Math.min(...pastures.value.map(pasture => pasture.y))
-  console.log(topX, topY)
-  pastures.value.forEach(pasture => {
-    pasture.x -= topX
-    pasture.y -= topY
-  })
-}
-const setEdgePasture = () => {
-  const edgePasture = getAEdgePasture()
-  if (!edgePasture){
-    console.log(pastures.value)
-    return
-  }
-  const directions = [
-    {
-      x: 1, y: 0 
-    },
-    {
-      x: 1, y: -1 
-    },
-    {
-      x: 0, y: -1 
-    },
-    {
-      x: -1, y: 0 
-    },
-    {
-      x: -1, y: 1 
-    },
-    {
-      x: 0, y: 1 
-    } ]
-  const randomIndex = Math.floor(Math.random() * directions.length)
-  for (let i = 0; i < directions.length; i++){
-    const x = edgePasture.x + directions[(randomIndex + i) % directions.length].x
-    const y = edgePasture.y + directions[(randomIndex + i) % directions.length].y
-    if (!pastures.value.find(pasture => pasture.x === x && pasture.y === y)){
-      addPasture({ x, y })
-      break
-    }
-  }
-}
-const checkAllIsEdge = () => {
-  const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
-  edgePastures.forEach(pasture => {
-    pasture.isEdge = checkIsEdge({ x: pasture.x, y: pasture.y })
-  })
-}
+// const initPastures = (pastureAmount) => {
+//   for (let i = 0; i < pastureAmount; i++) {
+//     if (pastures.value.length === 0){
+//       addPasture({ x: 0, y: 0, isEdge: true })
+//       continue
+//     }
+//     setEdgePasture()
+//     checkAllIsEdge()
+//   }
+//   const topX = Math.min(...pastures.value.map(pasture => pasture.x))
+//   const topY = Math.min(...pastures.value.map(pasture => pasture.y))
+//   console.log(topX, topY)
+//   pastures.value.forEach(pasture => {
+//     pasture.x -= topX
+//     pasture.y -= topY
+//   })
+// }
+// const setEdgePasture = () => {
+//   const edgePasture = getAEdgePasture()
+//   if (!edgePasture){
+//     console.log(pastures.value)
+//     return
+//   }
+//   const directions = [
+//     {
+//       x: 1, y: 0 
+//     },
+//     {
+//       x: 1, y: -1 
+//     },
+//     {
+//       x: 0, y: -1 
+//     },
+//     {
+//       x: -1, y: 0 
+//     },
+//     {
+//       x: -1, y: 1 
+//     },
+//     {
+//       x: 0, y: 1 
+//     } ]
+//   const randomIndex = Math.floor(Math.random() * directions.length)
+//   for (let i = 0; i < directions.length; i++){
+//     const x = edgePasture.x + directions[(randomIndex + i) % directions.length].x
+//     const y = edgePasture.y + directions[(randomIndex + i) % directions.length].y
+//     if (!pastures.value.find(pasture => pasture.x === x && pasture.y === y)){
+//       addPasture({ x, y })
+//       break
+//     }
+//   }
+// }
+// const checkAllIsEdge = () => {
+//   const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
+//   edgePastures.forEach(pasture => {
+//     pasture.isEdge = checkIsEdge({ x: pasture.x, y: pasture.y })
+//   })
+// }
 const addPasture = ({ x, y }) => {
   const isEdge = checkIsEdge({ x, y })
   pastures.value.push({

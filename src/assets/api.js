@@ -144,5 +144,14 @@ const api = {
       throw error.response.data
     }
   },
+  getGameStatus: async (id) => {
+    try {
+      const response = await axiosInstance.get(`/api/v1/games/${ id }`)
+      return response.data
+    }
+    catch (error) {
+      throw error.response.data
+    }
+  }
 }
 export default api

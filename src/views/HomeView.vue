@@ -35,7 +35,7 @@ const showCreateRoomModal = ref(false)
 const showChangeNicknameModal = ref(false)
 const newNickname = ref('')
 const roomMe = computed(() => {
-  return roomInfo.value.players.find((player) => player.id === user.value.id) || {}
+  return roomInfo.value.players.find((player) => player.player_id === user.value.id) || {}
 })
 let token = localStorage.getItem('token')
 

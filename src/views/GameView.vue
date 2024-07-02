@@ -2,14 +2,17 @@
 import { ref, computed, onMounted, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePublicStore } from '../stores/public'
+import { useUserStore } from '../stores/user'
 import api from '@/assets/api'
 const publicStore = usePublicStore()
+const userStore = useUserStore()
 const { consumer } = toRefs(publicStore)
+const { user } = toRefs(userStore)
 const route = useRoute()
 console.log(route.query.roomId)
 const gameId = ref(route.query.game_id)
-const pastures = ref([])
-const players = ref([ {
+// const pastures = ref([])
+const defaultPlayers = ref([ {
   name: 'Tux', color: '#ae0000', character: 'tux', isEnd: false, id: 1, nickname: 'Tux'
 }, {
   name: '阿鵝', color: '#2563eb', character: 'gunter', isEnd: false, id: 2, nickname: '阿鵝'
@@ -18,7 +21,25 @@ const players = ref([ {
 }, {
   name: 'sin', color: '#d38021', character: 'sin', isEnd: false, id: 4, nickname: 'sin'
 } ])
+const players = computed(() => gameStatus.value?.game_config?.players || defaultPlayers.value)
 const gameStatus = ref(null)
+const pastures = computed(() => {
+  if (!gameStatus.value) return []
+  const pastures = gameStatus.value.game_data.pastures.map(pasture => {
+    return {
+      ...pasture,
+      x: pasture.x, y: pasture.y, amount: pasture.stack.amount, selected: false, isAllowTarget: false, isBlocked: pasture.is_blocked, isEdge: false,
+      owner: players.value.find(player => player.color === pasture.stack.color)
+    }
+  })
+  
+  const pastures2 = pastures.map(pasture => ({
+    ...pasture,
+    isEdge: checkIsEdgeByMap({ pastures, x: pasture.x, y: pasture.y })
+  }))
+  // checkAllIsEdge()
+  return pastures2
+})
 const initing = ref(false)
 // initialize pastures
 // for (let x = 0; x < 5; x++)
@@ -26,18 +47,23 @@ const initing = ref(false)
 //     pastures.value.push({
 //       x, y, amount: 0, selected: false
 //     })
-// let gameChannel = null
+let gameChannel = null
 const getGameStatus = async () => {
   const data = await api.getGameStatus(gameId.value)
-  gameStatus.value = data
+  gameStatus.value = data.game
   return data
 }
+const needPutCharacter = computed(() => {
+  return pastures.value.filter(pasture => pasture.owner).length < players.value.length
+})
+const myTurn = computed(() => {
+  return currentPlayer.value.id === user.value.id
+})
 onMounted(() => {
   const users = ref(Number(route.query.users || 2))
   
   console.log(users.value, gameId.value)
-  // gameChannel = 
-  consumer.value.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
+  gameChannel = consumer.value.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
     connected () {
       console.log('connected game channel', gameId.value)
     },
@@ -54,20 +80,25 @@ onMounted(() => {
           // initPastures(pastureAmount)
           // console.log(players.value, 'players')
           getGameStatus().then(() => {
-            gameStatus.value.game.game_data.pastures.forEach(pasture => {
-              addPasture({ x: pasture.x, y: pasture.y })
-            })
-            // 放置初始位置
-            for (let i = 0; i < players.value.length; i++){
-              let pasture = getAEdgePasture()
-              while (pasture.owner){
-                pasture = getAEdgePasture()
-              }
-              pasture.amount = 16
-              pasture.owner = players.value[i]
-            }
+            // gameStatus.value = 
+            // gameStatus.value.game_data.pastures.forEach(pasture => {
+            //   addPasture({ x: pasture.x, y: pasture.y })
+            //   checkAllIsEdge()
+            // })
+            // // 放置初始位置
+            // for (let i = 0; i < players.value.length; i++){
+            //   let pasture = getAEdgePasture()
+            //   while (pasture.owner){
+            //     pasture = getAEdgePasture()
+            //   }
+            //   pasture.amount = 16
+            //   pasture.owner = players.value[i]
+            // }
           })
         }
+      }
+      else if (data.event === 'stack_placed') {
+        gameStatus.value.game_data = data.game_data
       }
       // if (data.event === 'game updated') {
       //   getgameInfo(gameId)
@@ -158,13 +189,39 @@ onMounted(() => {
 //     pasture.isEdge = checkIsEdge({ x: pasture.x, y: pasture.y })
 //   })
 // }
-const addPasture = ({ x, y }) => {
-  const isEdge = checkIsEdge({ x, y })
-  pastures.value.push({
-    x, y, amount: 0, selected: false, isAllowTarget: false, isBlocked: false, isEdge
-  })
-}
-const checkIsEdge = ({ x, y }) => {
+// const addPasture = ({ x, y }) => {
+//   const isEdge = checkIsEdge({ x, y })
+//   pastures.value.push({
+//     x, y, amount: 0, selected: false, isAllowTarget: false, isBlocked: false, isEdge
+//   })
+// }
+// const checkIsEdge = ({ x, y }) => {
+//   const directions = [
+//     {
+//       x: 1, y: 0 
+//     },
+//     {
+//       x: 1, y: -1 
+//     },
+//     {
+//       x: 0, y: -1 
+//     },
+//     {
+//       x: -1, y: 0 
+//     },
+//     {
+//       x: -1, y: 1 
+//     },
+//     {
+//       x: 0, y: 1 
+//     } ]
+//   for (let i = 0; i < directions.length; i++){
+//     const target = pastures.value.find(pasture => pasture.x === x + directions[i].x && pasture.y === y + directions[i].y)
+//     if (!target) return true
+//   }
+//   return false
+// }
+const checkIsEdgeByMap = ({ pastures, x, y }) => {
   const directions = [
     {
       x: 1, y: 0 
@@ -185,16 +242,16 @@ const checkIsEdge = ({ x, y }) => {
       x: 0, y: 1 
     } ]
   for (let i = 0; i < directions.length; i++){
-    const target = pastures.value.find(pasture => pasture.x === x + directions[i].x && pasture.y === y + directions[i].y)
+    const target = pastures.find(pasture => pasture.x === x + directions[i].x && pasture.y === y + directions[i].y)
     if (!target) return true
   }
   return false
 }
-const getAEdgePasture = () => {
-  const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
-  const randomIndex = Math.floor(Math.random() * edgePastures.length)
-  return edgePastures[randomIndex]
-}
+// const getAEdgePasture = () => {
+//   const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
+//   const randomIndex = Math.floor(Math.random() * edgePastures.length)
+//   return edgePastures[randomIndex]
+// }
 
 // pastures.value[0].amount = 16
 // pastures.value[0].owner = players.value[0]
@@ -206,12 +263,26 @@ const getAEdgePasture = () => {
 // pastures.value[pastures.value.length - 1].owner = players.value[1]
 //
 const currentPlayerIndex = ref(0)
-const currentPlayer = computed(() => players.value[currentPlayerIndex.value])
+// const currentPlayer = computed(() => players.value[currentPlayerIndex.value])
+const currentPlayer = computed(() => players.value[gameStatus.value?.game_data?.current_player_index || 0])
 const originPasure = ref(null)
 const targetPasure = ref(null)
+const setFirstPasture = (pasture) => {
+  console.log(`put character x:${ pasture.x }, y:${ pasture.y } `)
+  gameChannel.send({ action: 'place_stack', x: pasture.x, y: pasture.y })
+}
 let originAmount = 0
 let targetAmount = 0
 const handleClick = (pasture) => {
+  // 是否為選擇起始位置動作
+  console.log(needPutCharacter.value, myTurn.value)
+  console.log(pasture)
+  if (needPutCharacter.value && myTurn.value){
+    if (pasture.owner || !pasture.isEdge) return
+    setFirstPasture(pasture)
+    return
+  }
+  console.log(1111)
   if (!originPasure.value) {
     console.log(pasture, currentPlayer.value)
     if (pasture.owner?.id !== currentPlayer.value.id) return
@@ -460,6 +531,9 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       <div>{{ player.score }}分</div>
     </div>
   </div>
+  <div v-if="needPutCharacter && myTurn">
+    請選擇一個初始位置
+  </div>
   <div class="text-white relative mt-10 pasture-table">
     <div
       v-for="pasture in pastures"
@@ -476,7 +550,7 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
         {{ `${pasture.x},${pasture.y}` }}
       </div> -->
       <div>
-        ({{ pasture.x }},{{ pasture.y }})
+        ({{ pasture.x }},{{ pasture.y }}),{{ pasture.isEdge }}
       </div>
       <div
         v-if="pasture.owner"

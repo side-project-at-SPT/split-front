@@ -1,5 +1,7 @@
 <script setup>
-import { ref, computed, onMounted, toRefs } from 'vue'
+import {
+  ref, computed, onMounted, toRefs, 
+} from 'vue'
 import { useRoute } from 'vue-router'
 import { usePublicStore } from '../stores/public'
 import { useUserStore } from '../stores/user'
@@ -23,12 +25,14 @@ const defaultPlayers = ref([ {
 } ])
 const players = computed(() => gameStatus.value?.game_config?.players || defaultPlayers.value)
 const gameStatus = ref(null)
+const allowTargetPastures = ref([])
 const pastures = computed(() => {
   if (!gameStatus.value) return []
   const pastures = gameStatus.value.game_data.pastures.map(pasture => {
+    const isAllowTarget = allowTargetPastures.value.find(p => p.x === pasture.x && p.y === pasture.y) ? true : false
     return {
       ...pasture,
-      x: pasture.x, y: pasture.y, amount: pasture.stack.amount, selected: false, isAllowTarget: false, isBlocked: pasture.is_blocked, isEdge: false,
+      x: pasture.x, y: pasture.y, amount: pasture.stack.amount, selected: false, isAllowTarget, isBlocked: pasture.is_blocked, isEdge: false,
       owner: players.value.find(player => player.color === pasture.stack.color)
     }
   })
@@ -282,7 +286,6 @@ const handleClick = (pasture) => {
     setFirstPasture(pasture)
     return
   }
-  console.log(1111)
   if (!originPasure.value) {
     console.log(pasture, currentPlayer.value)
     if (pasture.owner?.id !== currentPlayer.value.id) return
@@ -309,10 +312,11 @@ const handleClick = (pasture) => {
     return
   }
   // 如果有選擇來源的牧場，且來源牧場有羊，則移動羊到目標牧場
-  if (targetPasure.value === pasture) {
+  if (targetPasure.value.x === pasture.x && targetPasure.value.y === pasture.y) {
     if (originPasure.value && originPasure.value.amount > 1) {
       // targetPasure.value.amount++
       originPasure.value.amount--
+      console.log('move', originPasure.value, targetPasure.value)
       moveItem({
         from: originPasure.value, to: targetPasure.value, character: originPasure.value.owner.character
       })
@@ -388,13 +392,14 @@ const showAllowedTarget = () => {
       directionAddY += direction.y
     }
     if (tempTarget) {
-      tempTarget.isAllowTarget = true
+      allowTargetPastures.value.push({ x: tempTarget.x, y: tempTarget.y })
+      // tempTarget.isAllowTarget = true
       tempTarget = null
     }
   })
 }
 const hideAllowedTarget = () => {
-  pastures.value.forEach(pasture => pasture.isAllowTarget = false)
+  allowTargetPastures.value = []
 }
 const handleConfirm = () => {
   originPasure.value.selected = false

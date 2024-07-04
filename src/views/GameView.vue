@@ -30,10 +30,20 @@ const pastures = computed(() => {
   if (!gameStatus.value) return []
   const pastures = gameStatus.value.game_data.pastures.map(pasture => {
     const isAllowTarget = allowTargetPastures.value.find(p => p.x === pasture.x && p.y === pasture.y) ? true : false
+    let amount = pasture.stack.amount
+    let owner = players.value.find(player => player.color === pasture.stack.color)
+    if (originPasure.value && originPasure.value.x === pasture.x && originPasure.value.y === pasture.y){
+      amount = originPasure.value.amount
+      owner = originPasure.value.owner
+    }
+    if (targetPasure.value && targetPasure.value.x === pasture.x && targetPasure.value.y === pasture.y) {
+      amount = targetPasure.value.amount
+      owner = targetPasure.value.owner
+    }
     return {
       ...pasture,
-      x: pasture.x, y: pasture.y, amount: pasture.stack.amount, selected: false, isAllowTarget, isBlocked: pasture.is_blocked, isEdge: false,
-      owner: players.value.find(player => player.color === pasture.stack.color)
+      x: pasture.x, y: pasture.y, amount, selected: false, isAllowTarget, isBlocked: pasture.is_blocked, isEdge: false,
+      owner
     }
   })
   
@@ -101,7 +111,7 @@ onMounted(() => {
           })
         }
       }
-      else if (data.event === 'stack_placed') {
+      else if (data.event === 'stack_placed' || data.event === 'stack_splitted') {
         gameStatus.value.game_data = data.game_data
       }
       // if (data.event === 'game updated') {
@@ -266,7 +276,7 @@ const checkIsEdgeByMap = ({ pastures, x, y }) => {
 // pastures.value[pastures.value.length - 1].amount = 16
 // pastures.value[pastures.value.length - 1].owner = players.value[1]
 //
-const currentPlayerIndex = ref(0)
+// const currentPlayerIndex = ref(0)
 // const currentPlayer = computed(() => players.value[currentPlayerIndex.value])
 const currentPlayer = computed(() => players.value[gameStatus.value?.game_data?.current_player_index || 0])
 const originPasure = ref(null)
@@ -290,7 +300,7 @@ const handleClick = (pasture) => {
     console.log(pasture, currentPlayer.value)
     if (pasture.owner?.id !== currentPlayer.value.id) return
     if (pasture.amount < 2) return
-    originPasure.value = pasture
+    originPasure.value = { ...pasture }
     originAmount = pasture.amount
     pasture.selected = !pasture.selected
     // 顯示合法目的地
@@ -303,7 +313,7 @@ const handleClick = (pasture) => {
   }
   if (!targetPasure.value) {
     if (!pasture.isAllowTarget) return
-    targetPasure.value = pasture
+    targetPasure.value = { ...pasture }
     targetAmount = pasture.amount
     pasture.selected = !pasture.selected
     targetPasure.value.owner = originPasure.value.owner
@@ -402,72 +412,82 @@ const hideAllowedTarget = () => {
   allowTargetPastures.value = []
 }
 const handleConfirm = () => {
+  const moveAmount = pastures.value.find(pasture => pasture.x === targetPasure.value.x && pasture.y === targetPasure.value.y).amount
+  const data = {
+    origin_x: originPasure.value.x, // 起點 X 座標
+    origin_y: originPasure.value.y, // 起點 Y 座標
+    target_x: targetPasure.value.x, // 終點 X 座標
+    target_y: targetPasure.value.y, // 終點 Y 座標
+    target_amount: moveAmount // 分配到終點的企鵝數量
+  }
+  gameChannel.send({ action: 'split_stack', ...data })
   originPasure.value.selected = false
   targetPasure.value.selected = false
   originPasure.value = null
   targetPasure.value = null
   originAmount = 0
   targetAmount = 0
+
   // 切換玩家
-  nextPlayer()
+  // nextPlayer()
 }
-const nextPlayer = () => {
-  if (players.value.every(player => player.isEnd)) {
-    alert('遊戲結束')
-    return
-  }
-  currentPlayerIndex.value = (currentPlayerIndex.value + 1) % players.value.length
-  // 判斷還可不可以移動
-  const ownerPastures = pastures.value.filter(pasture => pasture.owner?.id === currentPlayer.value.id)
-  ownerPastures.forEach(pasture => {
-    if (pasture.isBlocked) return
-    if (pasture.amount < 2) pasture.isBlocked = true
-    // 查看是否有可以移動的牧場
-    const directions = [
-      {
-        x: 1, y: 0 
-      },
-      {
-        x: 1, y: -1 
-      },
-      {
-        x: 0, y: -1 
-      },
-      {
-        x: -1, y: 0 
-      },
-      {
-        x: -1, y: 1 
-      },
-      {
-        x: 0, y: 1 
-      }
-    ]
-    let isAlive = false
-    directions.forEach(direction => {
-      let directionAddX = direction.x
-      let directionAddY = direction.y
-      while (true) {
-        if (isAlive) return
-        const target = pastures.value.find(p => p.x === pasture.x + directionAddX && p.y === pasture.y + directionAddY)
-        if (!target || target.amount > 0) {
-          break
-        }
-        if (target.amount === 0) {
-          isAlive = true
-          break
-        }
-        directionAddX += direction.x
-        directionAddY += direction.y
-      }
-    })
-    if (!isAlive) pasture.isBlocked = true
-  })
-  if (ownerPastures.every(pasture => pasture.isBlocked)) {
-    currentPlayer.value.isEnd = true
-    nextPlayer()
-  }
-}
+// const nextPlayer = () => {
+//   if (players.value.every(player => player.isEnd)) {
+//     alert('遊戲結束')
+//     return
+//   }
+//   currentPlayerIndex.value = (currentPlayerIndex.value + 1) % players.value.length
+//   // 判斷還可不可以移動
+//   const ownerPastures = pastures.value.filter(pasture => pasture.owner?.id === currentPlayer.value.id)
+//   ownerPastures.forEach(pasture => {
+//     if (pasture.isBlocked) return
+//     if (pasture.amount < 2) pasture.isBlocked = true
+//     // 查看是否有可以移動的牧場
+//     const directions = [
+//       {
+//         x: 1, y: 0 
+//       },
+//       {
+//         x: 1, y: -1 
+//       },
+//       {
+//         x: 0, y: -1 
+//       },
+//       {
+//         x: -1, y: 0 
+//       },
+//       {
+//         x: -1, y: 1 
+//       },
+//       {
+//         x: 0, y: 1 
+//       }
+//     ]
+//     let isAlive = false
+//     directions.forEach(direction => {
+//       let directionAddX = direction.x
+//       let directionAddY = direction.y
+//       while (true) {
+//         if (isAlive) return
+//         const target = pastures.value.find(p => p.x === pasture.x + directionAddX && p.y === pasture.y + directionAddY)
+//         if (!target || target.amount > 0) {
+//           break
+//         }
+//         if (target.amount === 0) {
+//           isAlive = true
+//           break
+//         }
+//         directionAddX += direction.x
+//         directionAddY += direction.y
+//       }
+//     })
+//     if (!isAlive) pasture.isBlocked = true
+//   })
+//   if (ownerPastures.every(pasture => pasture.isBlocked)) {
+//     currentPlayer.value.isEnd = true
+//     nextPlayer()
+//   }
+// }
 const finalPlayers = computed(() => players.value.map(player => {
   return {
     name: player.nickname,

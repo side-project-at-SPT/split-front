@@ -35,7 +35,7 @@ const showCreateRoomModal = ref(false)
 const showChangeNicknameModal = ref(false)
 const newNickname = ref('')
 const roomMe = computed(() => {
-  return roomInfo.value.players.find((player) => player.player_id === user.value.id) || {}
+  return roomInfo.value.players.find((player) => player.id === user.value.id) || {}
 })
 let token = localStorage.getItem('token')
 
@@ -53,6 +53,9 @@ const handleSeeRoom = async (room) => {
   roomChannel = consumer.value.subscriptions.create({ channel: 'RoomChannel', room_id: room.id }, {
     connected () {
       console.log('connected room channel', room.id)
+      // 隨機選一個角色
+      const randomIndex = Math.floor(Math.random() * roles.length)
+      handleChangeRole(randomIndex)
     },
     disconnected () {
       console.log('disconnected room channel', room.id)

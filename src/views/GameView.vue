@@ -114,6 +114,15 @@ onMounted(() => {
       else if (data.event === 'stack_placed' || data.event === 'stack_splitted') {
         gameStatus.value.game_data = data.game_data
       }
+      else if (data.type === 'move_sheep') {
+        // const originPasture = pastures.value.find(pasture => pasture.x === data.origin_x && pasture.y === data.origin_y)
+        // const targetPasture = pastures.value.find(pasture => pasture.x === data.target_x && pasture.y === data.target_y)
+        // originPasture.amount--
+        // targetPasture.amount++
+        moveItem({
+          from: data.from, to: data.to, character: data.character
+        })
+      }
       // if (data.event === 'game updated') {
       //   getgameInfo(gameId)
       // }
@@ -329,6 +338,9 @@ const handleClick = (pasture) => {
       console.log('move', originPasure.value, targetPasure.value)
       moveItem({
         from: originPasure.value, to: targetPasure.value, character: originPasure.value.owner.character
+      })
+      gameChannel.send({
+        type: 'move_sheep', from: { x: originPasure.value.x, y: originPasure.value.y }, to: { x: targetPasure.value.x, y: targetPasure.value.y }, character: originPasure.value.owner.character
       })
     }
     return

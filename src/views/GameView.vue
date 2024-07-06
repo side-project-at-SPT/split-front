@@ -86,7 +86,7 @@ onMounted(() => {
     },
     received (data) {
       if (data.event === 'player_joined_game') {
-        players.value = data.player_state
+        // players.value = data.player_state
         console.log(data, 'game player_joined_game')
         if (pastures.value.length === 0 && !initing.value){
           initing.value = true
@@ -113,8 +113,11 @@ onMounted(() => {
       }
       else if (data.event === 'stack_placed' || data.event === 'stack_splitted') {
         gameStatus.value.game_data = data.game_data
+        originPasure.value = null
+        targetPasure.value = null
       }
       else if (data.type === 'move_sheep') {
+        if (data.actionPlayer === user.value.id) return
         // const originPasture = pastures.value.find(pasture => pasture.x === data.origin_x && pasture.y === data.origin_y)
         // const targetPasture = pastures.value.find(pasture => pasture.x === data.target_x && pasture.y === data.target_y)
         // originPasture.amount--
@@ -122,7 +125,27 @@ onMounted(() => {
         moveItem({
           from: data.from, to: data.to, character: data.character
         })
+        originPasure.value.amount--
+        targetPasure.value.amount++
       }
+      else if (data.type === 'set_origin_pasure') {
+        if (data.actionPlayer === user.value.id) return
+        console.log(data, 'set_origin_pasure')
+        originPasure.value = data.pasture
+        originPasure.value.selected = true
+        // showAllowedTarget()
+      }
+      else if (data.type === 'set_target_pasure') {
+        if (data.actionPlayer === user.value.id) return
+        console.log(data, 'set_target_pasure')
+        targetPasure.value = data.pasture
+        targetPasure.value.selected = true
+      }
+      else if (data.type === 'cancel_action') {
+        if (data.actionPlayer === user.value.id) return
+        targetPasure.value = null
+        originPasure.value = null
+      } 
       // if (data.event === 'game updated') {
       //   getgameInfo(gameId)
       // }
@@ -310,6 +333,7 @@ const handleClick = (pasture) => {
     if (pasture.owner?.id !== currentPlayer.value.id) return
     if (pasture.amount < 2) return
     originPasure.value = { ...pasture }
+    gameChannel.send({ type: 'set_origin_pasure', pasture, actionPlayer: user.value.id })
     originAmount = pasture.amount
     pasture.selected = !pasture.selected
     // 顯示合法目的地
@@ -323,6 +347,7 @@ const handleClick = (pasture) => {
   if (!targetPasure.value) {
     if (!pasture.isAllowTarget) return
     targetPasure.value = { ...pasture }
+    gameChannel.send({ type: 'set_target_pasure', pasture: { ...pasture, owner: originPasure.value.owner }, actionPlayer: currentPlayer.value.id })
     targetAmount = pasture.amount
     pasture.selected = !pasture.selected
     targetPasure.value.owner = originPasure.value.owner
@@ -340,7 +365,7 @@ const handleClick = (pasture) => {
         from: originPasure.value, to: targetPasure.value, character: originPasure.value.owner.character
       })
       gameChannel.send({
-        type: 'move_sheep', from: { x: originPasure.value.x, y: originPasure.value.y }, to: { x: targetPasure.value.x, y: targetPasure.value.y }, character: originPasure.value.owner.character
+        type: 'move_sheep', from: { x: originPasure.value.x, y: originPasure.value.y }, to: { x: targetPasure.value.x, y: targetPasure.value.y }, character: originPasure.value.owner.character, actionPlayer: user.value.id
       })
     }
     return
@@ -520,6 +545,7 @@ const handleCancel = () => {
     targetPasure.value = null
   }
   hideAllowedTarget()
+  gameChannel.send({ type: 'cancel_action' })
 }
 const gameOver = computed(() => players.value.every(player => player.isEnd))
 </script>
@@ -586,9 +612,9 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       <!-- <div>
         {{ `${pasture.x},${pasture.y}` }}
       </div> -->
-      <div>
+      <!-- <div>
         ({{ pasture.x }},{{ pasture.y }}),{{ pasture.isEdge }}
-      </div>
+      </div> -->
       <div
         v-if="pasture.owner"
         :style="{ color: pasture.owner?.color }"

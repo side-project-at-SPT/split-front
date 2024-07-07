@@ -321,9 +321,8 @@ let originAmount = 0
 let targetAmount = 0
 const handleClick = (pasture) => {
   // 是否為選擇起始位置動作
-  console.log(needPutCharacter.value, myTurn.value)
-  console.log(pasture)
-  if (needPutCharacter.value && myTurn.value){
+  if (!myTurn.value) return 
+  if (needPutCharacter.value){
     if (pasture.owner || !pasture.isEdge) return
     setFirstPasture(pasture)
     return
@@ -594,8 +593,13 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       <div>{{ player.score }}分</div>
     </div>
   </div>
-  <div v-if="needPutCharacter && myTurn">
-    請選擇一個初始位置
+  <div v-if="myTurn">
+    <div v-if="needPutCharacter">
+      請選擇一個初始位置
+    </div>
+    <div v-else>
+      輪到你了，請移動
+    </div>
   </div>
   <div class="text-white relative mt-10 pasture-table">
     <div
@@ -670,6 +674,7 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
     background-position: center;
     background-size: contain;
   }
+
   .bg-from-owner {
     background-image: linear-gradient(to bottom right, #b3d9ff, var(--player-coler));
   }

@@ -604,9 +604,11 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       class="hexagon flex flex-col justify-center items-center text-black cursor-pointer"
       :class="{ 'bg-green-500': pasture.selected,
                 'bg-green-400': pasture.isAllowTarget,
-                'ice': !pasture.selected && !pasture.isAllowTarget }"
+                'ice': !pasture.selected && !pasture.isAllowTarget,
+                'bg-from-owner': pasture.owner }"
       :style="{ left: `calc(${pasture.x * 105}px + ${pasture.y * 105}px * sin(30deg))`,
-                top: `calc(${pasture.y * 105 / 2}px * sqrt(3) * cos(30deg))` }"
+                top: `calc(${pasture.y * 105 / 2}px * sqrt(3) * cos(30deg))`,
+                '--player-coler': pasture.owner?.color }"
       @click="()=>handleClick(pasture)"
     >
       <!-- <div>
@@ -617,7 +619,6 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       </div> -->
       <div
         v-if="pasture.owner"
-        :style="{ color: pasture.owner?.color }"
       >
         {{ pasture.amount }}
       </div>
@@ -668,5 +669,8 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+  }
+  .bg-from-owner {
+    background-image: linear-gradient(to bottom right, #b3d9ff, var(--player-coler));
   }
 </style>

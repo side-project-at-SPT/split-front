@@ -2,15 +2,17 @@
 import {
   ref, computed, onMounted, toRefs, 
 } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { usePublicStore } from '../stores/public'
 import { useUserStore } from '../stores/user'
+import GameOverModal from '@/components/GameOverModal.vue'
 import api from '@/assets/api'
 const publicStore = usePublicStore()
 const userStore = useUserStore()
 const { consumer } = toRefs(publicStore)
 const { user } = toRefs(userStore)
 const route = useRoute()
+const router = useRouter()
 console.log(route.query.roomId)
 const gameId = ref(route.query.game_id)
 // const pastures = ref([])
@@ -110,6 +112,9 @@ onMounted(() => {
             // }
           })
         }
+      }
+      else if (data.event === 'game_over'){
+        gameOver.value = true
       }
       else if (data.event === 'stack_placed' || data.event === 'stack_splitted') {
         gameStatus.value.game_data = data.game_data
@@ -546,10 +551,35 @@ const handleCancel = () => {
   hideAllowedTarget()
   gameChannel.send({ type: 'cancel_action' })
 }
-const gameOver = computed(() => players.value.every(player => player.isEnd))
+// const gameOver = computed(() => players.value.every(player => player.isEnd))
+const gameOver = ref(false)
+const handlebackRoom = () => {
+  router.push('/')
+}
 </script>
 
 <template>
+  <GameOverModal v-model="gameOver">
+    <div
+      class="w-[500px] flex flex-col items-center justify-around"
+    >
+      <div>遊戲結束</div>
+      <div
+        v-for="player in finalPlayers"
+        :key="player.name"
+        class="flex items-center justify-center gap-2"
+      >
+        <div>{{ player.name }}:</div>
+        <div>{{ player.score }}分</div>
+      </div>
+      <button
+        class="hexagon-div flex mt-4 justify-center rounded-md bg-blue-300 h-[100px] w-[100px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        @click="handlebackRoom"
+      >
+        回到大廳
+      </button>
+    </div>
+  </GameOverModal>
   <div class="flex items-center ">
     <div class="flex items-center ">
       <div class="bg-white p-3">
@@ -578,20 +608,6 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
     >
       取消選取
     </span>
-  </div>
-  <div
-    v-if="gameOver"
-    class="w-[500px] flex flex-col items-center"
-  >
-    <div>遊戲結束</div>
-    <div
-      v-for="player in finalPlayers"
-      :key="player.name"
-      class="flex items-center justify-center gap-2"
-    >
-      <div>{{ player.name }}:</div>
-      <div>{{ player.score }}分</div>
-    </div>
   </div>
   <div v-if="myTurn">
     <div v-if="needPutCharacter">
@@ -695,5 +711,8 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
 
   .bg-from-owner {
     background-image: linear-gradient(to bottom right, #b3d9ff, var(--player-coler));
+  }
+  .hexagon-div {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   }
 </style>

@@ -609,7 +609,8 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       :class="{ 'bg-green-500': pasture.selected,
                 'bg-green-400': pasture.isAllowTarget,
                 'ice': !pasture.selected && !pasture.isAllowTarget,
-                'bg-from-owner': pasture.owner }"
+                'bg-from-owner': pasture.owner,
+      }"
       :style="{ left: `calc(${pasture.x * 105}px + ${pasture.y * 105}px * sin(30deg))`,
                 top: `calc(${pasture.y * 105 / 2}px * sqrt(3) * cos(30deg))`,
                 '--player-coler': pasture.owner?.color }"
@@ -628,7 +629,7 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
       </div>
       <div
         v-if="pasture.amount"
-        :class="pasture.owner?.character"
+        :class="[pasture.owner?.character , { 'zoom-in-out': myTurn && pasture.owner?.id === user.id && !originPasure && !pasture.is_blocked }]"
         class="h-12 w-12"
       ></div>
     </div>
@@ -665,7 +666,24 @@ const gameOver = computed(() => players.value.every(player => player.isEnd))
     background-image: url('@/assets/images/abc.png');
     background-repeat: no-repeat;
     background-position: center;
-    background-size: contain;
+    background-size: 100% 100%;
+  }
+
+  .zoom-in-out {
+    animation: animate-zoom-in-out 1.5s infinite;
+  }
+  @keyframes animate-zoom-in-out {
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.3);
+    }
+
+    100% {
+      transform: scale(1);
+    }
   }
 
   .sin {

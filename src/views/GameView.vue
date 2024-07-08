@@ -712,6 +712,7 @@ const handlebackRoom = () => {
   .bg-from-owner {
     background-image: linear-gradient(to bottom right, #b3d9ff, var(--player-coler));
   }
+
   .hexagon-div {
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   }

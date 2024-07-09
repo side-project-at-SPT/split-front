@@ -130,8 +130,14 @@ onMounted(() => {
         moveItem({
           from: data.from, to: data.to, character: data.character
         })
-        originPasure.value.amount--
-        targetPasure.value.amount++
+        if (data.direction === 'go'){
+          originPasure.value.amount--
+          targetPasure.value.amount++
+        }
+        else if (data.direction === 'back'){
+          originPasure.value.amount++
+          targetPasure.value.amount--
+        }
       }
       else if (data.type === 'set_origin_pasure') {
         if (data.actionPlayer === user.value.id) return
@@ -362,24 +368,26 @@ const handleClick = (pasture) => {
   // 如果有選擇來源的牧場，且來源牧場有羊，則移動羊到目標牧場
   if (targetPasure.value.x === pasture.x && targetPasure.value.y === pasture.y) {
     if (originPasure.value && originPasure.value.amount > 1) {
-      // targetPasure.value.amount++
       originPasure.value.amount--
       console.log('move', originPasure.value, targetPasure.value)
       moveItem({
         from: originPasure.value, to: targetPasure.value, character: originPasure.value.owner.character
       })
       gameChannel.send({
-        type: 'move_sheep', from: { x: originPasure.value.x, y: originPasure.value.y }, to: { x: targetPasure.value.x, y: targetPasure.value.y }, character: originPasure.value.owner.character, actionPlayer: user.value.id
+        type: 'move_sheep', from: { x: originPasure.value.x, y: originPasure.value.y }, to: { x: targetPasure.value.x, y: targetPasure.value.y }, character: originPasure.value.owner.character, actionPlayer: user.value.id, direction: 'go'
       })
     }
     return
   }
-  if (originPasure.value === pasture) {
+  if (originPasure.value.x === pasture.x && originPasure.value.y === pasture.y) {
+    // 往回走
     if (targetPasure.value && targetPasure.value.amount > 1) {
-      // originPasure.value.amount++
       targetPasure.value.amount--
       moveItem({
         from: targetPasure.value, to: originPasure.value, character: originPasure.value.owner.character
+      })
+      gameChannel.send({
+        type: 'move_sheep', from: { x: targetPasure.value.x, y: targetPasure.value.y }, to: { x: originPasure.value.x, y: originPasure.value.y }, character: originPasure.value.owner.character, actionPlayer: user.value.id, direction: 'back'
       })
     }
   }

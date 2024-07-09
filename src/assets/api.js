@@ -42,7 +42,7 @@ const api = {
       return response.data
     }
     catch (error) {
-      throw error.response.data
+      throw error
     }
   },
   getUserInfo: async () => {

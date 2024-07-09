@@ -40,12 +40,17 @@ const roomMe = computed(() => {
 let token = localStorage.getItem('token')
 
 const login = async () => {
-  const data = await api.login(userName.value, password.value)
-  if (data.token) {
-    token = data.token
-    doAfterLogin()
+  try {
+    const data = await api.login(userName.value, password.value)
+    if (data.token) {
+      token = data.token
+      doAfterLogin()
+    }
+    return
   }
-  return
+  catch (error) {
+    showErrorMessage(error.error)
+  }
 }
 let roomChannel = null
 const handleSeeRoom = async (room) => {
@@ -198,7 +203,7 @@ onMounted(() => {
         Game
       </RouterLink>
       <div
-        v-if="errorMessage"
+        v-if="errorMessage && isLogin"
         class="text-red"
       >
         {{ errorMessage }}
@@ -228,12 +233,6 @@ onMounted(() => {
               for="password"
               class="block text-sm font-medium leading-6 text-gray-900"
             >Password</label>
-          <!-- <div class="text-sm">
-              <a
-                href="#"
-                class="font-semibold text-indigo-600 hover:text-indigo-500"
-              >Forgot password?</a>
-            </div> -->
           </div>
           <div class="mt-2">
             <input
@@ -246,7 +245,9 @@ onMounted(() => {
             >
           </div>
         </div>
-
+        <div class="text-red">
+          {{ errorMessage }}
+        </div>
         <div class="mt-7">
           <button
             class="flex w-full justify-center rounded-md bg-blue-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

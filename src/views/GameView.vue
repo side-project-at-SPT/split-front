@@ -51,11 +51,13 @@ const pastures = computed(() => {
   
   const pastures2 = pastures.map(pasture => ({
     ...pasture,
-    isEdge: checkIsEdgeByMap({ pastures, x: pasture.x, y: pasture.y })
+    // isEdge: checkIsEdgeByMap({ pastures, x: pasture.x, y: pasture.y })
+    isEdge: edgePastures.value.find(p => p.x === pasture.x && p.y === pasture.y) ? true : false
   }))
   // checkAllIsEdge()
   return pastures2
 })
+const edgePastures = ref([])
 const initing = ref(false)
 // initialize pastures
 // for (let x = 0; x < 5; x++)
@@ -66,6 +68,31 @@ const initing = ref(false)
 let gameChannel = null
 const getGameStatus = async () => {
   const data = await api.getGameStatus(gameId.value)
+  // mock
+  // const mockPastures = [
+  //   { x: 1, y: 3, stack: { amount: 0 } },
+  //   { x: 2, y: 3, stack: { amount: 0 } },
+  //   { x: 3, y: 3, stack: { amount: 0 } },
+  //   { x: 4, y: 3, stack: { amount: 0 } },
+  //   { x: 5, y: 3, stack: { amount: 0 } },
+  //   { x: 0, y: 4, stack: { amount: 0 } },
+  //   { x: 0, y: 5, stack: { amount: 0 } },
+  //   { x: 1, y: 5, stack: { amount: 0 } },
+  //   { x: 2, y: 5, stack: { amount: 0 } },
+  //   { x: 3, y: 5, stack: { amount: 0 } },
+  //   { x: 4, y: 5, stack: { amount: 0 } },
+  //   { x: 0, y: 6, stack: { amount: 0 } },
+  //   { x: 1, y: 6, stack: { amount: 0 } },
+  //   { x: 2, y: 6, stack: { amount: 0 } },
+  //   { x: 3, y: 6, stack: { amount: 0 } },
+  //   { x: 4, y: 6, stack: { amount: 0 } },
+  //   { x: 0, y: 7, stack: { amount: 0 } },
+  //   { x: 1, y: 7, stack: { amount: 0 } },
+  //   { x: 2, y: 7, stack: { amount: 0 } },
+  //   { x: 3, y: 7, stack: { amount: 0 } },
+  //   { x: 4, y: 7, stack: { amount: 0 } },
+  // ]
+  // data.game.game_data.pastures = mockPastures
   gameStatus.value = data.game
   return data
 }
@@ -75,6 +102,68 @@ const needPutCharacter = computed(() => {
 const myTurn = computed(() => {
   return currentPlayer.value.id === user.value.id
 })
+const initGame = () => {
+  console.log('init game')
+  // 找外圍第一格
+  let i = 0
+  while (edgePastures.value.length === 0){
+    for (let j = 0; j <= i; j++){
+      const x = i - j
+      const y = j
+      console.log(x, y)
+      const edgePasture = pastures.value.find(pasture => pasture.x === x && pasture.y === y)
+      if (edgePasture){
+        edgePastures.value.push({ x, y })
+        break
+      }
+    }
+    i++
+  }
+  // 順時針找出所有外圍牧場
+  const directions = [
+    {
+      x: 0, y: -1 
+    },
+    {
+      x: 1, y: -1 
+    },
+    {
+      x: 1, y: 0 
+    },
+    {
+      x: 0, y: 1 
+    },
+    {
+      x: -1, y: 1 
+    },
+    {
+      x: -1, y: 0 
+    },
+  ]
+  const firstPoint = edgePastures.value[0]
+  let cPoint = {
+    x: firstPoint.x,
+    y: firstPoint.y,
+  }
+  let directionIndex = 0
+  let count = 0 // 保護
+  while (!(cPoint.x == firstPoint.x && cPoint.y == firstPoint.y && directionIndex == 0 && edgePastures.value.length !== 1) && count < 100){
+    const testPoint = {
+      x: cPoint.x + directions[directionIndex].x,
+      y: cPoint.y + directions[directionIndex].y
+    }
+    const pasture = pastures.value.find(pasture => pasture.x === testPoint.x && pasture.y === testPoint.y)
+    if (pasture){
+      edgePastures.value.push(testPoint)
+      cPoint = testPoint
+      directionIndex = (directionIndex + 5) % 6
+    }
+    else {
+      directionIndex = (directionIndex + 1) % 6
+    }
+    count++
+  }
+}
 onMounted(() => {
   const users = ref(Number(route.query.users || 2))
   
@@ -89,13 +178,15 @@ onMounted(() => {
     received (data) {
       if (data.event === 'player_joined_game') {
         // players.value = data.player_state
-        console.log(data, 'game player_joined_game')
+        console.log(data, 'game player_joined_game', pastures.value.length)
+        // pastures.value.length 用這個判斷有優化空間
         if (pastures.value.length === 0 && !initing.value){
           initing.value = true
           // const pastureAmount = players.value.length * 16
           // initPastures(pastureAmount)
           // console.log(players.value, 'players')
           getGameStatus().then(() => {
+            initGame()
             // gameStatus.value = 
             // gameStatus.value.game_data.pastures.forEach(pasture => {
             //   addPasture({ x: pasture.x, y: pasture.y })
@@ -278,32 +369,32 @@ onMounted(() => {
 //   }
 //   return false
 // }
-const checkIsEdgeByMap = ({ pastures, x, y }) => {
-  const directions = [
-    {
-      x: 1, y: 0 
-    },
-    {
-      x: 1, y: -1 
-    },
-    {
-      x: 0, y: -1 
-    },
-    {
-      x: -1, y: 0 
-    },
-    {
-      x: -1, y: 1 
-    },
-    {
-      x: 0, y: 1 
-    } ]
-  for (let i = 0; i < directions.length; i++){
-    const target = pastures.find(pasture => pasture.x === x + directions[i].x && pasture.y === y + directions[i].y)
-    if (!target) return true
-  }
-  return false
-}
+// const checkIsEdgeByMap = ({ pastures, x, y }) => {
+//   const directions = [
+//     {
+//       x: 1, y: 0 
+//     },
+//     {
+//       x: 1, y: -1 
+//     },
+//     {
+//       x: 0, y: -1 
+//     },
+//     {
+//       x: -1, y: 0 
+//     },
+//     {
+//       x: -1, y: 1 
+//     },
+//     {
+//       x: 0, y: 1 
+//     } ]
+//   for (let i = 0; i < directions.length; i++){
+//     const target = pastures.find(pasture => pasture.x === x + directions[i].x && pasture.y === y + directions[i].y)
+//     if (!target) return true
+//   }
+//   return false
+// }
 // const getAEdgePasture = () => {
 //   const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
 //   const randomIndex = Math.floor(Math.random() * edgePastures.length)
@@ -630,9 +721,9 @@ const handlebackRoom = () => {
       v-for="pasture in pastures"
       :key="`${pasture.x}-${pasture.y}`"
       class="hexagon flex flex-col justify-center items-center text-black cursor-pointer"
-      :class="{ 'bg-green-500': pasture.selected,
+      :class="{ 'bg-green-500': pasture.selected || (needPutCharacter && pasture.isEdge),
                 'bg-green-400': pasture.isAllowTarget,
-                'ice': !pasture.selected && !pasture.isAllowTarget,
+                'ice': !pasture.selected && !pasture.isAllowTarget && !(needPutCharacter && pasture.isEdge),
                 'bg-from-owner': pasture.owner,
       }"
       :style="{ left: `calc(${pasture.x * 105}px + ${pasture.y * 105}px * sin(30deg))`,

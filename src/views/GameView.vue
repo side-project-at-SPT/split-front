@@ -454,6 +454,15 @@ const handleClick = (pasture) => {
     targetPasure.value.owner = originPasure.value.owner
     // 取消顯示合法目的地
     hideAllowedTarget()
+    // 選中先送一隻過去
+    originPasure.value.amount--
+    console.log('move', originPasure.value, targetPasure.value)
+    moveItem({
+      from: originPasure.value, to: targetPasure.value, character: originPasure.value.owner.character
+    })
+    gameChannel.send({
+      type: 'move_sheep', from: { x: originPasure.value.x, y: originPasure.value.y }, to: { x: targetPasure.value.x, y: targetPasure.value.y }, character: originPasure.value.owner.character, actionPlayer: user.value.id, direction: 'go'
+    })
     return
   }
   // 如果有選擇來源的牧場，且來源牧場有羊，則移動羊到目標牧場

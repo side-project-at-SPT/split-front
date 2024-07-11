@@ -710,7 +710,7 @@ const handlebackRoom = () => {
   </div>
   <div v-if="myTurn">
     <div v-if="needPutCharacter">
-      請選擇一個初始位置
+      選擇一個初始位置(綠色底色)
     </div>
     <div v-else>
       輪到你了，請移動
@@ -744,7 +744,7 @@ const handlebackRoom = () => {
       </div>
       <div
         v-if="pasture.amount"
-        :class="[pasture.owner?.character , { 'zoom-in-out': myTurn && pasture.owner?.id === user.id && !originPasure && !pasture.is_blocked }]"
+        :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originPasure && !pasture.is_blocked }]"
         class="h-12 w-12"
       ></div>
     </div>

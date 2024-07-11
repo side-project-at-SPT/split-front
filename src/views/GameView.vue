@@ -508,6 +508,7 @@ const moveItem = ({
   newDiv.style.position = 'absolute'
   newDiv.style.width = '50px'
   newDiv.style.height = '50px'
+  newDiv.style.pointerEvents = 'none'
   // newDiv.style.backgroundColor = color
   newDiv.style.transition = 'left 0.5s, top 0.5s'
   newDiv.className = character

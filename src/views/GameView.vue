@@ -419,6 +419,13 @@ onMounted(() => {
 // const currentPlayerIndex = ref(0)
 // const currentPlayer = computed(() => players.value[currentPlayerIndex.value])
 const currentPlayer = computed(() => players.value[gameStatus.value?.game_data?.current_player_index || 0])
+const orderedPlayers = computed(() => {
+  const playersOrder = []
+  for (let i = 0; i < players.value.length; i++){
+    playersOrder.push(players.value[((gameStatus.value?.game_data?.current_player_index || 0) + i) % players.value.length])
+  }
+  return playersOrder
+})
 const originPasure = ref(null)
 const targetPasure = ref(null)
 const setFirstPasture = (pasture) => {
@@ -700,13 +707,25 @@ const handlebackRoom = () => {
       <div class="bg-white p-3">
         當前回合
       </div>
-      <div
+      <!-- <div
         class="p-3 flex items-center"
         :style="{ background: currentPlayer.color }"
       >
         {{ currentPlayer.nickname }}
         <div
           :class="currentPlayer.character"
+          class="h-6 w-6"
+        ></div>
+      </div> -->
+      <div
+        v-for="player in orderedPlayers"
+        :key="player.id"
+        class="p-3 flex items-center"
+        :style="{ background: player.color }"
+      >
+        {{ player.nickname }}
+        <div
+          :class="player.character"
           class="h-6 w-6"
         ></div>
       </div>

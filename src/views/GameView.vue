@@ -10,7 +10,9 @@ import api from '@/assets/api'
 const publicStore = usePublicStore()
 const userStore = useUserStore()
 const { consumer } = toRefs(publicStore)
+const { initConnection } = publicStore
 const { user } = toRefs(userStore)
+const { getUserInfo } = userStore
 const route = useRoute()
 const router = useRouter()
 console.log(route.query.roomId)
@@ -166,8 +168,12 @@ const initGame = () => {
 }
 onMounted(() => {
   const users = ref(Number(route.query.users || 2))
-  
   console.log(users.value, gameId.value)
+  if (!consumer.value){
+    const token = localStorage.getItem('token')
+    initConnection(token)
+    getUserInfo()
+  }
   gameChannel = consumer.value.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
     connected () {
       console.log('connected game channel', gameId.value)

@@ -167,7 +167,7 @@ const doAfterLogin = () => {
       if (data.event === 'user preferences updated') {
         getUsers()
       }
-      if (data.event === 'create_room') {
+      if (data.event === 'create_room' || data.event === 'room_closed') {
         getRooms()
       }
       if (data.event === 'join_room' || data.event === 'leave_room'){

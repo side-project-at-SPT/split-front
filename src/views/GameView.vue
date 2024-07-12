@@ -112,7 +112,6 @@ const initGame = () => {
     for (let j = 0; j <= i; j++){
       const x = i - j
       const y = j
-      console.log(x, y)
       const edgePasture = pastures.value.find(pasture => pasture.x === x && pasture.y === y)
       if (edgePasture){
         edgePastures.value.push({ x, y })
@@ -167,8 +166,7 @@ const initGame = () => {
   }
 }
 onMounted(() => {
-  const users = ref(Number(route.query.users || 2))
-  console.log(users.value, gameId.value)
+  // const users = ref(Number(route.query.users || 2))
   if (!consumer.value){
     const token = localStorage.getItem('token')
     initConnection(token)
@@ -238,14 +236,12 @@ onMounted(() => {
       }
       else if (data.type === 'set_origin_pasure') {
         if (data.actionPlayer === user.value.id) return
-        console.log(data, 'set_origin_pasure')
         originPasure.value = data.pasture
         originPasure.value.selected = true
         // showAllowedTarget()
       }
       else if (data.type === 'set_target_pasure') {
         if (data.actionPlayer === user.value.id) return
-        console.log(data, 'set_target_pasure')
         targetPasure.value = data.pasture
         targetPasure.value.selected = true
       }
@@ -443,7 +439,7 @@ const handleClick = (pasture) => {
     return
   }
   if (!originPasure.value) {
-    console.log(pasture, currentPlayer.value)
+    // console.log(pasture, currentPlayer.value)
     if (pasture.owner?.id !== currentPlayer.value.id) return
     if (pasture.amount < 2) return
     originPasure.value = { ...pasture }
@@ -469,7 +465,6 @@ const handleClick = (pasture) => {
     hideAllowedTarget()
     // 選中先送一隻過去
     originPasure.value.amount--
-    console.log('move', originPasure.value, targetPasure.value)
     moveItem({
       from: originPasure.value, to: targetPasure.value, character: originPasure.value.owner.character
     })
@@ -482,7 +477,6 @@ const handleClick = (pasture) => {
   if (targetPasure.value.x === pasture.x && targetPasure.value.y === pasture.y) {
     if (originPasure.value && originPasure.value.amount > 1) {
       originPasure.value.amount--
-      console.log('move', originPasure.value, targetPasure.value)
       moveItem({
         from: originPasure.value, to: targetPasure.value, character: originPasure.value.owner.character
       })

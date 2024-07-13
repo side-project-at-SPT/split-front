@@ -648,9 +648,92 @@ const handleConfirm = () => {
 const finalPlayers = computed(() => players.value.map(player => {
   return {
     name: player.nickname,
-    score: pastures.value.filter(pasture => pasture.owner?.id === player.id).length
+    score: pastures.value.filter(pasture => pasture.owner?.id === player.id).length,
+    largestPasture: getLargestPasture(player)
   }
 }).sort((a, b) => b.score - a.score))
+const getLargestPasture = (player) => {
+  // 找出此玩家所有牧場
+  const playerPastures = pastures.value.filter(pasture => pasture.owner?.id === player.id)
+  // 找出最大牧場
+  let largestPasture = 0
+  const directions = [
+    {
+      x: 1, y: 0 
+    },
+    {
+      x: 1, y: -1 
+    },
+    {
+      x: 0, y: -1 
+    },
+    {
+      x: -1, y: 0 
+    },
+    {
+      x: -1, y: 1 
+    },
+    {
+      x: 0, y: 1 
+    }
+  ]
+  let parts = []
+  for (let i = 0 ; i < playerPastures.length; i++){
+    // 空的直接加入
+    if (parts.length === 0){
+      parts.push([ playerPastures[i] ])
+      continue
+    }
+    // 檢查目前牧場是否有與parts中的牧場相鄰
+    let nearPart = []
+    for (let j = 0; j < parts.length; j++){
+      const part = parts[j]
+      for (let k = 0; k < part.length; k++){
+        const partPasture = part[k]
+        for (let l = 0; l < directions.length; l++){
+          const direction = directions[l]
+          if (partPasture.x + direction.x === playerPastures[i].x && partPasture.y + direction.y === playerPastures[i].y){
+            // part.push(playerPastures[i])
+            nearPart.push(j)
+            // isAdd = true
+            break
+          }
+        }
+        if (nearPart.includes(j)) break
+        // if(isAdd) break
+      }
+      // if(isAdd) break
+    }
+    // 如果有相鄰的part，則合併
+    if (nearPart.length > 0){
+      let newPart = [ playerPastures[i] ]
+      nearPart.forEach(partIndex => {
+        newPart = [ ...newPart, ...parts[partIndex] ]
+        // parts[partIndex].forEach(partPasture => {
+        //   newPart.push(partPasture)
+        // })
+      })
+      // 刪除舊的part
+      let newParts = []
+      parts.forEach((part, index) => {
+        if (!nearPart.includes(index)) newParts.push(part)
+      })
+      // parts = parts.filter((part, index) => !nearPart.includes(index))
+      newParts.push(newPart)
+      // parts.push(newPart)
+      parts = newParts
+    }
+    else {
+      parts.push([ playerPastures[i] ])
+    }
+  }
+  // 找出最大的part
+  parts.forEach(part => {
+    console.log(part, 'part', player.nickname)
+    if (part.length > largestPasture) largestPasture = part.length
+  })
+  return largestPasture
+}
 const handleCancel = () => {
   // 還原數字
   if (originPasure.value) {
@@ -736,6 +819,17 @@ const handlebackRoom = () => {
     >
       取消選取
     </span>
+    <div>
+      <div
+        v-for="player in finalPlayers"
+        :key="player.name"
+        class="flex items-center justify-center gap-2"
+      >
+        <div>{{ player.name }}:</div>
+        <div>{{ player.score }}分</div>
+        <div>最大區塊{{ player.largestPasture }}</div>
+      </div>
+    </div>
   </div>
   <div v-if="myTurn">
     <div v-if="needPutCharacter">

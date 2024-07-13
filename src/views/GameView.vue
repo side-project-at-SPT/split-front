@@ -7,6 +7,26 @@ import { usePublicStore } from '../stores/public'
 import { useUserStore } from '../stores/user'
 import GameOverModal from '@/components/GameOverModal.vue'
 import api from '@/assets/api'
+const directions = [
+  {
+    x: 0, y: -1 
+  },
+  {
+    x: 1, y: -1 
+  },
+  {
+    x: 1, y: 0 
+  },
+  {
+    x: 0, y: 1 
+  },
+  {
+    x: -1, y: 1 
+  },
+  {
+    x: -1, y: 0 
+  },
+]
 const publicStore = usePublicStore()
 const userStore = useUserStore()
 const { consumer } = toRefs(publicStore)
@@ -121,26 +141,7 @@ const initGame = () => {
     i++
   }
   // 順時針找出所有外圍牧場
-  const directions = [
-    {
-      x: 0, y: -1 
-    },
-    {
-      x: 1, y: -1 
-    },
-    {
-      x: 1, y: 0 
-    },
-    {
-      x: 0, y: 1 
-    },
-    {
-      x: -1, y: 1 
-    },
-    {
-      x: -1, y: 0 
-    },
-  ]
+
   const firstPoint = edgePastures.value[0]
   let cPoint = {
     x: firstPoint.x,
@@ -218,10 +219,6 @@ onMounted(() => {
       }
       else if (data.type === 'move_sheep') {
         if (data.actionPlayer === user.value.id) return
-        // const originPasture = pastures.value.find(pasture => pasture.x === data.origin_x && pasture.y === data.origin_y)
-        // const targetPasture = pastures.value.find(pasture => pasture.x === data.target_x && pasture.y === data.target_y)
-        // originPasture.amount--
-        // targetPasture.amount++
         moveItem({
           from: data.from, to: data.to, character: data.character
         })
@@ -250,170 +247,11 @@ onMounted(() => {
         targetPasure.value = null
         originPasure.value = null
       } 
-      // if (data.event === 'game updated') {
-      //   getgameInfo(gameId)
-      // }
-      // else if (data.event === 'game_start_in_seconds') {
-      //   const gameData = {
-      //     id: gameId,
-      //     gameStartInSeconds: data.seconds,
-      //     status: 'starting'
-      //   }
-      //   updategameData(gameData)
-      // }
-      // else if (data.event === 'game_started') {
-      //   const gameId = data.game_id
-      //   router.push(`/game/?game_id=${ gameId }`)
-      // }
       console.log(data, 'data game channel', gameId.value)
     }
   })
-  // console.log(users.value)
-  // const pastureAmount = users.value * 16
-  // initPastures(pastureAmount)
-  // for (let i = 0; i < users.value; i++){
-  //   let pasture = getAEdgePasture()
-  //   while (pasture.owner){
-  //     pasture = getAEdgePasture()
-  //   }
-  //   pasture.amount = 16
-  //   pasture.owner = players.value[i]
-  // }
   getGameStatus()
 })
-// const initPastures = (pastureAmount) => {
-//   for (let i = 0; i < pastureAmount; i++) {
-//     if (pastures.value.length === 0){
-//       addPasture({ x: 0, y: 0, isEdge: true })
-//       continue
-//     }
-//     setEdgePasture()
-//     checkAllIsEdge()
-//   }
-//   const topX = Math.min(...pastures.value.map(pasture => pasture.x))
-//   const topY = Math.min(...pastures.value.map(pasture => pasture.y))
-//   console.log(topX, topY)
-//   pastures.value.forEach(pasture => {
-//     pasture.x -= topX
-//     pasture.y -= topY
-//   })
-// }
-// const setEdgePasture = () => {
-//   const edgePasture = getAEdgePasture()
-//   if (!edgePasture){
-//     console.log(pastures.value)
-//     return
-//   }
-//   const directions = [
-//     {
-//       x: 1, y: 0 
-//     },
-//     {
-//       x: 1, y: -1 
-//     },
-//     {
-//       x: 0, y: -1 
-//     },
-//     {
-//       x: -1, y: 0 
-//     },
-//     {
-//       x: -1, y: 1 
-//     },
-//     {
-//       x: 0, y: 1 
-//     } ]
-//   const randomIndex = Math.floor(Math.random() * directions.length)
-//   for (let i = 0; i < directions.length; i++){
-//     const x = edgePasture.x + directions[(randomIndex + i) % directions.length].x
-//     const y = edgePasture.y + directions[(randomIndex + i) % directions.length].y
-//     if (!pastures.value.find(pasture => pasture.x === x && pasture.y === y)){
-//       addPasture({ x, y })
-//       break
-//     }
-//   }
-// }
-// const checkAllIsEdge = () => {
-//   const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
-//   edgePastures.forEach(pasture => {
-//     pasture.isEdge = checkIsEdge({ x: pasture.x, y: pasture.y })
-//   })
-// }
-// const addPasture = ({ x, y }) => {
-//   const isEdge = checkIsEdge({ x, y })
-//   pastures.value.push({
-//     x, y, amount: 0, selected: false, isAllowTarget: false, isBlocked: false, isEdge
-//   })
-// }
-// const checkIsEdge = ({ x, y }) => {
-//   const directions = [
-//     {
-//       x: 1, y: 0 
-//     },
-//     {
-//       x: 1, y: -1 
-//     },
-//     {
-//       x: 0, y: -1 
-//     },
-//     {
-//       x: -1, y: 0 
-//     },
-//     {
-//       x: -1, y: 1 
-//     },
-//     {
-//       x: 0, y: 1 
-//     } ]
-//   for (let i = 0; i < directions.length; i++){
-//     const target = pastures.value.find(pasture => pasture.x === x + directions[i].x && pasture.y === y + directions[i].y)
-//     if (!target) return true
-//   }
-//   return false
-// }
-// const checkIsEdgeByMap = ({ pastures, x, y }) => {
-//   const directions = [
-//     {
-//       x: 1, y: 0 
-//     },
-//     {
-//       x: 1, y: -1 
-//     },
-//     {
-//       x: 0, y: -1 
-//     },
-//     {
-//       x: -1, y: 0 
-//     },
-//     {
-//       x: -1, y: 1 
-//     },
-//     {
-//       x: 0, y: 1 
-//     } ]
-//   for (let i = 0; i < directions.length; i++){
-//     const target = pastures.find(pasture => pasture.x === x + directions[i].x && pasture.y === y + directions[i].y)
-//     if (!target) return true
-//   }
-//   return false
-// }
-// const getAEdgePasture = () => {
-//   const edgePastures = pastures.value.filter(pasture => pasture.isEdge)
-//   const randomIndex = Math.floor(Math.random() * edgePastures.length)
-//   return edgePastures[randomIndex]
-// }
-
-// pastures.value[0].amount = 16
-// pastures.value[0].owner = players.value[0]
-// pastures.value[20].amount = 16
-// pastures.value[20].owner = players.value[2]
-// pastures.value[4].amount = 16
-// pastures.value[4].owner = players.value[3]
-// pastures.value[pastures.value.length - 1].amount = 16
-// pastures.value[pastures.value.length - 1].owner = players.value[1]
-//
-// const currentPlayerIndex = ref(0)
-// const currentPlayer = computed(() => players.value[currentPlayerIndex.value])
 const currentPlayer = computed(() => players.value[gameStatus.value?.game_data?.current_player_index || 0])
 const orderedPlayers = computed(() => {
   const playersOrder = []
@@ -524,27 +362,6 @@ const moveItem = ({
   }, 500)
 }
 const showAllowedTarget = () => {
-  // 六個方向
-  const directions = [
-    {
-      x: 1, y: 0 
-    },
-    {
-      x: 1, y: -1 
-    },
-    {
-      x: 0, y: -1 
-    },
-    {
-      x: -1, y: 0 
-    },
-    {
-      x: -1, y: 1 
-    },
-    {
-      x: 0, y: 1 
-    }
-  ]
   directions.forEach(direction => {
     let tempTarget
     let directionAddX = direction.x
@@ -588,63 +405,7 @@ const handleConfirm = () => {
   // 切換玩家
   // nextPlayer()
 }
-// const nextPlayer = () => {
-//   if (players.value.every(player => player.isEnd)) {
-//     alert('遊戲結束')
-//     return
-//   }
-//   currentPlayerIndex.value = (currentPlayerIndex.value + 1) % players.value.length
-//   // 判斷還可不可以移動
-//   const ownerPastures = pastures.value.filter(pasture => pasture.owner?.id === currentPlayer.value.id)
-//   ownerPastures.forEach(pasture => {
-//     if (pasture.isBlocked) return
-//     if (pasture.amount < 2) pasture.isBlocked = true
-//     // 查看是否有可以移動的牧場
-//     const directions = [
-//       {
-//         x: 1, y: 0 
-//       },
-//       {
-//         x: 1, y: -1 
-//       },
-//       {
-//         x: 0, y: -1 
-//       },
-//       {
-//         x: -1, y: 0 
-//       },
-//       {
-//         x: -1, y: 1 
-//       },
-//       {
-//         x: 0, y: 1 
-//       }
-//     ]
-//     let isAlive = false
-//     directions.forEach(direction => {
-//       let directionAddX = direction.x
-//       let directionAddY = direction.y
-//       while (true) {
-//         if (isAlive) return
-//         const target = pastures.value.find(p => p.x === pasture.x + directionAddX && p.y === pasture.y + directionAddY)
-//         if (!target || target.amount > 0) {
-//           break
-//         }
-//         if (target.amount === 0) {
-//           isAlive = true
-//           break
-//         }
-//         directionAddX += direction.x
-//         directionAddY += direction.y
-//       }
-//     })
-//     if (!isAlive) pasture.isBlocked = true
-//   })
-//   if (ownerPastures.every(pasture => pasture.isBlocked)) {
-//     currentPlayer.value.isEnd = true
-//     nextPlayer()
-//   }
-// }
+
 const finalPlayers = computed(() => players.value.map(player => {
   return {
     name: player.nickname,
@@ -657,26 +418,6 @@ const getLargestPasture = (player) => {
   const playerPastures = pastures.value.filter(pasture => pasture.owner?.id === player.id)
   // 找出最大牧場
   let largestPasture = 0
-  const directions = [
-    {
-      x: 1, y: 0 
-    },
-    {
-      x: 1, y: -1 
-    },
-    {
-      x: 0, y: -1 
-    },
-    {
-      x: -1, y: 0 
-    },
-    {
-      x: -1, y: 1 
-    },
-    {
-      x: 0, y: 1 
-    }
-  ]
   let parts = []
   for (let i = 0 ; i < playerPastures.length; i++){
     // 空的直接加入
@@ -729,7 +470,7 @@ const getLargestPasture = (player) => {
   }
   // 找出最大的part
   parts.forEach(part => {
-    console.log(part, 'part', player.nickname)
+    // console.log(part, 'part', player.nickname)
     if (part.length > largestPasture) largestPasture = part.length
   })
   return largestPasture

@@ -26,6 +26,7 @@ const api = {
       const response = await axiosInstance.post('/api/v1/users', {
         name: name,
         password: password
+        // token: string 大平台token
       })
       token.value = response.data.token
       localStorage.setItem('token', response.data.token)

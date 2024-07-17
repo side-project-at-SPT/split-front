@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { ref } from 'vue'
 const errorMessage = ref({})
-const token = ref(localStorage.getItem('token') || 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQsImV4cCI6MTcxODc2OTMyNH0.4foZU9X0ztp4m8UVeXXUSi4h0_RrFH1l8oRVFV_EF6k')
+const token = ref(localStorage.getItem('token'))
 const axiosInstance = axios.create({
   baseURL: 'https://spt-games-split.zeabur.app/',
   headers: {
@@ -153,6 +153,23 @@ const api = {
     catch (error) {
       throw error.response.data
     }
-  }
+  },
+  setToken: (newToken) => {
+    axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + newToken
+    token.value = newToken
+  },
+  getTokenFromGaas: async () => {
+    try {
+      const response = await axiosInstance.post('/api/v1/users/login-via-gaas-token')
+      axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + response.data.token
+      token.value = response.data.token
+      return response.data
+    }
+    catch (error) {
+      console.log(error, 'getTokenFromGaas')
+      throw error
+    }
+  },
+
 }
 export default api

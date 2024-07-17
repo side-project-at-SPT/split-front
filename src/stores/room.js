@@ -53,6 +53,7 @@ export const useRoomStore = defineStore('useRoomStore', () => {
   return {
     rooms,
     roomInfo,
+    joinedRoomId,
     getRooms,
     // getRoomInfo,
     updateRoomData,

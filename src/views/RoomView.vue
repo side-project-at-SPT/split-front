@@ -83,8 +83,14 @@ onMounted(async () => {
       console.log('disconnected room channel', roomId)
     },
     received (data) {
-      if (data.event === 'room updated') {
-        getRoomInfo(roomId)
+      if (data.event === 'room_updated') {
+        const roomData = {
+          id: roomId,
+          // gameStartInSeconds: data.seconds,
+          status: data.status,
+          players: data.players
+        }
+        updateRoomData(roomData)
       }
       else if (data.event === 'game_start_in_seconds') {
         const roomData = {

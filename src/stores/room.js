@@ -32,7 +32,12 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     const room = rooms.value.find((room) => room.id === roomData.id)
     if (room) {
       room.status = roomData.status
-      room.gameStartInSeconds = roomData.gameStartInSeconds
+      if (roomData.gameStartInSeconds){
+        room.gameStartInSeconds = roomData.gameStartInSeconds
+      }
+      if (roomData.players){
+        room.players = roomData.players
+      }
     }
   }
   const joinRoom = (room) => {

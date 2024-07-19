@@ -24,9 +24,9 @@ const {
   getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData
 } = roomStore
 const { params, query } = useRoute()
-const { roomId } = toRefs(params)
-roomId.value = Number(roomId.value)
-const { token } = toRefs(query)
+let { roomId } = params
+roomId = Number(roomId)
+const { token: gaasToken } = query
 const trueToken = ref('')
 const handleChangeRole = (index) => {
   roomChannel.send({ action: 'set_character', character: roles[index] }) 
@@ -42,42 +42,53 @@ const handleCancelReady = async () => {
   console.log('cancel ready')
   roomChannel.send({ action: 'cancel_ready' }) 
 }
+const isGaasRoom = computed(() => {
+  return !!gaasToken
+})
 const handleLeaveRoom = async () => {
   consumer.value.subscriptions.remove(roomChannel)
   clearRoomInfo()
+  if (isGaasRoom.value){
+    // Gaas room離開時要做什麼事？？？
+  }
+  else {
+    router.push('/')
+  }
 }
 let roomChannel = null
 onMounted(async () => {
-  console.log('roomId', roomId.value)
-  console.log('token', token.value)
-  api.setToken(token.value)
-  const res = await api.getTokenFromGaas()
-  console.log('res getTokenFromGaas', res)
-  trueToken.value = res.token
+  console.log('roomId', roomId)
+  console.log('gaasToken: ', gaasToken)
+  if (gaasToken) {
+    api.setToken(gaasToken)
+    const res = await api.getTokenFromGaas()
+    console.log('res getTokenFromGaas', res)
+    trueToken.value = res.token
+  }
   if (!consumer.value){
     initConnection(trueToken.value)
     getUserInfo()
     getRooms()
-    joinRoom({ id: roomId.value })
   }
-  roomChannel = consumer.value.subscriptions.create({ channel: 'RoomChannel', room_id: roomId.value }, {
+  joinRoom({ id: roomId })
+  roomChannel = consumer.value.subscriptions.create({ channel: 'RoomChannel', room_id: roomId }, {
     connected () {
-      console.log('connected room channel', roomId.value)
+      console.log('connected room channel', roomId)
       // 隨機選一個角色
       const randomIndex = Math.floor(Math.random() * roles.length)
       handleChangeRole(randomIndex)
       getRooms()
     },
     disconnected () {
-      console.log('disconnected room channel', roomId.value)
+      console.log('disconnected room channel', roomId)
     },
     received (data) {
       if (data.event === 'room updated') {
-        getRoomInfo(roomId.value)
+        getRoomInfo(roomId)
       }
       else if (data.event === 'game_start_in_seconds') {
         const roomData = {
-          id: roomId.value,
+          id: roomId,
           gameStartInSeconds: data.seconds,
           status: 'starting'
         }
@@ -85,7 +96,7 @@ onMounted(async () => {
       }
       else if (data.event === 'starting_game_is_cancelled'){
         const roomData = {
-          id: roomId.value,
+          id: roomId,
           gameStartInSeconds: 5,
           status: 'waiting'
         }
@@ -101,7 +112,7 @@ onMounted(async () => {
       }
       else if (data.event === 'set_character'){
         const roomData = {
-          id: roomId.value,
+          id: roomId,
           players: data.players
         }
         updateRoomPlayers(roomData)
@@ -110,7 +121,14 @@ onMounted(async () => {
         const gameId = data.game_id
         router.push(`/game/?game_id=${ gameId }`)
       }
-      console.log(data, 'data room channel', roomId.value)
+      // else if (data.event === 'join_room') {
+      //   const roomData = {
+      //     id: roomId,
+      //     players: [ ...roomInfo.value.players, data.player ]
+      //   }
+      //   updateRoomPlayers(roomData)
+      // }
+      console.log(data, 'data room channel', roomId)
     }
   })
 })

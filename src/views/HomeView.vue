@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, toRefs } from 'vue'
+import { onMounted, ref, toRefs } from 'vue'
 import api from '@/assets/api'
 import { RouterLink, useRouter } from 'vue-router'
 import { useRoomStore } from '../stores/room'
@@ -21,7 +21,7 @@ const { rooms, roomInfo } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 const { consumer } = toRefs(publicStore)
 const {
-  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, closeRoom, updateRoomData
+  getRooms, updateRoomPlayers,
 } = roomStore
 const { getUsers, getUserInfo } = userStore
 const { initConnection } = publicStore
@@ -34,9 +34,9 @@ const errorMessage = ref('')
 const showCreateRoomModal = ref(false)
 const showChangeNicknameModal = ref(false)
 const newNickname = ref('')
-const roomMe = computed(() => {
-  return roomInfo.value.players.find((player) => player.id === user.value.id) || {}
-})
+// const roomMe = computed(() => {
+//   return roomInfo.value.players.find((player) => player.id === user.value.id) || {}
+// })
 let token = localStorage.getItem('token')
 
 const login = async () => {
@@ -52,79 +52,81 @@ const login = async () => {
     showErrorMessage(error.error)
   }
 }
-let roomChannel = null
+// let roomChannel = null
 const handleSeeRoom = async (room) => {
-  joinRoom(room)
-  roomChannel = consumer.value.subscriptions.create({ channel: 'RoomChannel', room_id: room.id }, {
-    connected () {
-      console.log('connected room channel', room.id)
-      // 隨機選一個角色
-      const randomIndex = Math.floor(Math.random() * roles.length)
-      handleChangeRole(randomIndex)
-    },
-    disconnected () {
-      console.log('disconnected room channel', room.id)
-    },
-    received (data) {
-      if (data.event === 'room updated') {
-        getRoomInfo(room.id)
-      }
-      else if (data.event === 'game_start_in_seconds') {
-        const roomData = {
-          id: room.id,
-          gameStartInSeconds: data.seconds,
-          status: 'starting'
-        }
-        updateRoomData(roomData)
-      }
-      else if (data.event === 'starting_game_is_cancelled'){
-        const roomData = {
-          id: room.id,
-          gameStartInSeconds: 5,
-          status: 'waiting'
-        }
-        updateRoomData(roomData)
-      }
-      else if (data.event === 'ready' || data.event === 'cancel_ready') {
-        roomInfo.value.players.forEach((player) => {
-          if (player.id === data.player.id
-          ) {
-            player.is_ready = data.player.is_ready
-          }
-        })
-      }
-      else if (data.event === 'set_character'){
-        const roomData = {
-          id: room.id,
-          players: data.players
-        }
-        updateRoomPlayers(roomData)
-      }
-      else if (data.event === 'game_started') {
-        const gameId = data.game_id
-        router.push(`/game/?game_id=${ gameId }`)
-      }
-      console.log(data, 'data room channel', room.id)
-    }
-  })
+  // 跳轉到room頁面
+  router.push(`/room/${ room.id }`)
+  // joinRoom(room)
+  // roomChannel = consumer.value.subscriptions.create({ channel: 'RoomChannel', room_id: room.id }, {
+  //   connected () {
+  //     console.log('connected room channel', room.id)
+  //     // 隨機選一個角色
+  //     const randomIndex = Math.floor(Math.random() * roles.length)
+  //     handleChangeRole(randomIndex)
+  //   },
+  //   disconnected () {
+  //     console.log('disconnected room channel', room.id)
+  //   },
+  //   received (data) {
+  //     if (data.event === 'room updated') {
+  //       getRoomInfo(room.id)
+  //     }
+  //     else if (data.event === 'game_start_in_seconds') {
+  //       const roomData = {
+  //         id: room.id,
+  //         gameStartInSeconds: data.seconds,
+  //         status: 'starting'
+  //       }
+  //       updateRoomData(roomData)
+  //     }
+  //     else if (data.event === 'starting_game_is_cancelled'){
+  //       const roomData = {
+  //         id: room.id,
+  //         gameStartInSeconds: 5,
+  //         status: 'waiting'
+  //       }
+  //       updateRoomData(roomData)
+  //     }
+  //     else if (data.event === 'ready' || data.event === 'cancel_ready') {
+  //       roomInfo.value.players.forEach((player) => {
+  //         if (player.id === data.player.id
+  //         ) {
+  //           player.is_ready = data.player.is_ready
+  //         }
+  //       })
+  //     }
+  //     else if (data.event === 'set_character'){
+  //       const roomData = {
+  //         id: room.id,
+  //         players: data.players
+  //       }
+  //       updateRoomPlayers(roomData)
+  //     }
+  //     else if (data.event === 'game_started') {
+  //       const gameId = data.game_id
+  //       router.push(`/game/?game_id=${ gameId }`)
+  //     }
+  //     console.log(data, 'data room channel', room.id)
+  //   }
+  // })
 }
-const handleReady = async () => {
-  console.log('ready')
-  roomChannel.send({ action: 'ready' }) 
-}
-const handleCancelReady = async () => {
-  console.log('cancel ready')
-  roomChannel.send({ action: 'cancel_ready' }) 
-}
-const handleLeaveRoom = async () => {
-  consumer.value.subscriptions.remove(roomChannel)
-  clearRoomInfo()
-}
-const handleCloseRoom = async () => {
-  closeRoom().catch((error) => {
-    showErrorMessage(error.error)
-  })
-}
+// const handleReady = async () => {
+//   console.log('ready')
+//   roomChannel.send({ action: 'ready' }) 
+// }
+// const handleCancelReady = async () => {
+//   console.log('cancel ready')
+//   roomChannel.send({ action: 'cancel_ready' }) 
+// }
+// const handleLeaveRoom = async () => {
+//   consumer.value.subscriptions.remove(roomChannel)
+//   clearRoomInfo()
+// }
+// const handleCloseRoom = async () => {
+//   closeRoom().catch((error) => {
+//     showErrorMessage(error.error)
+//   })
+// }
 // const handleBackRooms = async () => {
 //   clearRoomInfo()
 // }
@@ -183,9 +185,9 @@ const roomStatus = {
   'starting': '即將開始',
   'playing': '進行中',
 }
-const handleChangeRole = (index) => {
-  roomChannel.send({ action: 'set_character', character: roles[index] }) 
-}
+// const handleChangeRole = (index) => {
+//   roomChannel.send({ action: 'set_character', character: roles[index] }) 
+// }
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -329,7 +331,7 @@ onMounted(() => {
           新增房間
         </div>
       </div>
-      <div
+      <!-- <div
         v-else
         class="flex justify-center"
       >
@@ -396,12 +398,12 @@ onMounted(() => {
             </div>
           </div>
           <div class="flex items-center justify-center gap-1">
-            <!-- <div
+             <div
               class="hexagon-ice w-[70px] h-[70px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleStartGame"
             >
               開始遊戲
-            </div> -->
+            </div>
             <div
               v-if="!roomMe.is_ready"
               class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
@@ -428,16 +430,16 @@ onMounted(() => {
             >
               關閉
             </div>
-            <!-- 
+            
             <div
               class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
               @click="handleBackRooms"
             >
               返回
-            </div> -->
+            </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

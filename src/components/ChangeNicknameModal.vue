@@ -18,7 +18,6 @@ const showChangeNicknameModal = computed({
 const handleSetNickname = () => {
   setNickname(newNickname.value).then(() => {
     showChangeNicknameModal.value = false
-    newNickname.value = ''
   })
 }
 </script>

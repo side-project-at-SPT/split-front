@@ -9,6 +9,7 @@ import Tux from '@/assets/images/tux.png'
 import Gunter from '@/assets/images/gunter.png'
 import Sin from '@/assets/images/sin.png'
 import Abc from '@/assets/images/abc.png'
+import ChangeNicknameModal from '@/components/ChangeNicknameModal.vue'
 const penguins = [ Tux, Gunter, Sin, Abc ]
 const roles = [ 'tux', 'gunter', 'sin', 'abc' ]
 const publicStore = usePublicStore()
@@ -34,6 +35,8 @@ const handleChangeRole = (index) => {
 const roomMe = computed(() => {
   return roomInfo.value.players?.find((player) => player.id === user.value.id) || {}
 })
+
+const showChangeNicknameModal = ref(false)
 const handleReady = async () => {
   console.log('ready')
   roomChannel.send({ action: 'ready' }) 
@@ -144,6 +147,7 @@ onMounted(async () => {
   <div
     class="flex justify-center"
   >
+    <ChangeNicknameModal v-model="showChangeNicknameModal" />
     <div class="flex flex-col gap-2 justify-center items-center hexagon-ice w-[360px] h-[360px]">
       <div class="p-4 text-2xl">
         {{ roomInfo.name }}
@@ -226,6 +230,12 @@ onMounted(async () => {
           @click="handleLeaveRoom"
         >
           離開
+        </div>
+        <div
+          class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+          @click="showChangeNicknameModal = true"
+        >
+          修改暱稱
         </div>
         <!-- 
             <div

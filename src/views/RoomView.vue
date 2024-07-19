@@ -28,7 +28,7 @@ const { params, query } = useRoute()
 let { roomId } = params
 roomId = Number(roomId)
 const { token: gaasToken } = query
-const trueToken = ref('')
+const trueToken = ref(localStorage.getItem('token'))
 const handleChangeRole = (index) => {
   roomChannel.send({ action: 'set_character', character: roles[index] }) 
 }

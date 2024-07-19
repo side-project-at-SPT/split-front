@@ -22,7 +22,7 @@ const { user } = toRefs(userStore)
 const { getUserInfo } = userStore
 const { roomInfo } = toRefs(roomStore)
 const {
-  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData
+  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom
 } = roomStore
 const { params, query } = useRoute()
 let { roomId } = params
@@ -57,6 +57,11 @@ const handleLeaveRoom = async () => {
   else {
     router.push('/')
   }
+}
+const handleCloseRoom = async () => {
+  closeRoom().catch((error) => {
+    showErrorMessage(error.error)
+  })
 }
 let roomChannel = null
 onMounted(async () => {
@@ -236,6 +241,13 @@ onMounted(async () => {
           @click="showChangeNicknameModal = true"
         >
           修改暱稱
+        </div>
+        <div
+          v-if="!isGaasRoom"
+          class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+          @click="handleCloseRoom"
+        >
+          關閉
         </div>
         <!-- 
             <div

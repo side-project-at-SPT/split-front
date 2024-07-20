@@ -37,6 +37,7 @@ const route = useRoute()
 const router = useRouter()
 console.log(route.query.roomId)
 const gameId = ref(route.query.game_id)
+const roomId = route.query.roomId
 // const pastures = ref([])
 const defaultPlayers = ref([ {
   name: 'Tux', color: '#ae0000', character: 'tux', isEnd: false, id: 1, nickname: 'Tux'
@@ -494,7 +495,7 @@ const handleCancel = () => {
 // const gameOver = computed(() => players.value.every(player => player.isEnd))
 const gameOver = ref(false)
 const handlebackRoom = () => {
-  router.push('/')
+  router.push(`/room/${ roomId }`)
 }
 </script>
 

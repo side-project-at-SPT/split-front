@@ -16,7 +16,7 @@ const publicStore = usePublicStore()
 const userStore = useUserStore()
 const roomStore = useRoomStore()
 const router = useRouter()
-const { consumer } = toRefs(publicStore)
+const { consumer, gaasToken } = toRefs(publicStore)
 const { initConnection } = publicStore
 const { user } = toRefs(userStore)
 const { getUserInfo } = userStore
@@ -27,7 +27,10 @@ const {
 const { params, query } = useRoute()
 let { roomId } = params
 roomId = Number(roomId)
-const { token: gaasToken } = query
+const { token: queryGaasToken } = query
+if (queryGaasToken){
+  gaasToken.value = queryGaasToken
+}
 const trueToken = ref(localStorage.getItem('token'))
 const handleChangeRole = (index) => {
   roomChannel.send({ action: 'set_character', character: roles[index] }) 
@@ -46,7 +49,7 @@ const handleCancelReady = async () => {
   roomChannel.send({ action: 'cancel_ready' }) 
 }
 const isGaasRoom = computed(() => {
-  return !!gaasToken
+  return !!gaasToken.value
 })
 const handleLeaveRoom = async () => {
   consumer.value.subscriptions.remove(roomChannel)
@@ -62,13 +65,19 @@ const handleCloseRoom = async () => {
   closeRoom().catch((error) => {
     showErrorMessage(error.error)
   })
+  // if (isGaasRoom.value){
+  //   api.closeGaasGame(roomId, trueToken.value)
+  // }
+  // else {
+  router.push('/')
+  // }
 }
 let roomChannel = null
 onMounted(async () => {
   console.log('roomId', roomId)
-  console.log('gaasToken: ', gaasToken)
-  if (gaasToken) {
-    api.setToken(gaasToken)
+  console.log('gaasToken: ', gaasToken.value)
+  if (gaasToken.value) {
+    api.setToken(gaasToken.value)
     const res = await api.getTokenFromGaas()
     console.log('res getTokenFromGaas', res)
     trueToken.value = res.token
@@ -133,7 +142,7 @@ onMounted(async () => {
       }
       else if (data.event === 'game_started') {
         const gameId = data.game_id
-        router.push(`/game/?game_id=${ gameId }`)
+        router.push(`/game/?game_id=${ gameId }&room_id=${ roomId }`)
       }
       // else if (data.event === 'join_room') {
       //   const roomData = {
@@ -243,7 +252,6 @@ onMounted(async () => {
           修改暱稱
         </div>
         <div
-          v-if="!isGaasRoom"
           class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
           @click="handleCloseRoom"
         >

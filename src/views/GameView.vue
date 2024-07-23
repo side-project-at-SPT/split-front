@@ -186,7 +186,7 @@ onMounted(() => {
         // players.value = data.player_state
         console.log(data, 'game player_joined_game', pastures.value.length)
         // pastures.value.length 用這個判斷有優化空間
-        if (pastures.value.length === 0 && !initing.value){
+        if (!initing.value){
           initing.value = true
           // const pastureAmount = players.value.length * 16
           // initPastures(pastureAmount)

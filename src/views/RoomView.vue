@@ -78,9 +78,10 @@ onMounted(async () => {
   console.log('gaasToken: ', gaasToken.value)
   if (gaasToken.value) {
     api.setToken(gaasToken.value)
-    const res = await api.getTokenFromGaas()
-    console.log('res getTokenFromGaas', res)
-    trueToken.value = res.token
+    // const res = await api.getTokenFromGaas()
+    // console.log('res getTokenFromGaas', res)
+    // trueToken.value = res.token
+    trueToken.value = gaasToken.value
   }
   if (!consumer.value){
     initConnection(trueToken.value)

@@ -37,7 +37,7 @@ const route = useRoute()
 const router = useRouter()
 console.log(route.query.roomId)
 const gameId = ref(route.query.game_id)
-const roomId = route.query.roomId
+const roomId = route.query.room_id
 // const pastures = ref([])
 const defaultPlayers = ref([ {
   name: 'Tux', color: '#ae0000', character: 'tux', isEnd: false, id: 1, nickname: 'Tux'

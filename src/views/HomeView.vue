@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, toRefs } from 'vue'
 import api from '@/assets/api'
-import { RouterLink, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useRoomStore } from '../stores/room'
 import { useUserStore } from '../stores/user'
 import { usePublicStore } from '../stores/public'
@@ -201,9 +201,6 @@ onMounted(() => {
     <CreateRoomModal v-model="showCreateRoomModal" />
     <ChangeNicknameModal v-model="showChangeNicknameModal" />
     <div class="flex gap-2">
-      <RouterLink to="/game">
-        Game
-      </RouterLink>
       <div
         v-if="errorMessage && isLogin"
         class="text-red"

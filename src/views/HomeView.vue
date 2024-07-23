@@ -17,7 +17,7 @@ const roles = [ 'tux', 'gunter', 'sin', 'abc' ]
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const publicStore = usePublicStore()
-const { rooms, roomInfo } = toRefs(roomStore)
+const { rooms } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 const { consumer } = toRefs(publicStore)
 const {
@@ -56,90 +56,7 @@ const login = async () => {
 const handleSeeRoom = async (room) => {
   // 跳轉到room頁面
   router.push(`/room/${ room.id }`)
-  // joinRoom(room)
-  // roomChannel = consumer.value.subscriptions.create({ channel: 'RoomChannel', room_id: room.id }, {
-  //   connected () {
-  //     console.log('connected room channel', room.id)
-  //     // 隨機選一個角色
-  //     const randomIndex = Math.floor(Math.random() * roles.length)
-  //     handleChangeRole(randomIndex)
-  //   },
-  //   disconnected () {
-  //     console.log('disconnected room channel', room.id)
-  //   },
-  //   received (data) {
-  //     if (data.event === 'room updated') {
-  //       getRoomInfo(room.id)
-  //     }
-  //     else if (data.event === 'game_start_in_seconds') {
-  //       const roomData = {
-  //         id: room.id,
-  //         gameStartInSeconds: data.seconds,
-  //         status: 'starting'
-  //       }
-  //       updateRoomData(roomData)
-  //     }
-  //     else if (data.event === 'starting_game_is_cancelled'){
-  //       const roomData = {
-  //         id: room.id,
-  //         gameStartInSeconds: 5,
-  //         status: 'waiting'
-  //       }
-  //       updateRoomData(roomData)
-  //     }
-  //     else if (data.event === 'ready' || data.event === 'cancel_ready') {
-  //       roomInfo.value.players.forEach((player) => {
-  //         if (player.id === data.player.id
-  //         ) {
-  //           player.is_ready = data.player.is_ready
-  //         }
-  //       })
-  //     }
-  //     else if (data.event === 'set_character'){
-  //       const roomData = {
-  //         id: room.id,
-  //         players: data.players
-  //       }
-  //       updateRoomPlayers(roomData)
-  //     }
-  //     else if (data.event === 'game_started') {
-  //       const gameId = data.game_id
-  //       router.push(`/game/?game_id=${ gameId }`)
-  //     }
-  //     console.log(data, 'data room channel', room.id)
-  //   }
-  // })
 }
-// const handleReady = async () => {
-//   console.log('ready')
-//   roomChannel.send({ action: 'ready' }) 
-// }
-// const handleCancelReady = async () => {
-//   console.log('cancel ready')
-//   roomChannel.send({ action: 'cancel_ready' }) 
-// }
-// const handleLeaveRoom = async () => {
-//   consumer.value.subscriptions.remove(roomChannel)
-//   clearRoomInfo()
-// }
-// const handleCloseRoom = async () => {
-//   closeRoom().catch((error) => {
-//     showErrorMessage(error.error)
-//   })
-// }
-// const handleBackRooms = async () => {
-//   clearRoomInfo()
-// }
-// const handleStartGame = async () => {
-//   try {
-//     const data = await api.startGame(roomId.value)
-//     router.push(`/game/?roomId=${ roomId.value }`)
-//     return data
-//   }
-//   catch (error) {
-//     showErrorMessage(error.error)
-//   }
-// }
 const showErrorMessage = (message) => {
   errorMessage.value = message
   setTimeout(() => {
@@ -277,7 +194,6 @@ onMounted(() => {
         </div>
       </div>
       <div
-        v-if="!roomInfo.id"
         class="flex gap-2 flex-wrap"
       >
         <div
@@ -328,115 +244,6 @@ onMounted(() => {
           新增房間
         </div>
       </div>
-      <!-- <div
-        v-else
-        class="flex justify-center"
-      >
-        <div class="flex flex-col gap-2 justify-center items-center hexagon-ice w-[360px] h-[360px]">
-          <div class="p-4 text-2xl">
-            {{ roomInfo.name }}
-            <div
-              v-if="roomInfo.status === 'starting'"
-              class="text-red"
-            >
-              {{ roomInfo.gameStartInSeconds }}秒後即將開始
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2 items-center justify-center">
-            <div
-              v-for="(player, index) in roomInfo.players"
-              :key="player.id"
-              class="text-sm flex items-center justify-center gap-1"
-            >
-              <div
-                v-if="player.is_ready"
-                class="text-red"
-              >
-                <img
-                  src="/src/assets/vue.svg"
-                  class="w-6 h-6 object-contain"
-                >
-              </div>
-              <div
-                v-if="roles.indexOf(player.character) != -1"
-                class="h-8 w-8"
-              >
-                <img
-                  :src="penguins[roles.indexOf(player.character)]"
-                  class="w-full h-full object-contain"
-                >
-              </div>
-              <div
-                v-else
-                class="h-8 w-8"
-              >
-                <img
-                  :src="penguins[index % 4]"
-                  class="w-full h-full object-contain"
-                >
-              </div>
-              <div>{{ player.nickname }}</div>
-            </div>
-          </div>
-          <div>
-            <div>選擇角色</div>
-            <div class="flex">
-              <div
-                v-for="index in 4"
-                :key="index"
-                class="h-8 w-8"
-                @click="handleChangeRole(index - 1)"
-              >
-                <img
-                  :src="penguins[index - 1]"
-                  class="w-6 h-6 object-contain"
-                >
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center justify-center gap-1">
-             <div
-              class="hexagon-ice w-[70px] h-[70px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              @click="handleStartGame"
-            >
-              開始遊戲
-            </div>
-            <div
-              v-if="!roomMe.is_ready"
-              class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              @click="handleReady"
-            >
-              準備
-            </div>
-            <div
-              v-else
-              class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              @click="handleCancelReady"
-            >
-              取消準備
-            </div>
-            <div
-              class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              @click="handleLeaveRoom"
-            >
-              離開
-            </div>
-            <div
-              class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              @click="handleCloseRoom"
-            >
-              關閉
-            </div>
-            
-            <div
-              class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              @click="handleBackRooms"
-            >
-              返回
-            </div>
-          </div>
-        </div>
-      </div> -->
     </div>
   </div>
 </template>

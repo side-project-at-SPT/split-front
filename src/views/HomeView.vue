@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router'
 import { useRoomStore } from '../stores/room'
 import { useUserStore } from '../stores/user'
 import { usePublicStore } from '../stores/public'
-// import { createConsumer } from '@rails/actioncable'
 import CreateRoomModal from '@/components/CreateRoomModal.vue'
 import ChangeNicknameModal from '../components/ChangeNicknameModal.vue'
 import Tux from '@/assets/images/tux.png'
@@ -29,14 +28,10 @@ const router = useRouter()
 const isLogin = ref(false)
 const userName = ref('')
 const password = ref('')
-// const roomId = ref('')
 const errorMessage = ref('')
 const showCreateRoomModal = ref(false)
 const showChangeNicknameModal = ref(false)
 const newNickname = ref('')
-// const roomMe = computed(() => {
-//   return roomInfo.value.players.find((player) => player.id === user.value.id) || {}
-// })
 let token = localStorage.getItem('token')
 
 const login = async () => {
@@ -66,14 +61,11 @@ const showErrorMessage = (message) => {
 const openCreateRoomModal = async () => {
   showCreateRoomModal.value = true
 }
-// let consumer = null
 const doAfterLogin = () => {
   isLogin.value = true
   getRooms()
   getUserInfo()
   initConnection(token)
-  // const socketUrl = `wss://spt-games-split.zeabur.app/cable?token=${ token }`
-  // consumer = createConsumer(socketUrl)
   consumer.value.subscriptions.create({ channel: 'LobbyChannel' }, {
     connected () {
       getUsers()
@@ -96,15 +88,11 @@ const doAfterLogin = () => {
     }
   })
 }
-
 const roomStatus = {
   'waiting': '等待中',
   'starting': '即將開始',
   'playing': '進行中',
 }
-// const handleChangeRole = (index) => {
-//   roomChannel.send({ action: 'set_character', character: roles[index] }) 
-// }
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token) {

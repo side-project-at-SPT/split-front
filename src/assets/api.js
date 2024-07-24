@@ -158,27 +158,6 @@ const api = {
     axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + newToken
     token.value = newToken
   },
-  getTokenFromGaas: async () => {
-    try {
-      const response = await axiosInstance.post('/api/v1/users/login-via-gaas-token')
-      axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + response.data.token
-      token.value = response.data.token
-      return response.data
-    }
-    catch (error) {
-      console.log(error, 'getTokenFromGaas')
-      throw error
-    }
-  },
-  closeGaasGame: async (gameId, gaasToken) => {
-    try {
-      const response = await axiosInstance.post(`/api/v1/games/${ gameId }/end-game-via-gaas-token`, {}, { headers: { 'Authorization': 'Bearer ' + gaasToken } })
-      return response.data
-    }
-    catch (error) {
-      throw error.response.data
-    }
-  },
 
 }
 export default api

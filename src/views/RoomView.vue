@@ -78,9 +78,6 @@ onMounted(async () => {
   console.log('gaasToken: ', gaasToken.value)
   if (gaasToken.value) {
     api.setToken(gaasToken.value)
-    // const res = await api.getTokenFromGaas()
-    // console.log('res getTokenFromGaas', res)
-    // trueToken.value = res.token
     trueToken.value = gaasToken.value
   }
   if (!consumer.value){
@@ -145,13 +142,6 @@ onMounted(async () => {
         const gameId = data.game_id
         router.push(`/game/?game_id=${ gameId }&room_id=${ roomId }`)
       }
-      // else if (data.event === 'join_room') {
-      //   const roomData = {
-      //     id: roomId,
-      //     players: [ ...roomInfo.value.players, data.player ]
-      //   }
-      //   updateRoomPlayers(roomData)
-      // }
       console.log(data, 'data room channel', roomId)
     }
   })

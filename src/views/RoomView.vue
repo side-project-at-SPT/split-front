@@ -234,7 +234,7 @@ onMounted(async () => {
           class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
           @click="handleLeaveRoom"
         >
-          離開
+          離開房間
         </div>
         <div
           class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
@@ -246,7 +246,7 @@ onMounted(async () => {
           class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
           @click="handleCloseRoom"
         >
-          關閉
+          關閉房間
         </div>
         <!-- 
             <div

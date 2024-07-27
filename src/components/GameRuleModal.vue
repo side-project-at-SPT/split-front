@@ -70,6 +70,19 @@ const showRuleModal = computed({
           </div>
         </div>
       </div>
+      <div>
+        <div class="text-lg">
+          遊戲獲勝
+        </div>
+        <div class="p-2">
+          <div>
+            當所有玩家都無法移動企鵝時，佔領最多牧場的玩家獲勝！
+          </div>
+          <div>
+            總牧場面積平手時，則相連的牧場面積最大的玩家獲勝
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -360,6 +360,7 @@ onMounted(async () => {
           取消準備
         </div>
         <div
+          v-if="!gaasToken"
           class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
           @click="handleLeaveRoom"
         >

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, toRefs } from 'vue'
+import { onMounted, ref, toRaw, toRefs } from 'vue'
 import api from '@/assets/api'
 import { useRouter } from 'vue-router'
 import { useRoomStore } from '../stores/room'
@@ -18,7 +18,7 @@ const userStore = useUserStore()
 const publicStore = usePublicStore()
 const { rooms } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
-const { consumer } = toRefs(publicStore)
+let consumer = toRaw(publicStore.consumer)
 const {
   getRooms, updateRoomPlayers,
 } = roomStore
@@ -65,28 +65,58 @@ const doAfterLogin = () => {
   isLogin.value = true
   getRooms()
   getUserInfo()
-  initConnection(token)
-  consumer.value.subscriptions.create({ channel: 'LobbyChannel' }, {
-    connected () {
-      getUsers()
-      console.log('connected')
-    },
-    disconnected () {
-      console.log('disconnected')
-    },
-    received (data) {
-      if (data.event === 'user preferences updated') {
+  if (!consumer){
+    initConnection(token)
+    consumer = toRaw(publicStore.consumer)
+    consumer.subscriptions.create({ channel: 'LobbyChannel' }, {
+      connected () {
         getUsers()
+        console.log('connected')
+      },
+      disconnected () {
+        console.log('disconnected')
+      },
+      received (data) {
+        if (data.event === 'user preferences updated') {
+          getUsers()
+        }
+        if (data.event === 'create_room' || data.event === 'room_closed') {
+          getRooms()
+        }
+        if (data.event === 'join_room' || data.event === 'leave_room'){
+          updateRoomPlayers(data.room)
+        }
+        console.log(data, 'data')
       }
-      if (data.event === 'create_room' || data.event === 'room_closed') {
-        getRooms()
-      }
-      if (data.event === 'join_room' || data.event === 'leave_room'){
-        updateRoomPlayers(data.room)
-      }
-      console.log(data, 'data')
+    })
+  } 
+  else {
+    // 檢查是否已經訂閱過LobbyChannel
+    if (consumer.subscriptions.findAll('{\"channel\":\"LobbyChannel\"}').length === 0){
+      // initConnection(token)
+      publicStore.consumer.subscriptions.create({ channel: 'LobbyChannel' }, {
+        connected () {
+          getUsers()
+          console.log('connected')
+        },
+        disconnected () {
+          console.log('disconnected')
+        },
+        received (data) {
+          if (data.event === 'user preferences updated') {
+            getUsers()
+          }
+          if (data.event === 'create_room' || data.event === 'room_closed') {
+            getRooms()
+          }
+          if (data.event === 'join_room' || data.event === 'leave_room'){
+            updateRoomPlayers(data.room)
+          }
+          console.log(data, 'data')
+        }
+      })
     }
-  })
+  }
 }
 const roomStatus = {
   'waiting': '等待中',

@@ -7,7 +7,7 @@ export const usePublicStore = defineStore('usePublicStore', () => {
   const initConnection = (token) => {
     const socketUrl = `wss://spt-games-split.zeabur.app/cable?token=${ token }`
     consumer.value = createConsumer(socketUrl)
-    return consumer
+    return consumer.value
   }
   return {
     consumer,

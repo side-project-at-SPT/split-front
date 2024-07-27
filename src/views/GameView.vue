@@ -7,6 +7,7 @@ import { usePublicStore } from '../stores/public'
 import { useUserStore } from '../stores/user'
 import GameOverModal from '@/components/GameOverModal.vue'
 import api from '@/assets/api'
+import GameRuleModal from '../components/GameRuleModal.vue'
 const directions = [
   {
     x: 0, y: -1 
@@ -494,12 +495,14 @@ const handleCancel = () => {
 }
 // const gameOver = computed(() => players.value.every(player => player.isEnd))
 const gameOver = ref(false)
+const showRule = ref(false)
 const handlebackRoom = () => {
   router.push(`/room/${ roomId }`)
 }
 </script>
 
 <template>
+  <GameRuleModal v-model="showRule" />
   <GameOverModal v-model="gameOver">
     <div
       class="w-[500px] flex flex-col items-center justify-around"
@@ -560,6 +563,12 @@ const handlebackRoom = () => {
       @click="handleCancel"
     >
       取消選取
+    </span>
+    <span
+      class="bg-blue-400 p-2 m-5 cursor-pointer"
+      @click="showRule = true"
+    >
+      遊戲規則
     </span>
     <div>
       <div

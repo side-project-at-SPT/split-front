@@ -37,6 +37,18 @@ const api = {
       throw error.response.data
     }
   },
+  loginAsVisitor: async () => {
+    try {
+      const response = await axiosInstance.post('/api/v1/users/login-as-visitor')
+      token.value = response.data.token
+      localStorage.setItem('token', response.data.token)
+      axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + response.data.token
+      return response.data
+    }
+    catch (error) {
+      throw error.response.data
+    }
+  },
   getUsers: async () => {
     try {
       const response = await axiosInstance.get('/api/v1/users')

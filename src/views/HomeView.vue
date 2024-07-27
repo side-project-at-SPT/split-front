@@ -47,6 +47,19 @@ const login = async () => {
     showErrorMessage(error.error)
   }
 }
+const loginAsVisitor = async () => {
+  try {
+    const data = await api.loginAsVisitor()
+    if (data.token) {
+      token = data.token
+      doAfterLogin()
+    }
+    return
+  }
+  catch (error) {
+    showErrorMessage(error.error)
+  }
+}
 // let roomChannel = null
 const handleSeeRoom = async (room) => {
   // 跳轉到room頁面
@@ -188,6 +201,12 @@ onMounted(() => {
             @click="login"
           >
             Sign in
+          </button>
+          <button
+            class="mt-7 flex w-full justify-center rounded-md bg-blue-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            @click="loginAsVisitor"
+          >
+            Sign in as visitor
           </button>
         </div>
       </div>

@@ -168,7 +168,7 @@ const initRoomChannel = () => {
     class="flex justify-center"
   >
     <ChangeNicknameModal v-model="showChangeNicknameModal" />
-    <div class="flex flex-col gap-2 justify-center items-center hexagon-ice w-[360px] h-[360px]">
+    <div class="flex flex-col gap-2 justify-center items-center hexagon-ice w-[480px] h-[480px]">
       <div class="p-4 text-2xl">
         {{ roomInfo.name }}
         <div

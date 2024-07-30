@@ -1,6 +1,7 @@
 <script setup>
 import {
-  ref, computed, onMounted, toRefs, 
+  ref, computed, onMounted, toRefs,
+  toRaw, 
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePublicStore } from '../stores/public'
@@ -30,7 +31,8 @@ const directions = [
 ]
 const publicStore = usePublicStore()
 const userStore = useUserStore()
-const { consumer } = toRefs(publicStore)
+// const { consumer } = toRefs(publicStore)
+let consumer = toRaw(publicStore.consumer)
 const { initConnection } = publicStore
 const { user } = toRefs(userStore)
 const { getUserInfo } = userStore
@@ -170,12 +172,13 @@ const initGame = () => {
 }
 onMounted(() => {
   // const users = ref(Number(route.query.users || 2))
-  if (!consumer.value){
+  if (!consumer){
     const token = localStorage.getItem('token')
     initConnection(token)
+    consumer = toRaw(publicStore.consumer)
     getUserInfo()
   }
-  gameChannel = consumer.value.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
+  gameChannel = consumer.subscriptions.create({ channel: 'GameChannel', game_id: gameId.value }, {
     connected () {
       console.log('connected game channel', gameId.value)
     },
@@ -497,6 +500,10 @@ const handleCancel = () => {
 const gameOver = ref(false)
 const showRule = ref(false)
 const handlebackRoom = () => {
+  // 斷線
+  if (consumer){
+    consumer.subscriptions.remove(gameChannel)
+  }
   router.push(`/room/${ roomId }`)
 }
 </script>
@@ -520,7 +527,7 @@ const handlebackRoom = () => {
         class="hexagon-div flex mt-4 justify-center rounded-md bg-blue-300 h-[100px] w-[100px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         @click="handlebackRoom"
       >
-        回到大廳
+        回到房間
       </button>
     </div>
   </GameOverModal>

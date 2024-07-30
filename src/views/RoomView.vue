@@ -98,6 +98,12 @@ onMounted(async () => {
   joinRoom({ id: roomId })
 })
 const initRoomChannel = () => {
+  // 檢查是否已經訂閱過該房間
+  if (consumer.subscriptions.findAll(`{"channel":"RoomChannel","room_id":${ roomId }}`).length > 0){
+    roomChannel = consumer.subscriptions.findAll(`{"channel":"RoomChannel","room_id":${ roomId }}`)[0]
+    roomChannel.send({ action: 'cancel_ready' }) 
+    return
+  }
   roomChannel = consumer.subscriptions.create({ channel: 'RoomChannel', room_id: roomId }, {
     connected () {
       console.log('connected room channel', roomId)

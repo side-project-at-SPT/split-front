@@ -33,6 +33,7 @@ roomId = Number(roomId)
 const { token: queryGaasToken } = query
 if (queryGaasToken){
   gaasToken.value = queryGaasToken
+  localStorage.setItem('token', queryGaasToken)
 }
 const trueToken = ref(localStorage.getItem('token'))
 const handleChangeRole = (index) => {
@@ -81,11 +82,15 @@ let roomChannel = null
 onMounted(async () => {
   console.log('roomId', roomId)
   console.log('gaasToken: ', gaasToken.value)
+  if (!gaasToken.value && sessionStorage.getItem('gaasToken')){
+    gaasToken.value = sessionStorage.getItem('gaasToken')
+  }
   if (gaasToken.value) {
     api.setToken(gaasToken.value)
     trueToken.value = gaasToken.value
   }
   if (!consumer){
+    console.log('no consumer')
     initConnection(trueToken.value)
     consumer = toRaw(publicStore.consumer)
     getUserInfo()
@@ -93,6 +98,7 @@ onMounted(async () => {
     initRoomChannel()
   }
   else {
+    console.log('has consumer')
     initRoomChannel()
   }
   joinRoom({ id: roomId })

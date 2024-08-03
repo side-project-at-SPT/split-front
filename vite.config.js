@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import vueDevTools from 'vite-plugin-vue-devtools'
 import vue from '@vitejs/plugin-vue'
 import {
   fileURLToPath, URL 
@@ -12,7 +13,7 @@ export default defineConfig({
   css: {
     
   },
-  plugins: [ vue() ],
+  plugins: [ vue(), vueDevTools() ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

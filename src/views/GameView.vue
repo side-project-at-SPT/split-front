@@ -531,34 +531,28 @@ const handlebackRoom = () => {
       </button>
     </div>
   </GameOverModal>
-  <div class="flex items-center ">
-    <div class="flex items-center ">
-      <div class="bg-white p-3">
-        當前回合
-      </div>
-      <!-- <div
-        class="p-3 flex items-center"
-        :style="{ background: currentPlayer.color }"
-      >
-        {{ currentPlayer.nickname }}
-        <div
-          :class="currentPlayer.character"
-          class="h-6 w-6"
-        ></div>
-      </div> -->
+  <div class="flex items-center flex-col fixed mt-5 ml-5 gap-3">
+    <div class="bg-white p-3 text-blue-500 ">
+      當前回合
+    </div>
+    <div
+      v-for="player in orderedPlayers"
+      :key="player.id"
+      class="h-20 w-20 flex flex-col items-center relative"
+    >
       <div
-        v-for="player in orderedPlayers"
-        :key="player.id"
-        class="p-3 flex items-center"
+        :class="player.character"
+        class="h-12 w-12"
+      ></div>
+      <div
+        class="absolute bottom-0 w-full text-center rounded-lg"
         :style="{ background: player.color }"
       >
         {{ player.nickname }}
-        <div
-          :class="player.character"
-          class="h-6 w-6"
-        ></div>
       </div>
     </div>
+  </div>
+  <div class="flex items-center ml-[500px]">
     <span
       class="bg-blue-400 p-2 m-5 cursor-pointer"
       @click="handleConfirm"

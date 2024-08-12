@@ -359,7 +359,7 @@ const moveItem = ({
   document.querySelector('.pasture-table').appendChild(newDiv)
   setTimeout(() => {
     newDiv.style.left = `calc(${ to.x * 105 }px + ${ to.y * 105 }px * sin(30deg) + 25px)`
-    newDiv.style.top = `calc(${ to.y * 105 }px *  cos(30deg) + 25px)`
+    newDiv.style.top = `calc(${ to.y * 105 }px *  cos(30deg) + 45px)`
   }, 10)
   setTimeout(() => {
     newDiv.remove()
@@ -552,7 +552,7 @@ const handlebackRoom = () => {
       </div>
     </div>
   </div>
-  <div class="flex items-center ml-[500px]">
+  <div class="flex items-center ml-[200px]">
     <span
       class="bg-blue-400 p-2 m-5 cursor-pointer"
       @click="handleConfirm"
@@ -583,7 +583,10 @@ const handlebackRoom = () => {
       </div>
     </div>
   </div>
-  <div v-if="myTurn">
+  <div
+    v-if="myTurn"
+    class="ml-[300px]"
+  >
     <div v-if="needPutCharacter">
       選擇一個初始位置(綠色底色)
     </div>

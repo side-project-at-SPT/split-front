@@ -348,7 +348,7 @@ const moveItem = ({
   // 在 pasture-table 新增一個羊
   const newDiv = document.createElement('div')
   newDiv.style.left = `calc(${ from.x * 105 }px + ${ from.y * 105 }px * sin(30deg) + 25px)`
-  newDiv.style.top = `calc(${ from.y * 105 / 2 }px * sqrt(3) * cos(30deg) + 25px)`
+  newDiv.style.top = `calc(${ from.y * 105 }px * cos(30deg) + 25px)`
   newDiv.style.position = 'absolute'
   newDiv.style.width = '50px'
   newDiv.style.height = '50px'
@@ -359,7 +359,7 @@ const moveItem = ({
   document.querySelector('.pasture-table').appendChild(newDiv)
   setTimeout(() => {
     newDiv.style.left = `calc(${ to.x * 105 }px + ${ to.y * 105 }px * sin(30deg) + 25px)`
-    newDiv.style.top = `calc(${ to.y * 105 / 2 }px * sqrt(3) * cos(30deg) + 25px)`
+    newDiv.style.top = `calc(${ to.y * 105 }px *  cos(30deg) + 25px)`
   }, 10)
   setTimeout(() => {
     newDiv.remove()
@@ -602,7 +602,7 @@ const handlebackRoom = () => {
                 'bg-from-owner': pasture.owner,
       }"
       :style="{ left: `calc(${pasture.x * 105}px + ${pasture.y * 105}px * sin(30deg))`,
-                top: `calc(${pasture.y * 105 / 2}px * sqrt(3) * cos(30deg))`,
+                top: `calc(${pasture.y * 105}px * cos(30deg))`,
                 '--player-coler': pasture.owner?.color }"
       @click="()=>handleClick(pasture)"
     >
@@ -630,7 +630,7 @@ const handlebackRoom = () => {
   .hexagon {
     position: absolute;
     width: 100px;
-    height: 100px;
+    height: calc(100px * 2 / sqrt(3));
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   }
 

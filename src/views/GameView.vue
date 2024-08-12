@@ -348,7 +348,7 @@ const moveItem = ({
   // 在 pasture-table 新增一個羊
   const newDiv = document.createElement('div')
   newDiv.style.left = `calc(${ from.x * 105 }px + ${ from.y * 105 }px * sin(30deg) + 25px)`
-  newDiv.style.top = `calc(${ from.y * 105 }px * cos(30deg) + 25px)`
+  newDiv.style.top = `calc(${ from.y * 105 }px * cos(30deg) + 45px)`
   newDiv.style.position = 'absolute'
   newDiv.style.width = '50px'
   newDiv.style.height = '50px'

@@ -1,7 +1,7 @@
 <script setup>
 import {
   ref, computed, onMounted, toRefs,
-  toRaw, 
+  toRaw, watchEffect
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePublicStore } from '../stores/public'
@@ -9,6 +9,7 @@ import { useUserStore } from '../stores/user'
 import GameOverModal from '@/components/GameOverModal.vue'
 import api from '@/assets/api'
 import GameRuleModal from '../components/GameRuleModal.vue'
+import TurnAnimation from '../components/TurnAnimation.vue'
 const directions = [
   {
     x: 0, y: -1 
@@ -125,8 +126,11 @@ const getGameStatus = async () => {
 const needPutCharacter = computed(() => {
   return pastures.value.filter(pasture => pasture.owner).length < players.value.length
 })
-const myTurn = computed(() => {
-  return currentPlayer.value.id === user.value.id
+
+const myCharacter = computed(() => {
+  const me = players.value.find(player => player.id === user.value.id)
+  if (!me) return 'tux'
+  return me.character
 })
 const initGame = () => {
   console.log('init game')
@@ -170,6 +174,7 @@ const initGame = () => {
     count++
   }
 }
+
 onMounted(() => {
   // const users = ref(Number(route.query.users || 2))
   if (!consumer){
@@ -258,6 +263,14 @@ onMounted(() => {
   getGameStatus()
 })
 const currentPlayer = computed(() => players.value[gameStatus.value?.game_data?.current_player_index || 0])
+const myTurn = computed(() => {
+  return currentPlayer.value.id === user.value.id
+})
+watchEffect(() => {
+  if (myTurn.value){
+    showTurnAnimation.value = true
+  }
+})
 const orderedPlayers = computed(() => {
   const playersOrder = []
   for (let i = 0; i < players.value.length; i++){
@@ -506,6 +519,7 @@ const handlebackRoom = () => {
   }
   router.push(`/room/${ roomId }`)
 }
+const showTurnAnimation = ref(false)
 </script>
 
 <template>
@@ -531,6 +545,10 @@ const handlebackRoom = () => {
       </button>
     </div>
   </GameOverModal>
+  <TurnAnimation
+    v-model="showTurnAnimation"
+    :character="myCharacter"
+  />
   <div class="flex items-center flex-col fixed mt-5 ml-5 gap-3">
     <div class="bg-white p-3 text-blue-500 ">
       當前回合

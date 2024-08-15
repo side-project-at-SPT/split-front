@@ -428,7 +428,8 @@ const finalPlayers = computed(() => players.value.map(player => {
   return {
     name: player.nickname,
     score: pastures.value.filter(pasture => pasture.owner?.id === player.id).length,
-    largestPasture: getLargestPasture(player)
+    largestPasture: getLargestPasture(player),
+    color: player.color
   }
 }).sort((a, b) => b.score - a.score))
 const getLargestPasture = (player) => {
@@ -570,6 +571,31 @@ const showTurnAnimation = ref(false)
       </div>
     </div>
   </div>
+  <div class="flex items-center flex-col fixed mt-5 right-0 gap-3">
+    <div class=" p-3  ">
+      最新戰況
+    </div>
+    <div
+      v-for="player in finalPlayers"
+      :key="player.id"
+      class="w-28 flex items-center relative bg-[#b3d9ff] rounded-l-full py-1"
+    >
+      <div
+        class="absolute w-8 h-8 -left-5 flex justify-center items-center rounded-full text-white"
+        :style="{ background: player.color }"
+      >
+        {{ player.score }}
+      </div>
+      <div class="ml-5">
+        <div>
+          {{ player.name }}
+        </div>
+        <div class="text-sm">
+          最大區塊{{ player.largestPasture }}
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="flex items-center ml-[200px]">
     <span
       class="bg-blue-400 p-2 m-5 cursor-pointer"
@@ -589,17 +615,6 @@ const showTurnAnimation = ref(false)
     >
       遊戲規則
     </span>
-    <div>
-      <div
-        v-for="player in finalPlayers"
-        :key="player.name"
-        class="flex items-center justify-center gap-2"
-      >
-        <div>{{ player.name }}:</div>
-        <div>{{ player.score }}分</div>
-        <div>最大區塊{{ player.largestPasture }}</div>
-      </div>
-    </div>
   </div>
   <div
     v-if="myTurn"

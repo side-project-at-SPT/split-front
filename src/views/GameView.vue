@@ -621,19 +621,26 @@ const showTurnAnimation = ref(false)
       </div>
     </div>
   </div>
+  <div
+    v-if="myTurn && targetPasure"
+    class="flex items-center justify-center w-full fixed bottom-10 pointer-events-none z-10"
+  >
+    <div class="flex items-center">
+      <div
+        class="bg-amber-400 text-amber-800 rounded-full py-2 px-4 m-5 cursor-pointer pointer-events-auto"
+        @click="handleConfirm"
+      >
+        確定移動
+      </div>
+      <div
+        class="bg-slate-400 text-white w-10 h-10 p-2 cursor-pointer pointer-events-auto rounded-full text-center"
+        @click="handleCancel"
+      >
+        X
+      </div>
+    </div>
+  </div>
   <div class="flex items-center ml-[200px]">
-    <span
-      class="bg-blue-400 p-2 m-5 cursor-pointer"
-      @click="handleConfirm"
-    >
-      確定移動
-    </span>
-    <span
-      class="bg-blue-400 p-2 m-5 cursor-pointer"
-      @click="handleCancel"
-    >
-      取消選取
-    </span>
     <span
       class="bg-blue-400 p-2 m-5 cursor-pointer"
       @click="showRule = true"

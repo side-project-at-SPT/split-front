@@ -216,6 +216,11 @@ onMounted(() => {
             //   pasture.amount = 16
             //   pasture.owner = players.value[i]
             // }
+          }).catch(error => {
+            if (error.error == 'Failed to authenticate'){
+              alert('請重新登入')
+              router.push('/')
+            }
           })
         }
       }
@@ -260,7 +265,12 @@ onMounted(() => {
       console.log(data, 'data game channel', gameId.value)
     }
   })
-  getGameStatus()
+  getGameStatus().catch(error => {
+    if (error.error == 'Failed to authenticate'){
+      alert('請重新登入')
+      router.push('/')
+    }
+  })
 })
 const currentPlayer = computed(() => players.value[gameStatus.value?.game_data?.current_player_index || 0])
 const myTurn = computed(() => {

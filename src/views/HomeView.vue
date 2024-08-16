@@ -62,6 +62,11 @@ const loginAsVisitor = async () => {
 }
 // let roomChannel = null
 const handleSeeRoom = async (room) => {
+  const hasPlayer = room.players.length > 0
+  if (room.status === 'playing' && hasPlayer){
+    showErrorMessage('遊戲進行中，無法進入')
+    return
+  }
   // 跳轉到room頁面
   router.push(`/room/${ room.id }`)
 }
@@ -124,6 +129,9 @@ const doAfterLogin = () => {
           }
           if (data.event === 'join_room' || data.event === 'leave_room'){
             updateRoomPlayers(data.room)
+          }
+          if (data.event === 'game_started'){
+            getRooms()
           }
           console.log(data, 'data')
         }

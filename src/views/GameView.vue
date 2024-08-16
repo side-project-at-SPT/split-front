@@ -606,6 +606,21 @@ const showTurnAnimation = ref(false)
       </div>
     </div>
   </div>
+  <div
+    class="flex items-center justify-center w-full fixed top-10 pointer-events-none"
+  >
+    <div class="bg-slate-300 py-5 px-10">
+      <div v-if="myTurn && needPutCharacter">
+        選擇一個初始位置(綠色底色)
+      </div>
+      <div v-else-if="myTurn">
+        請移動你的企鵝
+      </div>
+      <div v-else>
+        等待{{ currentPlayer.nickname }}移動
+      </div>
+    </div>
+  </div>
   <div class="flex items-center ml-[200px]">
     <span
       class="bg-blue-400 p-2 m-5 cursor-pointer"
@@ -626,17 +641,7 @@ const showTurnAnimation = ref(false)
       遊戲規則
     </span>
   </div>
-  <div
-    v-if="myTurn"
-    class="ml-[300px]"
-  >
-    <div v-if="needPutCharacter">
-      選擇一個初始位置(綠色底色)
-    </div>
-    <div v-else>
-      輪到你了，請移動
-    </div>
-  </div>
+
   <div class="text-white relative mt-10 pasture-table">
     <div
       v-for="pasture in pastures"

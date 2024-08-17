@@ -9,6 +9,6 @@
 
 <style>
 body{
-  background-color: #0077be;
+  background-image : url('@/assets/images/bg.webp');
 }
 </style>

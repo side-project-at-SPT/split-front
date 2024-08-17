@@ -716,6 +716,7 @@ const showTurnAnimation = ref(false)
     background-position: center;
     background-size: 100% 100%;
   }
+
   .stroke {
     background-image: url('@/assets/images/stroke.svg');
     background-repeat: no-repeat;
@@ -752,11 +753,5 @@ const showTurnAnimation = ref(false)
 
   .hexagon-div {
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
-  .close {
-    background-image: url('@/assets/images/close.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100% 100%;
   }
 </style>

@@ -31,6 +31,8 @@ export default {
       },
       boxShadow: {
         message: '0px 4px 0px 0px #27B8E0',
+        confirm: '0px 4px 0px 0px #FF9200',
+        cancel: '0px 4px 0px 0px #919A9C', 
       }
 
     },

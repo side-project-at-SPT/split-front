@@ -611,7 +611,7 @@ const showTurnAnimation = ref(false)
   >
     <div class="bg-gradient-light w-[580px] py-5 text-center text-text border-4 border-white rounded-3xl shadow-message text-3xl">
       <div v-if="myTurn && needPutCharacter">
-        選擇一個初始位置(綠色底色)
+        請選擇一個初始位置(綠色底色)
       </div>
       <div v-else-if="myTurn">
         請移動你的企鵝
@@ -623,20 +623,20 @@ const showTurnAnimation = ref(false)
   </div>
   <div
     v-if="myTurn && targetPasure"
-    class="flex items-center justify-center w-full fixed bottom-10 pointer-events-none z-10"
+    class="flex items-center justify-center w-full fixed bottom-20 pointer-events-none z-10"
   >
-    <div class="flex items-center">
+    <div class="flex items-center gap-3">
       <div
-        class="bg-amber-400 text-amber-800 rounded-full py-2 px-4 m-5 cursor-pointer pointer-events-auto"
+        class=" text-[#982000] text-xl rounded-full py-[10px] px-7 cursor-pointer pointer-events-auto bg-gradient-to-b from-[#FFFBD6] to-[#FFBA39] border border-[#FFDE7B] shadow-confirm"
         @click="handleConfirm"
       >
         確定移動
       </div>
       <div
-        class="bg-slate-400 text-white w-10 h-10 p-2 cursor-pointer pointer-events-auto rounded-full text-center"
+        class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#AFB7B9] to-[#6B7375] border border-[#DBDFEO] shadow-cancel flex justify-center items-center"
         @click="handleCancel"
       >
-        X
+        <div class="stroke h-5 w-5"></div>
       </div>
     </div>
   </div>
@@ -716,6 +716,11 @@ const showTurnAnimation = ref(false)
     background-position: center;
     background-size: 100% 100%;
   }
+  .stroke {
+    background-image: url('@/assets/images/stroke.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 
   .zoom-in-out {
     animation: animate-zoom-in-out 1.5s infinite;
@@ -747,5 +752,11 @@ const showTurnAnimation = ref(false)
 
   .hexagon-div {
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+  .close {
+    background-image: url('@/assets/images/close.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
   }
 </style>

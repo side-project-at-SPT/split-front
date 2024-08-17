@@ -6,6 +6,7 @@ export default {
     extend: {
       colors: {
         // Configure your color palette here
+        text: '#006989',
         red: '#AE0000',
         'red-dark': '#730000',
         pink: '#EC7DD3',
@@ -25,6 +26,13 @@ export default {
         white20: 'rgba(255, 255, 255, 0.20)',
         oldBook: '#C8B59F',
       },
+      backgroundImage: {
+        'gradient-light': 'linear-gradient(180deg, #FFFFFF 0%, #DAFFFF 100%)'
+      },
+      boxShadow: {
+        message: '0px 4px 0px 0px #27B8E0',
+      }
+
     },
   },
   plugins: [],

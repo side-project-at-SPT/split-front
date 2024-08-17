@@ -607,9 +607,9 @@ const showTurnAnimation = ref(false)
     </div>
   </div>
   <div
-    class="flex items-center justify-center w-full fixed top-10 pointer-events-none"
+    class="flex items-center justify-center w-full fixed top-10 pointer-events-none z-10"
   >
-    <div class="bg-slate-300 py-5 px-10">
+    <div class="bg-gradient-light w-[580px] py-5 text-center text-text border-4 border-white rounded-3xl shadow-message text-3xl">
       <div v-if="myTurn && needPutCharacter">
         選擇一個初始位置(綠色底色)
       </div>

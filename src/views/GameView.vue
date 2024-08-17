@@ -763,26 +763,28 @@ const showTurnAnimation = ref(false)
     background-repeat: no-repeat;
     background-position: center;
   }
+
   .score-yellow {
-    background: #FFC23B;
-    border: 3px solid #FFF7AE;
-    box-shadow: 1px 1px 0px 0px #FFC23B;
+    background: #ffc23b;
+    border: 3px solid #fff7ae;
+    box-shadow: 1px 1px 0px 0px #ffc23b;
   }
+
   .score-blue {
-    background: #56B2F6;
-    border: 3px solid #B3D9FF;
-    box-shadow: 1px 1px 0px 0px #2B9CEF;
-
+    background: #56b2f6;
+    border: 3px solid #b3d9ff;
+    box-shadow: 1px 1px 0px 0px #2b9cef;
   }
+
   .score-red {
-    background: #FB8464;
-    border: 3px solid #FCC0B4;
-    box-shadow: 1px 1px 0px 0px #FB8464;
+    background: #fb8464;
+    border: 3px solid #fcc0b4;
+    box-shadow: 1px 1px 0px 0px #fb8464;
   }
-  .score-green {
-    background: #A1D548;
-    border: 3px solid #CAF67E;
-    box-shadow: 1px 1px 0px 0px #79BF00;
 
+  .score-green {
+    background: #a1d548;
+    border: 3px solid #caf67e;
+    box-shadow: 1px 1px 0px 0px #79bf00;
   }
 </style>

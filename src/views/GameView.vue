@@ -582,26 +582,26 @@ const showTurnAnimation = ref(false)
     </div>
   </div>
   <div class="flex items-center flex-col fixed top-10 right-0 gap-3">
-    <div class=" p-3  ">
+    <div class=" text-text h-6 w-[126px]">
       最新戰況
     </div>
     <div
       v-for="player in finalPlayers"
       :key="player.id"
-      class="w-28 flex items-center relative bg-[#b3d9ff] rounded-l-full py-1"
+      class="w-[166px] h-[69px] flex items-center relative bg-gradient-light border-4 border-white shadow-button rounded-l-3xl py-3 box-border"
     >
       <div
-        class="absolute w-8 h-8 -left-5 flex justify-center items-center rounded-full text-white"
-        :style="{ background: player.color }"
+        class="absolute w-8 h-8 -left-5 flex justify-center items-center rounded-full text-white box-content"
+        :class="`score-${ player.color }`"
       >
         {{ player.score }}
       </div>
-      <div class="ml-5">
-        <div>
+      <div class="ml-8 text-text ">
+        <div class="font-medium">
           {{ player.name }}
         </div>
         <div class="text-sm">
-          最大區塊{{ player.largestPasture }}
+          最大區塊 {{ player.largestPasture }}
         </div>
       </div>
     </div>
@@ -762,5 +762,27 @@ const showTurnAnimation = ref(false)
     background-image: url('@/assets/images/icon-question.svg');
     background-repeat: no-repeat;
     background-position: center;
+  }
+  .score-yellow {
+    background: #FFC23B;
+    border: 3px solid #FFF7AE;
+    box-shadow: 1px 1px 0px 0px #FFC23B;
+  }
+  .score-blue {
+    background: #56B2F6;
+    border: 3px solid #B3D9FF;
+    box-shadow: 1px 1px 0px 0px #2B9CEF;
+
+  }
+  .score-red {
+    background: #FB8464;
+    border: 3px solid #FCC0B4;
+    box-shadow: 1px 1px 0px 0px #FB8464;
+  }
+  .score-green {
+    background: #A1D548;
+    border: 3px solid #CAF67E;
+    box-shadow: 1px 1px 0px 0px #79BF00;
+
   }
 </style>

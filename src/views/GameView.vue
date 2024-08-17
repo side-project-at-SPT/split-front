@@ -560,7 +560,7 @@ const showTurnAnimation = ref(false)
     v-model="showTurnAnimation"
     :character="myCharacter"
   />
-  <div class="flex items-center flex-col fixed mt-5 ml-5 gap-3">
+  <div class="flex items-center flex-col fixed top-10 ml-5 gap-3">
     <div class="bg-white p-3 text-blue-500 ">
       當前回合
     </div>
@@ -581,7 +581,7 @@ const showTurnAnimation = ref(false)
       </div>
     </div>
   </div>
-  <div class="flex items-center flex-col fixed mt-5 right-0 gap-3">
+  <div class="flex items-center flex-col fixed top-10 right-0 gap-3">
     <div class=" p-3  ">
       最新戰況
     </div>
@@ -640,16 +640,19 @@ const showTurnAnimation = ref(false)
       </div>
     </div>
   </div>
-  <div class="flex items-center ml-[200px]">
-    <span
-      class="bg-blue-400 p-2 m-5 cursor-pointer"
-      @click="showRule = true"
-    >
-      遊戲規則
-    </span>
+  <div
+    class="flex items-center justify-center fixed bottom-10 right-10 pointer-events-none z-10"
+  >
+    <div class="flex items-center gap-3">
+      <div
+        class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
+        @click="showRule = true"
+      >
+        <div class="question h-[38px] w-[38px]"></div>
+      </div>
+    </div>
   </div>
-
-  <div class="text-white relative mt-10 pasture-table">
+  <div class="text-white relative mt-32 pasture-table">
     <div
       v-for="pasture in pastures"
       :key="`${pasture.x}-${pasture.y}`"
@@ -753,5 +756,11 @@ const showTurnAnimation = ref(false)
 
   .hexagon-div {
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+
+  .question {
+    background-image: url('@/assets/images/icon-question.svg');
+    background-repeat: no-repeat;
+    background-position: center;
   }
 </style>

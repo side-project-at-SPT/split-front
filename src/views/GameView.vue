@@ -10,6 +10,7 @@ import GameOverModal from '@/components/GameOverModal.vue'
 import api from '@/assets/api'
 import GameRuleModal from '../components/GameRuleModal.vue'
 import TurnAnimation from '../components/TurnAnimation.vue'
+import PlayerAvatar from '../components/PlayerAvatar.vue'
 const directions = [
   {
     x: 0, y: -1 
@@ -561,24 +562,19 @@ const showTurnAnimation = ref(false)
     :character="myCharacter"
   />
   <div class="flex items-center flex-col fixed top-10 ml-5 gap-3">
-    <div class="bg-white p-3 text-blue-500 ">
+    <div class="p-3 text-text">
       當前回合
     </div>
     <div
       v-for="player in orderedPlayers"
       :key="player.id"
-      class="h-20 w-20 flex flex-col items-center relative"
+      class="h-[106px] w-[106px] flex flex-col items-center relative"
     >
-      <div
-        :class="player.character"
-        class="h-12 w-12"
-      ></div>
-      <div
-        class="absolute bottom-0 w-full text-center rounded-lg"
-        :style="{ background: player.color }"
-      >
-        {{ player.nickname }}
-      </div>
+      <PlayerAvatar
+        :character="player.character"
+        :color="player.color"
+        :name="player.nickname"
+      />
     </div>
   </div>
   <div class="flex items-center flex-col fixed top-10 right-0 gap-3">

@@ -28,7 +28,7 @@ watchEffect(() => {
 <template>
   <div
     v-if="showRuleModal"
-    class="absolute w-svw h-dvh bg-black bg-opacity-90 flex items-center justify-center z-10 selection:bg-blue-700 selection:text-white"
+    class="fixed top-0 left-0 w-svw h-dvh bg-black bg-opacity-90 flex items-center justify-center z-10 selection:bg-blue-700 selection:text-white"
   >
     <div class="flex gap-2 p-10 items-center slide-in-out">
       <div

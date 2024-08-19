@@ -561,7 +561,7 @@ const showTurnAnimation = ref(false)
     v-model="showTurnAnimation"
     :character="myCharacter"
   />
-  <div class="flex items-center flex-col fixed top-10 ml-5 gap-3">
+  <div class="flex items-center flex-col fixed top-10 left-[50px] gap-3">
     <div class="p-3 text-text">
       當前回合
     </div>
@@ -574,6 +574,7 @@ const showTurnAnimation = ref(false)
         :character="player.character"
         :color="player.color"
         :name="player.nickname"
+        :active="player.id === currentPlayer.id"
       />
     </div>
   </div>

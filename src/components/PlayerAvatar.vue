@@ -12,6 +12,10 @@ const props = defineProps({
   name: {
     type: String,
     default: 'Player'
+  },
+  active: {
+    type: Boolean,
+    default: false
   }
 })
 const gradientFrom = computed(() => {
@@ -45,7 +49,10 @@ const gradientEnd = computed(() => {
 </script>
 
 <template>
-  <div class="avatar justify-center flex">
+  <div
+    v-if="props.active"
+    class="avatar justify-center flex"
+  >
     <svg
       width="120"
       height="120"
@@ -76,42 +83,74 @@ const gradientEnd = computed(() => {
       </defs>
     </svg>
     <div
+      :class="props.character"
+      class="h-[106px] w-[106px] absolute"
+    ></div>
+    <div
       class="name flex justify-center items-center"
       :class="props.color"
     >
       {{ props.name }}
     </div>
     <div
+      class="banner"
+      :class="props.color"
+    >
+    </div>
+    <!-- <div class="test-clip">
+    </div> -->
+  </div>
+  <div
+    v-else
+    class="avatar justify-center flex"
+  >
+    <svg>
+      <defs>
+        <clipPath id="avatarClip">
+          <path
+            d="M82.4 42.8989C82.4 75.1473 73.6129 82 41.4 82C9.18712 82 0.400024 73.2032 0.400024 40.9548C0.400024 8.70636 9.18712 0 41.4 0C73.6129 0 82.4 10.6504 82.4 42.8989Z"
+            fill="white"
+          ></path>
+        </clipPath>
+      </defs>
+    </svg>
+    <div
       :class="props.character"
-      class="h-[106px] w-[106px] absolute"
+      class="h-[102px] w-[102px] test-clip  absolute top-5"
     ></div>
+    <div
+      class="name flex justify-center items-center"
+      :class="props.color"
+    >
+      {{ props.name }}
+    </div>
   </div>
 </template>
 
 <style scoped>
 .tux {
-  background-image: url('@/assets/images/tux.png');
+  background-image: url('@/assets/images/1.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .gunter {
-  background-image: url('@/assets/images/gunter.png');
+  background-image: url('@/assets/images/2.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .abc {
-  background-image: url('@/assets/images/abc.png');
+  background-image: url('@/assets/images/3.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
 }
 
 .sin {
-  background-image: url('@/assets/images/sin.png');
+  background-image: url('@/assets/images/4.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -152,4 +191,46 @@ const gradientEnd = computed(() => {
 .name.yellow {
   background: #ff9200;
 }
+
+.test-clip {
+  position: absolute;
+  width: 82px;
+  height: 82px;
+  clip-path: url('#avatarClip');
+  background-color: #fff;
+}
+
+.banner {
+  position: absolute;
+  top: 31px;
+  left: -50px;
+  width: 100px;
+  height: 64px;
+}
+
+.banner.blue {
+  background: linear-gradient(270deg, rgba(86, 178, 246, 0) 0%, rgba(86, 178, 246, .8) 100%);
+}
+
+.banner.red {
+  background: linear-gradient(270deg, rgba(231, 80, 39, 0) 0%, rgba(231, 80, 39, .8) 100%);
+}
+
+.banner.green {
+  background: linear-gradient(270deg, rgba(121, 191, 0, 0) 0%, rgba(121, 191, 0, .8) 100%);
+}
+
+.banner.yellow {
+  background: linear-gradient(270deg, rgba(255, 146, 0, 0) 0%, rgba(255, 146, 0, .8) 100%);
+}
+/* .test-clip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 5px solid #fff;
+  clip-path: inherit;
+} */
 </style>

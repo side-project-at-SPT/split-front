@@ -90,7 +90,7 @@ export default function useGame () {
   })
   
   const myCharacter = computed(() => {
-    const me = players.value.find(player => player.id === user.value.id)
+    const me = players.value.find(player => player.id === userStore.user.id)
     if (!me) return 'tux'
     return me.character
   })

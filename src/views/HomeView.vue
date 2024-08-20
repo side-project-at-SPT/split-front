@@ -63,7 +63,8 @@ const loginAsVisitor = async () => {
 // let roomChannel = null
 const handleSeeRoom = async (room) => {
   const hasPlayer = room.players.length > 0
-  if (room.status === 'playing' && hasPlayer){
+  const isMePlaying = room.players.some((player) => player.id === user.value.id)
+  if (room.status === 'playing' && hasPlayer && !isMePlaying){
     showErrorMessage('遊戲進行中，無法進入')
     return
   }

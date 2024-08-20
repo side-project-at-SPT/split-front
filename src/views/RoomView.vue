@@ -71,8 +71,8 @@ const handleLeaveRoom = async () => {
   }
 }
 const handleCloseRoom = async () => {
-  closeRoom().catch((error) => {
-    showErrorMessage(error.error)
+  closeRoom().catch(() => {
+    // showErrorMessage(error.error)
   })
   router.push('/')
 }

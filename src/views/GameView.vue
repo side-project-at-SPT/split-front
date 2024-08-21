@@ -11,6 +11,7 @@ import api from '@/assets/api'
 import GameRuleModal from '../components/GameRuleModal.vue'
 import TurnAnimation from '../components/TurnAnimation.vue'
 import PlayerAvatar from '../components/PlayerAvatar.vue'
+import IcePasture from '../components/IcePasture.vue'
 import useGame from '@/composables/useGame'
 const {
   gameStatus, pastures, originPasure, targetPasure, currentPlayer, myTurn, finalPlayers, orderedPlayers, needPutCharacter, myCharacter, initGame, showAllowedTarget, hideAllowedTarget
@@ -435,7 +436,7 @@ const showTurnAnimation = ref(false)
     </div>
   </div>
   <div class="text-white relative mt-32 pasture-table">
-    <div
+    <!-- <div
       v-for="pasture in pastures"
       :key="`${pasture.x}-${pasture.y}`"
       class="hexagon flex flex-col justify-center items-center text-black cursor-pointer"
@@ -448,37 +449,43 @@ const showTurnAnimation = ref(false)
                 top: `calc(${pasture.y * 105}px * cos(30deg))`,
                 '--player-coler': pasture.owner?.color }"
       @click="()=>handleClick(pasture)"
-    >
-      <!-- <div>
+    > -->
+    <!-- <div>
         {{ `${pasture.x},${pasture.y}` }}
       </div> -->
-      <!-- <div>
+    <!-- <div>
         ({{ pasture.x }},{{ pasture.y }}),{{ pasture.isEdge }}
       </div> -->
-      <div
-        v-if="pasture.owner"
-      >
-        {{ pasture.amount }}
-      </div>
-      <div
-        v-if="pasture.amount"
-        :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originPasure && !pasture.is_blocked }]"
-        class="h-12 w-12"
-      ></div>
+    <!-- <div
+      v-if="pasture.owner"
+    >
+      {{ pasture.amount }}
     </div>
+    <div
+      v-if="pasture.amount"
+      :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originPasure && !pasture.is_blocked }]"
+      class="h-12 w-12"
+    ></div> -->
+    <!-- </div> -->
+    <IcePasture
+      v-for="pasture in pastures"
+      :key="`${pasture.x}-${pasture.y}`"
+      :pasture="pasture"
+      :need-put-character="needPutCharacter"
+      :current-player="currentPlayer"
+      :origin-pasure="originPasure"
+      :style="{ left: `calc(${pasture.x * 105}px + ${pasture.y * 105}px * sin(30deg))`,
+                top: `calc(${pasture.y * 105}px * cos(30deg))` }"
+      @handle-click="handleClick"
+    />
   </div>
 </template>
 
 <style>
-  .hexagon {
-    position: absolute;
-    width: 100px;
-    height: calc(100px * 2 / sqrt(3));
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
-
   .ice {
-    background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3);
+    background: linear-gradient(0deg, #B2EFFF -0.01%, #DEF6FF 100.01%);
+
+    /* background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3); */
   }
 
   .tux {

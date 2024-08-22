@@ -1,5 +1,5 @@
 <script setup>
-// import { computed } from 'vue'
+import { toRefs } from 'vue'
 const props = defineProps({
   pasture: {
     type: Object,
@@ -22,10 +22,13 @@ const emit = defineEmits([ 'handleClick' ])
 const handleClick = (pasture) => {
   emit('handleClick', pasture)
 }
-const pasture = props.pasture
-const needPutCharacter = props.needPutCharacter
-const currentPlayer = props.currentPlayer
-const originPasure = props.originPasure
+
+const { pasture, needPutCharacter, currentPlayer, originPasure } = toRefs(props)
+
+// const pasture = props.pasture
+// const needPutCharacter = props.needPutCharacter
+// const currentPlayer = props.currentPlayer
+// const originPasure = props.originPasure
 // const gradientFrom = computed(() => {
 //   switch (props.color) {
 //   case 'red':
@@ -128,10 +131,11 @@ const originPasure = props.originPasure
   background-position: center;
   background-size: contain;
 }
+
 .pasture {
+  z-index: 10;
   width: 86px;
   height: 86px;
-  z-index: 10;
 }
 
 #avatar {
@@ -187,40 +191,49 @@ const originPasure = props.originPasure
 
 .hexagon.green {
   background: linear-gradient(180deg, #e4ffb5 0%, #caf67e 100%);
+
   .amount-bg {
-    background: var(--green-400)
+    background: var(--green-400);
   }
+
   .land {
-    background: var(--green-300)
+    background: var(--green-300);
   }
 }
 
 .hexagon.yellow {
   background: linear-gradient(180deg, #fffad4 0%, #fff7ae 100%);
+
   .amount-bg {
-    background: var(--yellow-400)
+    background: var(--yellow-400);
   }
+
   .land {
-    background: var(--yellow-300)
+    background: var(--yellow-300);
   }
 }
 
 .hexagon.red {
-  background: linear-gradient(180deg, #FFD5CC 0%, #FCC0B4 100%);
+  background: linear-gradient(180deg, #ffd5cc 0%, #fcc0b4 100%);
+
   .amount-bg {
-    background: var(--red-400)
+    background: var(--red-400);
   }
+
   .land {
-    background: var(--red-300)
+    background: var(--red-300);
   }
 }
+
 .hexagon.blue {
-  background: linear-gradient(180deg, #CCE6FF 0%, #B3D9FF 100%);
+  background: linear-gradient(180deg, #cce6ff 0%, #b3d9ff 100%);
+
   .amount-bg {
-    background: var(--blue-400)
+    background: var(--blue-400);
   }
+
   .land {
-    background: var(--blue-300)
+    background: var(--blue-300);
   }
 }
 

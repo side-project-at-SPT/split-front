@@ -483,7 +483,7 @@ const showTurnAnimation = ref(false)
 
 <style>
   .ice {
-    background: linear-gradient(0deg, #B2EFFF -0.01%, #DEF6FF 100.01%);
+    background: linear-gradient(0deg, #b2efff -.01%, #def6ff 100.01%);
 
     /* background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3); */
   }

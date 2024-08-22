@@ -74,15 +74,20 @@ const originPasure = props.originPasure
       <!-- <div>
         ({{ pasture.x }},{{ pasture.y }}),{{ pasture.isEdge }}
       </div> -->
+      <div class="w-[75px] h-[75px] absolute rounded-full -top-[20px] -left-[40px] amount-bg">
+      </div>
+      <div class="w-[50px] h-[40px] absolute rounded-full top-[65px] land">
+      </div>
       <div
         v-if="pasture.owner"
+        class="absolute top-[1.3rem] left-2 text-white"
       >
         {{ pasture.amount }}
       </div>
       <div
         v-if="pasture.amount"
         :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originPasure && !pasture.is_blocked }]"
-        class="h-12 w-12"
+        class="pasture"
       ></div>
     <!-- <div>{{ pasture.owner?.nickname }}</div> -->
     </div>
@@ -96,32 +101,37 @@ const originPasure = props.originPasure
 </template>
 
 <style scoped>
-.tux {
-  background-image: url('@/assets/images/1.png');
+.pasture.tux {
+  background-image: url('@/assets/images/1p.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
-.gunter {
-  background-image: url('@/assets/images/2.png');
+.pasture.gunter {
+  background-image: url('@/assets/images/2p.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
-.abc {
-  background-image: url('@/assets/images/3.png');
+.pasture.abc {
+  background-image: url('@/assets/images/3p.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
 }
 
-.sin {
-  background-image: url('@/assets/images/4.png');
+.pasture.sin {
+  background-image: url('@/assets/images/4p.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
+}
+.pasture {
+  width: 86px;
+  height: 86px;
+  z-index: 10;
 }
 
 #avatar {
@@ -168,55 +178,68 @@ const originPasure = props.originPasure
   background-color: #fff;
 }
 
-.banner {
-  position: absolute;
-  top: 31px;
-  left: -50px;
-  width: 100px;
-  height: 64px;
-}
-
-.banner.blue {
-  background: linear-gradient(270deg, rgba(86, 178, 246, 0) 0%, rgba(86, 178, 246, .8) 100%);
-}
-
-.banner.red {
-  background: linear-gradient(270deg, rgba(231, 80, 39, 0) 0%, rgba(231, 80, 39, .8) 100%);
-}
-
-.banner.green {
-  background: linear-gradient(270deg, rgba(121, 191, 0, 0) 0%, rgba(121, 191, 0, .8) 100%);
-}
-
-.banner.yellow {
-  background: linear-gradient(270deg, rgba(255, 146, 0, 0) 0%, rgba(255, 146, 0, .8) 100%);
-}
 .hexagon {
-    position: absolute;
-    width: 100px;
-    height: calc(100px * 2 / sqrt(3));
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
-.hexagon.green {
-  background: linear-gradient(180deg, #E4FFB5 0%, #CAF67E 100%);
-}
-.hexagon.yellow {
-  background: linear-gradient(180deg, #FFFAD4 0%, #FFF7AE 100%);
-}
-.hexagon-bg {
   position: absolute;
   width: 100px;
   height: calc(100px * 2 / sqrt(3));
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  background: #27B8E0;
-  z-index: -10;
+}
+
+.hexagon.green {
+  background: linear-gradient(180deg, #e4ffb5 0%, #caf67e 100%);
+  .amount-bg {
+    background: var(--green-400)
+  }
+  .land {
+    background: var(--green-300)
+  }
+}
+
+.hexagon.yellow {
+  background: linear-gradient(180deg, #fffad4 0%, #fff7ae 100%);
+  .amount-bg {
+    background: var(--yellow-400)
+  }
+  .land {
+    background: var(--yellow-300)
+  }
+}
+
+.hexagon.red {
+  background: linear-gradient(180deg, #FFD5CC 0%, #FCC0B4 100%);
+  .amount-bg {
+    background: var(--red-400)
+  }
+  .land {
+    background: var(--red-300)
+  }
+}
+.hexagon.blue {
+  background: linear-gradient(180deg, #CCE6FF 0%, #B3D9FF 100%);
+  .amount-bg {
+    background: var(--blue-400)
+  }
+  .land {
+    background: var(--blue-300)
+  }
+}
+
+.hexagon-bg {
+  position: absolute;
   top: 12px;
+  z-index: -10;
+  width: 100px;
+  height: calc(100px * 2 / sqrt(3));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: #27b8e0;
 }
+
 .hexagon-bg.green {
-  background: #A1D548;
+  background: #a1d548;
 }
+
 .hexagon-bg.yellow {
-  background: #FFC23B;
+  background: #ffc23b;
 }
 /* .test-clip::before {
   content: '';

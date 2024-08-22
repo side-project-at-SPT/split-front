@@ -157,6 +157,22 @@ const api = {
       throw error.response.data
     }
   },
+  /**
+   * 在房間中加入 AI 玩家
+   * 1. 只有房間中的玩家可以加入 AI 玩家
+   * 2. 房間未滿時，可以加入 AI 玩家
+   * 3. 仍有 AI 玩家時，可以加入 AI 玩家
+   * @param { int | string } id room id
+   */
+  addAiPlayer: async (id) => {
+    try {
+      const response = await axiosInstance.post('/api/v1/rooms/' + id + '/ai_players')
+      return response.data
+    }
+    catch (error) {
+      throw error.response.data
+    }
+  },
   getGameStatus: async (id) => {
     try {
       const response = await axiosInstance.get(`/api/v1/games/${ id }`)

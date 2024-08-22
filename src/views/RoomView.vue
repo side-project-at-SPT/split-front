@@ -25,7 +25,7 @@ const { user } = toRefs(userStore)
 const { getUserInfo } = userStore
 const { roomInfo } = toRefs(roomStore)
 const {
-  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom
+  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom, addAiPlayer
 } = roomStore
 const { params, query } = useRoute()
 let { roomId } = params
@@ -75,6 +75,11 @@ const handleCloseRoom = async () => {
     // showErrorMessage(error.error)
   })
   router.push('/')
+}
+const handleAddAiPlayer = async () => {
+  await addAiPlayer()
+  aiPlayerJoined.value = true
+  console.log('add ai player success')
 }
 let roomChannel = null
 // let publicStoreRoomChannel = null
@@ -224,6 +229,9 @@ const initRoomChannel = () => {
             >
           </div>
           <div>{{ player.nickname }}</div>
+        </div>
+        <div class="text-sm flex items-center justify-center gap-1">
+          <div class="cursor-pointer px-5 py-3" @click="handleAddAiPlayer">加入 AI</div>
         </div>
       </div>
       <div>

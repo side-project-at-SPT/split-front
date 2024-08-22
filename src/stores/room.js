@@ -55,6 +55,10 @@ export const useRoomStore = defineStore('useRoomStore', () => {
   const clearRoomInfo = () => {
     joinedRoomId.value = ''
   }
+  const addAiPlayer = () => {
+    api.addAiPlayer(roomInfo.value.id)
+    return undefined
+  }
   return {
     rooms,
     roomInfo,
@@ -68,5 +72,6 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     closeRoom,
     createRoom,
     clearRoomInfo,
+    addAiPlayer
   }
 })

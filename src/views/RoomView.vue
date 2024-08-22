@@ -44,6 +44,7 @@ const roomMe = computed(() => {
 })
 
 const showChangeNicknameModal = ref(false)
+const aiPlayerJoined = ref(false)
 const handleReady = async () => {
   console.log('ready')
   roomChannel.send({ action: 'ready' }) 
@@ -231,7 +232,7 @@ const initRoomChannel = () => {
           <div>{{ player.nickname }}</div>
         </div>
         <div class="text-sm flex items-center justify-center gap-1">
-          <div class="cursor-pointer px-5 py-3" @click="handleAddAiPlayer">加入 AI</div>
+          <div v-if="!aiPlayerJoined" class="cursor-pointer px-5 py-3" @click="handleAddAiPlayer">加入 AI</div>
         </div>
       </div>
       <div>

@@ -33,7 +33,10 @@ export default function useGame () {
   } ])
   const gameStatus = ref(null)
   const allowTargetPastures = ref([])
-  const players = computed(() => gameStatus.value?.game_config?.players || defaultPlayers.value)
+  const players = computed(() => gameStatus.value?.game_config?.players.map((player) => ({
+    ...player,
+    character: player.character === 'none' ? 'tux' : player.character
+  })) || defaultPlayers.value)
   const originPasure = ref(null)
   const targetPasure = ref(null)
   const edgePastures = ref([])

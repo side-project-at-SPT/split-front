@@ -347,7 +347,7 @@ const showTurnAnimation = ref(false)
     v-model="showTurnAnimation"
     :character="myCharacter"
   />
-  <div class="flex items-center flex-col fixed top-10 left-[50px] gap-3">
+  <div class="flex items-center flex-col fixed top-10 left-[50px] gap-3 z-10">
     <div class="p-3 text-text">
       當前回合
     </div>
@@ -364,7 +364,7 @@ const showTurnAnimation = ref(false)
       />
     </div>
   </div>
-  <div class="flex items-center flex-col fixed top-10 right-0 gap-3">
+  <div class="flex items-center flex-col fixed top-10 right-0 gap-3 z-10">
     <div class=" text-text h-6 w-[126px]">
       最新戰況
     </div>

@@ -232,7 +232,13 @@ const initRoomChannel = () => {
           <div>{{ player.nickname }}</div>
         </div>
         <div class="text-sm flex items-center justify-center gap-1">
-          <div v-if="!aiPlayerJoined" class="cursor-pointer px-5 py-3" @click="handleAddAiPlayer">加入 AI</div>
+          <div
+            v-if="!aiPlayerJoined"
+            class="cursor-pointer px-5 py-3"
+            @click="handleAddAiPlayer"
+          >
+            加入 AI
+          </div>
         </div>
       </div>
       <div>

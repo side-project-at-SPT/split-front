@@ -251,19 +251,19 @@ const moveItem = ({
 }) => {
   // 在 pasture-table 新增一個羊
   const newDiv = document.createElement('div')
-  newDiv.style.left = `calc(${ from.x * 105 }px + ${ from.y * 105 }px * sin(30deg) + 25px)`
-  newDiv.style.top = `calc(${ from.y * 105 }px * cos(30deg) + 45px)`
+  newDiv.style.left = `calc(${ from.x * 105 }px + ${ from.y * 105 }px * sin(30deg) + 7px)`
+  newDiv.style.top = `calc(${ from.y * 105 }px * cos(30deg) + 15px)`
   newDiv.style.position = 'absolute'
-  newDiv.style.width = '50px'
-  newDiv.style.height = '50px'
+  newDiv.style.width = '86px'
+  newDiv.style.height = '86px'
   newDiv.style.pointerEvents = 'none'
   // newDiv.style.backgroundColor = color
   newDiv.style.transition = 'left 0.5s, top 0.5s'
   newDiv.className = character
   document.querySelector('.pasture-table').appendChild(newDiv)
   setTimeout(() => {
-    newDiv.style.left = `calc(${ to.x * 105 }px + ${ to.y * 105 }px * sin(30deg) + 25px)`
-    newDiv.style.top = `calc(${ to.y * 105 }px *  cos(30deg) + 45px)`
+    newDiv.style.left = `calc(${ to.x * 105 }px + ${ to.y * 105 }px * sin(30deg) + 7px)`
+    newDiv.style.top = `calc(${ to.y * 105 }px *  cos(30deg) + 15px)`
   }, 10)
   setTimeout(() => {
     newDiv.remove()
@@ -489,26 +489,31 @@ const showTurnAnimation = ref(false)
   }
 
   .tux {
-    background-image: url('@/assets/images/tux.png');
+    background-image: url('@/assets/images/1p.png');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
   }
 
   .gunter {
-    background-image: url('@/assets/images/gunter.png');
+    background-image: url('@/assets/images/2p.png');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
   }
 
   .abc {
-    background-image: url('@/assets/images/abc.png');
+    background-image: url('@/assets/images/3p.png');
     background-repeat: no-repeat;
     background-position: center;
     background-size: 100% 100%;
   }
-
+  .sin {
+    background-image: url('@/assets/images/4p.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
   .stroke {
     background-image: url('@/assets/images/stroke.svg');
     background-repeat: no-repeat;
@@ -530,13 +535,6 @@ const showTurnAnimation = ref(false)
     100% {
       transform: scale(1);
     }
-  }
-
-  .sin {
-    background-image: url('@/assets/images/sin.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
   }
 
   .bg-from-owner {

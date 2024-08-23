@@ -508,12 +508,14 @@ const showTurnAnimation = ref(false)
     background-position: center;
     background-size: 100% 100%;
   }
+
   .sin {
     background-image: url('@/assets/images/4p.png');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
   }
+
   .stroke {
     background-image: url('@/assets/images/stroke.svg');
     background-repeat: no-repeat;

@@ -276,22 +276,23 @@ const {
 } */
 .shine {
   position: absolute;
-  height: 280px;
-  width: 280px;
-  background-image: url('@/assets/images/shine.svg');
-  animation: animate-shine 2s linear infinite;
-  transform-origin: 144px 144px;
-  pointer-events: none;
   top: -83px;
   left: -96px;
   z-index: 11;
+  width: 280px;
+  height: 280px;
+  pointer-events: none;
+  background-image: url('@/assets/images/shine.svg');
+  transform-origin: 144px 144px;
+  animation: animate-shine 2s linear infinite;
+}
+@keyframes animate-shine {
+  0% {
+    transform: rotate(0deg);
   }
-  @keyframes animate-shine {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+
+  100% {
+    transform: rotate(360deg);
   }
+}
 </style>

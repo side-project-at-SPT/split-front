@@ -12,6 +12,7 @@ import Gunter from '@/assets/images/gunter.png'
 import Sin from '@/assets/images/sin.png'
 import Abc from '@/assets/images/abc.png'
 import ChangeNicknameModal from '@/components/ChangeNicknameModal.vue'
+import RoomButton from '@/components/RoomButton.vue'
 const penguins = [ Tux, Gunter, Sin, Abc ]
 const roles = [ 'tux', 'gunter', 'sin', 'abc' ]
 const publicStore = usePublicStore()
@@ -179,6 +180,26 @@ const initRoomChannel = () => {
     }
   })
 }
+const buttonConfig = computed(() => [
+  {
+    text: !roomMe.value.is_ready ? '準備' : '取消準備',
+    onClick: !roomMe.value.is_ready ? handleReady : handleCancelReady,
+  },
+  {
+    text: '離開房間',
+    isShow: !gaasToken.value,
+    onClick: handleLeaveRoom
+  },
+  {
+    text: '修改暱稱',
+    onClick: () => {showChangeNicknameModal.value = true}
+  },
+  {
+    text: '關閉房間',
+    onClick: handleCloseRoom
+  }
+])
+
 </script>
 
 <template>
@@ -258,52 +279,20 @@ const initRoomChannel = () => {
         </div>
       </div>
       <div class="flex items-center justify-center gap-1">
-        <div
-          v-if="!roomMe.is_ready"
-          class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-          @click="handleReady"
-        >
-          準備
-        </div>
-        <div
-          v-else
-          class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-          @click="handleCancelReady"
-        >
-          取消準備
-        </div>
-        <div
-          v-if="!gaasToken"
-          class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-          @click="handleLeaveRoom"
-        >
-          離開房間
-        </div>
-        <div
-          class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-          @click="showChangeNicknameModal = true"
-        >
-          修改暱稱
-        </div>
-        <div
-          class="hexagon-ice w-[75px] h-[75px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-          @click="handleCloseRoom"
-        >
-          關閉房間
-        </div>
-        <!-- 
-            <div
-              class="hexagon-ice w-[50px] h-[50px] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              @click="handleBackRooms"
-            >
-              返回
-            </div> -->
+        <RoomButton
+          v-for="{ text,isShow,onClick } in buttonConfig"
+          :key="text"
+          :text="text"
+          :is-show="isShow"
+          @on-click="onClick"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+
   .hexagon-ice {
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3);

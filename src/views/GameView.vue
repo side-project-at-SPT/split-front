@@ -474,6 +474,7 @@ const showTurnAnimation = ref(false)
       :need-put-character="needPutCharacter"
       :current-player="currentPlayer"
       :origin-pasure="originPasure"
+      :target-pasure="targetPasure"
       :style="{ left: `calc(${pasture.x * 105}px + ${pasture.y * 105}px * sin(30deg))`,
                 top: `calc(${pasture.y * 105}px * cos(30deg))` }"
       @handle-click="handleClick"
@@ -576,4 +577,5 @@ const showTurnAnimation = ref(false)
     border: 3px solid #caf67e;
     box-shadow: 1px 1px 0px 0px #79bf00;
   }
+
 </style>

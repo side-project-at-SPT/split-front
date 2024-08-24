@@ -17,13 +17,19 @@ const props = defineProps({
     type: Object,
     default: null
   },
+  targetPasure: {
+    type: Object,
+    default: null
+  }
 })
 const emit = defineEmits([ 'handleClick' ])
 const handleClick = (pasture) => {
   emit('handleClick', pasture)
 }
 
-const { pasture, needPutCharacter, currentPlayer, originPasure } = toRefs(props)
+const {
+  pasture, needPutCharacter, currentPlayer, originPasure, targetPasure 
+} = toRefs(props)
 
 // const pasture = props.pasture
 // const needPutCharacter = props.needPutCharacter
@@ -98,7 +104,11 @@ const { pasture, needPutCharacter, currentPlayer, originPasure } = toRefs(props)
       class="hexagon-bg"
       :class="{ [pasture.owner?.color]: pasture.owner }"
     >
-      123
+    </div>
+    <div
+      v-if="originPasure && !targetPasure && pasture.x === originPasure.x && pasture.y === originPasure.y"
+      class="shine"
+    >
     </div>
   </div>
 </template>
@@ -264,4 +274,24 @@ const { pasture, needPutCharacter, currentPlayer, originPasure } = toRefs(props)
   border: 5px solid #fff;
   clip-path: inherit;
 } */
+.shine {
+  position: absolute;
+  height: 280px;
+  width: 280px;
+  background-image: url('@/assets/images/shine.svg');
+  animation: animate-shine 2s linear infinite;
+  transform-origin: 144px 144px;
+  pointer-events: none;
+  top: -83px;
+  left: -96px;
+  z-index: 11;
+  }
+  @keyframes animate-shine {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 </style>

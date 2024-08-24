@@ -13,13 +13,17 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  originPasure: {
-    type: Object,
-    default: null
+  isOrigin: {
+    type: Boolean,
+    default: false
   },
-  targetPasure: {
-    type: Object,
-    default: null
+  originExist: {
+    type: Boolean,
+    default: false
+  },
+  targetExist: {
+    type: Boolean,
+    default: false
   }
 })
 const emit = defineEmits([ 'handleClick' ])
@@ -28,7 +32,7 @@ const handleClick = (pasture) => {
 }
 
 const {
-  pasture, needPutCharacter, currentPlayer, originPasure, targetPasure 
+  pasture, needPutCharacter, currentPlayer, isOrigin, originExist, targetExist
 } = toRefs(props)
 
 // const pasture = props.pasture
@@ -95,7 +99,7 @@ const {
       </div>
       <div
         v-if="pasture.amount"
-        :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originPasure && !pasture.is_blocked }]"
+        :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originExist && !pasture.is_blocked }]"
         class="pasture"
       ></div>
     <!-- <div>{{ pasture.owner?.nickname }}</div> -->
@@ -106,7 +110,7 @@ const {
     >
     </div>
     <div
-      v-if="originPasure && !targetPasure && pasture.x === originPasure.x && pasture.y === originPasure.y"
+      v-if="!targetExist && isOrigin"
       class="shine"
     >
     </div>

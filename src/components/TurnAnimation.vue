@@ -69,28 +69,28 @@ watchEffect(() => {
 }
 
 .tux {
-  background-image: url('@/assets/images/tux.png');
+  background-image: url('@/assets/images/1.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .gunter {
-  background-image: url('@/assets/images/gunter.png');
+  background-image: url('@/assets/images/2.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .abc {
-  background-image: url('@/assets/images/abc.png');
+  background-image: url('@/assets/images/3.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
 }
 
 .sin {
-  background-image: url('@/assets/images/sin.png');
+  background-image: url('@/assets/images/4.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;

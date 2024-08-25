@@ -473,6 +473,7 @@ const showTurnAnimation = ref(false)
       :pasture="pasture"
       :need-put-character="needPutCharacter"
       :current-player="currentPlayer"
+      :my-turn="myTurn"
       :is-origin="!!originPasure && pasture.x === originPasure.x && pasture.y === originPasure.y"
       :is-target="!!targetPasure && pasture.x === targetPasure.x && pasture.y === targetPasure.y"
       :origin-exist="!!originPasure"

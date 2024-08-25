@@ -28,6 +28,10 @@ const props = defineProps({
   targetExist: {
     type: Boolean,
     default: false
+  },
+  myTurn: {
+    type: Boolean,
+    default: false
   }
 })
 const emit = defineEmits([ 'handleClick' ])
@@ -103,7 +107,8 @@ const {
       </div>
       <div
         v-if="pasture.amount"
-        :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originExist && !pasture.is_blocked }]"
+        :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originExist && !pasture.is_blocked,
+                                              'opacity-40': myTurn && pasture.owner?.id !== currentPlayer.id }]"
         class="pasture"
       ></div>
     <!-- <div>{{ pasture.owner?.nickname }}</div> -->
@@ -308,6 +313,7 @@ const {
     transform: rotate(360deg);
   }
 }
+
 .pin {
   position: absolute;
   top: -65px;
@@ -320,8 +326,16 @@ const {
   animation: animate-pin 2s linear infinite;
 }
 @keyframes animate-pin {
-  0% { transform:translateY(20px);}
-  50% {transform:translateY(50px);}
-  100% {transform:translateY(20px);}
+  0% {
+    transform: translateY(20px);
+  }
+
+  50% {
+    transform: translateY(50px);
+  }
+
+  100% {
+    transform: translateY(20px);
+  }
 }
 </style>

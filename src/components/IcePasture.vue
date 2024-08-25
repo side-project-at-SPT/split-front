@@ -21,6 +21,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  isTarget: {
+    type: Boolean,
+    default: false
+  },
   targetExist: {
     type: Boolean,
     default: false
@@ -32,7 +36,7 @@ const handleClick = (pasture) => {
 }
 
 const {
-  pasture, needPutCharacter, currentPlayer, isOrigin, originExist, targetExist
+  pasture, needPutCharacter, currentPlayer, isOrigin, isTarget, originExist, targetExist
 } = toRefs(props)
 
 // const pasture = props.pasture
@@ -112,6 +116,11 @@ const {
     <div
       v-if="!targetExist && isOrigin"
       class="shine"
+    >
+    </div>
+    <div
+      v-if="isOrigin || isTarget"
+      class="pin"
     >
     </div>
   </div>
@@ -298,5 +307,21 @@ const {
   100% {
     transform: rotate(360deg);
   }
+}
+.pin {
+  position: absolute;
+  top: -65px;
+  left: 30px;
+  z-index: 12;
+  width: 40px;
+  height: 50px;
+  pointer-events: none;
+  background-image: url('@/assets/images/pin.svg');
+  animation: animate-pin 2s linear infinite;
+}
+@keyframes animate-pin {
+  0% { transform:translateY(20px);}
+  50% {transform:translateY(50px);}
+  100% {transform:translateY(20px);}
 }
 </style>

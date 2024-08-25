@@ -474,6 +474,7 @@ const showTurnAnimation = ref(false)
       :need-put-character="needPutCharacter"
       :current-player="currentPlayer"
       :is-origin="!!originPasure && pasture.x === originPasure.x && pasture.y === originPasure.y"
+      :is-target="!!targetPasure && pasture.x === targetPasure.x && pasture.y === targetPasure.y"
       :origin-exist="!!originPasure"
       :target-exist="!!targetPasure"
       :style="{ left: `calc(${pasture.x * 105}px + ${pasture.y * 105}px * sin(30deg))`,

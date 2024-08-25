@@ -83,7 +83,7 @@ const {
       :key="`${pasture.x}-${pasture.y}`"
       class="hexagon flex flex-col justify-center items-center text-black cursor-pointer"
       :class="{ 'bg-green-500': pasture.selected || (needPutCharacter && pasture.isEdge),
-                'bg-green-400': pasture.isAllowTarget,
+                'bg-active-pasture': pasture.isAllowTarget,
                 'ice': !pasture.selected && !pasture.isAllowTarget && !(needPutCharacter && pasture.isEdge),
                 [pasture.owner?.color]: pasture.owner,
       }"

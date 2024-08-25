@@ -25,6 +25,7 @@ export default {
         skin: '#FFFFFF',
         white20: 'rgba(255, 255, 255, 0.20)',
         oldBook: '#C8B59F',
+        'active-pasture': '#83FFDC',
       },
       backgroundImage: {
         'gradient-light': 'linear-gradient(180deg, #FFFFFF 0%, #DAFFFF 100%)'

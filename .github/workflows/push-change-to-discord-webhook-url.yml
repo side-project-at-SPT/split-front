@@ -19,7 +19,7 @@ jobs:
           script: |
             const commits = context.payload.commits;
             const messages = commits.map(commit => commit.message.split('\n')[0]);
-            console.log(commits, messages);
+            console.log(commits, messages); 
             console.log('context: ', context)
             core.exportVariable('messages', messages.join('\n'));
       - name: build-discord-webhook-payload

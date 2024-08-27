@@ -40,7 +40,7 @@ jobs:
                 return;
               }
               const icon = commitType === 'feat' ? '<:thumb:1239951662832156752>' : commitType === 'fix' ? ':construction_site:' : ':womans_clothes:';
-              return icon + ' ' + message;
+              return icon + ' ' + message; 
             }).filter(Boolean);
 
             const availableAvatarUrls = [

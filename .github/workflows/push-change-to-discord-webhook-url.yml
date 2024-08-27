@@ -21,7 +21,6 @@ jobs:
             const messages = commits.map(commit => commit.message.split('\n')[0]);
             console.log(commits, messages);
             console.log('context: ', context)
-            core.exportVariable('commitMessageHeaders', commitMessageHeaders);
             core.exportVariable('messages', messages.join('\n'));
       - name: build-discord-webhook-payload
         id: build-discord-webhook-payload
@@ -33,7 +32,7 @@ jobs:
           # DISCORD_WEBHOOK_URL: ${{ secrets.SPLIT_GAME_CHANNEL_DISCORD_WEBHOOK_URL }}
         with:
           script: |
-            const { commitMessageHeaders, messages } = process.env;
+            const { messages } = process.env;
             const iconMessages = messages.split('\n').map(message => {
               const [commitType, message, ...rest]= message.split(': ');
               if (commitType !== 'feat' && commitType !== 'fix' && commitType !== 'mockup') {

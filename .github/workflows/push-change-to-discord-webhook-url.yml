@@ -17,7 +17,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const commits = context.payload.commits; 
+            const commits = context.payload.commits;
             const messages = commits.map(commit => commit.message.split('\n')[0]);
             console.log(commits, messages);
             console.log('context: ', context)

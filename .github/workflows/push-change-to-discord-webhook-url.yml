@@ -33,8 +33,8 @@ jobs:
         with:
           script: |
             const { messages } = process.env;
-            const iconMessages = messages.split('\n').map(message => {
-              const [commitType, message, ...rest]= message.split(': ');
+            const iconMessages = messages.split('\n').map(m => {
+              const [commitType, message, ...rest]= m.split(': ');
               if (commitType !== 'feat' && commitType !== 'fix' && commitType !== 'mockup') {
                 return;
               }

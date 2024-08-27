@@ -17,11 +17,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const commitMessage = context.payload.head_commit.message;
-            const commitMessageHeaders = commitMessage.split('\n')[0];
-            console.log(commitMessageHeaders);
+            const commits = context.payload.commits;
+            const messages = commits.map(commit => commit.message.split('\n')[0]);
+            console.log(commits, messages);
             console.log('context: ', context)
             core.exportVariable('commitMessageHeaders', commitMessageHeaders);
+            core.exportVariable('messages', messages.join('\n'));
       - name: build-discord-webhook-payload
         id: build-discord-webhook-payload
         uses: actions/github-script@v7
@@ -32,13 +33,16 @@ jobs:
           # DISCORD_WEBHOOK_URL: ${{ secrets.SPLIT_GAME_CHANNEL_DISCORD_WEBHOOK_URL }}
         with:
           script: |
-            const { commitMessageHeaders } = process.env;
-            const [commitType, message, ...rest]= commitMessageHeaders.split(': ');
-            if (commitType !== 'feat' && commitType !== 'fix' && commitType !== 'mockup') {
-              console.log('No need to send to Discord Webhook URL');
-              return;
-            }
-            const icon = commitType === 'feat' ? '<:thumb:1239951662832156752>' : commitType === 'fix' ? ':construction_site:' : ':womans_clothes:';
+            const { commitMessageHeaders, messages } = process.env;
+            const iconMessages = messages.split('\n').map(message => {
+              const [commitType, message, ...rest]= message.split(': ');
+              if (commitType !== 'feat' && commitType !== 'fix' && commitType !== 'mockup') {
+                return;
+              }
+              const icon = commitType === 'feat' ? '<:thumb:1239951662832156752>' : commitType === 'fix' ? ':construction_site:' : ':womans_clothes:';
+              return icon + ' ' + message;
+            }).filter(Boolean);
+
             const availableAvatarUrls = [
               'https://media.discordapp.net/attachments/808663045109710898/1277146864906407988/image.png?ex=66ce1574&is=66ccc3f4&hm=f8dbff1de3b493dcdd0c8844a848efaa3c36b7296466d6709b9fe1c610561fa5&=&format=webp&quality=lossless',
               'https://media.discordapp.net/attachments/808663045109710898/1277146864659070976/image.png?ex=66ce1574&is=66ccc3f4&hm=92594dbcba8a33e7505364f787b4893cf332e92aa5824a1646bf944be57c3655&=&format=webp&quality=lossless',
@@ -46,7 +50,7 @@ jobs:
               'https://media.discordapp.net/attachments/808663045109710898/1277146865351262249/image.png?ex=66ce1574&is=66ccc3f4&hm=0241c136973320980b25d3a87138c30f875800e690b3eee028d5e44fbba2af2b&=&format=webp&quality=lossless'
             ]
             const discordWebhookPayload = {
-              content: '# 企鵝搶地前端 update' + '\n' + icon + ' ' + message,
+              content: '# 企鵝搶地前端 update' + '\n' + iconMessages.join('\n'),
               username: '阿鵝',
               avatar_url: availableAvatarUrls.sort(() => Math.random() - 0.5)[0]
             };

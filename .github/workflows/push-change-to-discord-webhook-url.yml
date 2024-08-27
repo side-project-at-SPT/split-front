@@ -20,6 +20,7 @@ jobs:
             const commitMessage = context.payload.head_commit.message;
             const commitMessageHeaders = commitMessage.split('\n')[0];
             console.log(commitMessageHeaders);
+            console.log('context: ', context)
             core.exportVariable('commitMessageHeaders', commitMessageHeaders);
       - name: build-discord-webhook-payload
         id: build-discord-webhook-payload

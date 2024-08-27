@@ -27,9 +27,9 @@ jobs:
         uses: actions/github-script@v7
         env:
           # # sandbox webhook url
-          DISCORD_WEBHOOK_URL: ${{ secrets.SANDBOX_DISCORD_WEBHOOK_URL }}
+          # DISCORD_WEBHOOK_URL: ${{ secrets.SANDBOX_DISCORD_WEBHOOK_URL }}
           # real webhook url
-          # DISCORD_WEBHOOK_URL: ${{ secrets.SPLIT_GAME_CHANNEL_DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.SPLIT_GAME_CHANNEL_DISCORD_WEBHOOK_URL }}
         with:
           script: |
             const { messages } = process.env;
@@ -50,7 +50,7 @@ jobs:
             ]
             const discordWebhookPayload = {
               content: '# 企鵝搶地前端 update' + '\n' + iconMessages.join('\n'),
-              username: '阿鵝',
+              username: '企鵝探險日誌',
               avatar_url: availableAvatarUrls.sort(() => Math.random() - 0.5)[0]
             };
             const req = new Request(process.env.DISCORD_WEBHOOK_URL, {

@@ -95,13 +95,13 @@ const {
       <!-- <div>
         ({{ pasture.x }},{{ pasture.y }}),{{ pasture.isEdge }}
       </div> -->
-      <div class="w-[75px] h-[75px] absolute rounded-full -top-[20px] -left-[40px] amount-bg">
+      <div class="amount-bg">
       </div>
       <div class="w-[50px] h-[40px] absolute rounded-full top-[65px] land">
       </div>
       <div
         v-if="pasture.owner"
-        class="absolute top-[1.3rem] left-2 text-white"
+        class="absolute top-[1.3rem] left-2 text-white font-medium text-xl"
       >
         {{ pasture.amount }}
       </div>
@@ -159,6 +159,13 @@ const {
   background-position: center;
   background-size: contain;
 }
+
+/* .bg-active-pasture:hover {
+  background-image: url('@/assets/images/3p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 86px 86px;
+} */
 
 .pasture {
   z-index: 10;
@@ -264,7 +271,15 @@ const {
     background: var(--blue-300);
   }
 }
-
+.amount-bg {
+  position: absolute;
+  top: -15px;
+  left: -36px;
+  z-index: -1;
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+}
 .hexagon-bg {
   position: absolute;
   top: 12px;

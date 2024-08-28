@@ -101,7 +101,7 @@ const {
       </div>
       <div
         v-if="pasture.owner"
-        class="absolute top-[1.3rem] left-2 text-white font-medium text-xl"
+        class="absolute top-[1.3rem] left-[6px] text-white font-medium text-xl text-center w-7"
       >
         {{ pasture.amount }}
       </div>
@@ -169,8 +169,9 @@ const {
 
 .pasture {
   z-index: 10;
-  width: 86px;
-  height: 86px;
+  width: 64px;
+  height: 64px;
+  margin-top: 16px;
 }
 
 #avatar {
@@ -271,6 +272,7 @@ const {
     background: var(--blue-300);
   }
 }
+
 .amount-bg {
   position: absolute;
   top: -15px;
@@ -280,6 +282,7 @@ const {
   height: 82px;
   border-radius: 50%;
 }
+
 .hexagon-bg {
   position: absolute;
   top: 12px;

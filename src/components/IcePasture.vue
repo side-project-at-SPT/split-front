@@ -86,6 +86,8 @@ const {
                 'bg-active-pasture': pasture.isAllowTarget,
                 'ice': !pasture.selected && !pasture.isAllowTarget && !(needPutCharacter && pasture.isEdge),
                 [pasture.owner?.color]: pasture.owner,
+                'is-origin': isOrigin,
+                'is-target': isTarget,
       }"
       @click="()=>handleClick(pasture)"
     >
@@ -100,18 +102,18 @@ const {
       <div class="w-[50px] h-[40px] absolute rounded-full top-[65px] land">
       </div>
       <div
-        v-if="pasture.owner"
-        class="absolute top-[1.3rem] left-[6px] text-white font-medium text-xl text-center w-7"
-      >
-        {{ pasture.amount }}
-      </div>
-      <div
         v-if="pasture.amount"
         :class="[pasture.owner?.character , { 'zoom-in-out': pasture.owner?.id === currentPlayer.id && !originExist && !pasture.is_blocked,
                                               'opacity-40': myTurn && pasture.owner?.id !== currentPlayer.id }]"
         class="pasture"
       ></div>
     <!-- <div>{{ pasture.owner?.nickname }}</div> -->
+    </div>
+    <div
+      v-if="pasture.owner"
+      class="penguin-amount"
+    >
+      {{ pasture.amount }}
     </div>
     <div
       class="hexagon-bg"
@@ -174,6 +176,30 @@ const {
   margin-top: 16px;
 }
 
+.penguin-amount {
+  position: absolute;
+  top: 1.3rem;
+  left: 6px;
+  width: 28px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.is-origin ~ .penguin-amount, .is-target ~ .penguin-amount {
+  background: #0F2A30E5;
+  width: 69px;
+  height: 36px;
+  top: -13px;
+  left: 17px;
+  padding: 10px;
+  gap: 10px;
+  border-radius: 20px;
+  opacity: 0px;
+  z-index: 1;
+}
 #avatar {
   position: relative;
   stroke: #fff;
@@ -282,7 +308,9 @@ const {
   height: 82px;
   border-radius: 50%;
 }
-
+.is-origin > .amount-bg, .is-target > .amount-bg {
+  display: none;
+}
 .hexagon-bg {
   position: absolute;
   top: 12px;
@@ -334,7 +362,7 @@ const {
 
 .pin {
   position: absolute;
-  top: -65px;
+  top: -90px;
   left: 30px;
   z-index: 12;
   width: 40px;
@@ -349,7 +377,7 @@ const {
   }
 
   50% {
-    transform: translateY(50px);
+    transform: translateY(30px);
   }
 
   100% {

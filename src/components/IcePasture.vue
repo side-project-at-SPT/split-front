@@ -180,26 +180,29 @@ const {
   position: absolute;
   top: 1.3rem;
   left: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 28px;
   font-size: 20px;
   font-weight: 500;
   color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
-.is-origin ~ .penguin-amount, .is-target ~ .penguin-amount {
-  background: #0F2A30E5;
-  width: 69px;
-  height: 36px;
+
+.is-origin ~ .penguin-amount,
+.is-target ~ .penguin-amount {
   top: -13px;
   left: 17px;
-  padding: 10px;
+  z-index: 1;
   gap: 10px;
+  width: 69px;
+  height: 36px;
+  padding: 10px;
+  background: #0f2a30e5;
   border-radius: 20px;
   opacity: 0px;
-  z-index: 1;
 }
+
 #avatar {
   position: relative;
   stroke: #fff;
@@ -308,9 +311,12 @@ const {
   height: 82px;
   border-radius: 50%;
 }
-.is-origin > .amount-bg, .is-target > .amount-bg {
+
+.is-origin > .amount-bg,
+.is-target > .amount-bg {
   display: none;
 }
+
 .hexagon-bg {
   position: absolute;
   top: 12px;

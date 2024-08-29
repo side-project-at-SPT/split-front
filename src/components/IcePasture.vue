@@ -201,6 +201,7 @@ const {
   background: #0f2a30e5;
   border-radius: 20px;
   opacity: 0px;
+  animation: animate-amount 2s linear infinite;
 }
 
 #avatar {
@@ -368,7 +369,7 @@ const {
 
 .pin {
   position: absolute;
-  top: -90px;
+  top: -75px;
   left: 30px;
   z-index: 12;
   width: 40px;
@@ -388,6 +389,19 @@ const {
 
   100% {
     transform: translateY(20px);
+  }
+}
+@keyframes animate-amount {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(10px);
+  }
+
+  100% {
+    transform: translateY(0px);
   }
 }
 </style>

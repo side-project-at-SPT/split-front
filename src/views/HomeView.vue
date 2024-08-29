@@ -62,10 +62,12 @@ const loginAsVisitor = async () => {
 }
 // let roomChannel = null
 const handleSeeRoom = async (room) => {
-  const hasPlayer = room.players.length > 0
-  const isMePlaying = room.players.some((player) => player.id === user.value.id)
-  if (room.status === 'playing' && hasPlayer && !isMePlaying){
-    showErrorMessage('遊戲進行中，無法進入')
+  // const hasPlayer = room.players.length > 0
+  // const isMePlaying = room.players.some((player) => player.id === user.value.id)
+  if (room.status === 'playing'){
+    // showErrorMessage('遊戲進行中，無法進入')
+    // 進入觀戰模式
+    router.push(`/game/?game_id=${ room.game_id }&room_id=${ room.id }`)
     return
   }
   // 跳轉到room頁面

@@ -225,6 +225,9 @@ export default function useGame () {
     })
     return largestPasture
   }
+  const isObserver = computed(() => {
+    return !players.value.find(player => player.id === userStore.user.id)
+  })
   return {
     gameStatus,
     originPasure,
@@ -236,6 +239,7 @@ export default function useGame () {
     orderedPlayers,
     needPutCharacter,
     myCharacter,
+    isObserver,
     initGame,
     showAllowedTarget,
     hideAllowedTarget

@@ -14,7 +14,7 @@ import PlayerAvatar from '../components/PlayerAvatar.vue'
 import IcePasture from '../components/IcePasture.vue'
 import useGame from '@/composables/useGame'
 const {
-  gameStatus, pastures, originPasure, targetPasure, currentPlayer, myTurn, finalPlayers, orderedPlayers, needPutCharacter, myCharacter, initGame, showAllowedTarget, hideAllowedTarget
+  gameStatus, pastures, originPasure, targetPasure, currentPlayer, myTurn, isObserver, finalPlayers, orderedPlayers, needPutCharacter, myCharacter, initGame, showAllowedTarget, hideAllowedTarget
 } = useGame()
 const publicStore = usePublicStore()
 const userStore = useUserStore()
@@ -393,7 +393,10 @@ const showTurnAnimation = ref(false)
     class="flex items-center justify-center w-full fixed top-10 pointer-events-none z-10"
   >
     <div class="bg-gradient-light w-[580px] py-5 text-center text-text border-4 border-white rounded-3xl shadow-message text-3xl">
-      <div v-if="myTurn && needPutCharacter">
+      <div v-if="isObserver">
+        觀戰中
+      </div>
+      <div v-else-if="myTurn && needPutCharacter">
         請選擇一個初始位置(綠色底色)
       </div>
       <div v-else-if="myTurn">

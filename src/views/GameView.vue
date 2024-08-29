@@ -414,7 +414,7 @@ const showTurnAnimation = ref(false)
     <div class="flex items-center gap-3">
       <div
         v-if="targetPasure"
-        class=" text-[#982000] text-xl rounded-full py-[10px] px-7 cursor-pointer pointer-events-auto bg-gradient-to-b from-[#FFFBD6] to-[#FFBA39] border border-[#FFDE7B] shadow-confirm"
+        class=" text-[#982000] text-xl rounded-full py-[10px] px-7 cursor-pointer pointer-events-auto bg-gradient-to-b from-[#FFFBD6] to-[#FFBA39] border border-[#FFDE7B] shadow-confirm confirm-in-out"
         @click="handleConfirm"
       >
         確定移動
@@ -546,7 +546,22 @@ const showTurnAnimation = ref(false)
       transform: scale(1);
     }
   }
+  .confirm-in-out {
+    animation: animate-confirm-in-out 3s infinite;
+  }
+  @keyframes animate-confirm-in-out {
+    0% {
+      transform: scale(1);
+    }
 
+    50% {
+      transform: scale(1.1);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
   .bg-from-owner {
     background-image: linear-gradient(to bottom right, #b3d9ff, var(--player-coler));
   }

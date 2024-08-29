@@ -405,11 +405,12 @@ const showTurnAnimation = ref(false)
     </div>
   </div>
   <div
-    v-if="myTurn && targetPasure"
+    v-if="myTurn && originPasure"
     class="flex items-center justify-center w-full fixed bottom-20 pointer-events-none z-10"
   >
     <div class="flex items-center gap-3">
       <div
+        v-if="targetPasure"
         class=" text-[#982000] text-xl rounded-full py-[10px] px-7 cursor-pointer pointer-events-auto bg-gradient-to-b from-[#FFFBD6] to-[#FFBA39] border border-[#FFDE7B] shadow-confirm"
         @click="handleConfirm"
       >

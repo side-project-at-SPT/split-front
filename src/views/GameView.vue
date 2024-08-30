@@ -546,6 +546,7 @@ const showTurnAnimation = ref(false)
       transform: scale(1);
     }
   }
+
   .confirm-in-out {
     animation: animate-confirm-in-out 3s infinite;
   }
@@ -562,6 +563,7 @@ const showTurnAnimation = ref(false)
       transform: scale(1);
     }
   }
+
   .bg-from-owner {
     background-image: linear-gradient(to bottom right, #b3d9ff, var(--player-coler));
   }

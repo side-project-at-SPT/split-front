@@ -326,25 +326,19 @@ const {
   height: calc(100px * 2 / sqrt(3));
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   background: #27b8e0;
+  &.green {
+    background: #a1d548;
+  }
+  &.yellow{
+    background: #ffc23b;
+  }
+  &.red {
+    background: #fb8464;
+  }
+  &.blue {
+    background: #56b2f6;
+  }
 }
-
-.hexagon-bg.green {
-  background: #a1d548;
-}
-
-.hexagon-bg.yellow {
-  background: #ffc23b;
-}
-/* .test-clip::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 5px solid #fff;
-  clip-path: inherit;
-} */
 .shine {
   position: absolute;
   top: -83px;

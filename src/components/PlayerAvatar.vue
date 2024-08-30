@@ -164,6 +164,7 @@ const gradientEnd = computed(() => {
   /* border: 5px solid #fff; */
   stroke-width: 5px;
 }
+
 .name {
   position: absolute;
   bottom: -12px;

@@ -347,8 +347,15 @@ const showTurnAnimation = ref(false)
     v-model="showTurnAnimation"
     :character="myCharacter"
   />
-  <div class="flex items-center flex-col fixed top-10 left-[50px] gap-3 z-10">
-    <div class="p-3 text-text">
+  <TransitionGroup
+    name="avatars"
+    tag="div"
+    class="flex items-center flex-col fixed top-10 left-[50px] gap-3 z-10"
+  >
+    <div
+      key="title"
+      class="p-3 text-text"
+    >
       當前回合
     </div>
     <div
@@ -363,7 +370,7 @@ const showTurnAnimation = ref(false)
         :active="player.id === currentPlayer.id"
       />
     </div>
-  </div>
+  </TransitionGroup>
   <div class="flex items-center flex-col fixed top-10 right-0 gap-3 z-10">
     <div class=" text-text h-6 w-[126px]">
       最新戰況
@@ -602,4 +609,7 @@ const showTurnAnimation = ref(false)
     box-shadow: 1px 1px 0px 0px #79bf00;
   }
 
+.avatars-move {
+  transition: transform 0.5s;
+}
 </style>

@@ -1,7 +1,8 @@
 <script setup>
 import {
   ref, onMounted, toRefs,
-  toRaw, watchEffect
+  toRaw, watchEffect,
+  computed,
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePublicStore } from '../stores/public'
@@ -14,8 +15,39 @@ import PlayerAvatar from '../components/PlayerAvatar.vue'
 import IcePasture from '../components/IcePasture.vue'
 import useGame from '@/composables/useGame'
 const {
-  gameStatus, pastures, originPasure, targetPasure, currentPlayer, myTurn, isObserver, finalPlayers, orderedPlayers, needPutCharacter, myCharacter, initGame, showAllowedTarget, hideAllowedTarget
+  gameStatus, pastures, originPasure, targetPasure, currentPlayer, myTurn, isObserver, finalPlayers, orderedPlayers: originalOrderedPlayers, needPutCharacter, myCharacter, initGame, showAllowedTarget, hideAllowedTarget
 } = useGame()
+
+// FIXME: Demo code
+console.log(originalOrderedPlayers)
+const p1 = {
+  id: 11,
+  nickname: 'player1',
+  color: 'green',
+  character: 'gunter',
+}
+const p2 = {
+  id: 15,
+  nickname: 'player2',
+  color: 'blue',
+  character: 'sin',
+}
+const p3 = {
+  id: 16,
+  nickname: 'player3',
+  color: 'yellow',
+  character: 'abc',
+}
+const mockPlayers = ref([ p1, p2, p3 ])
+const orderedPlayers = computed(() => {
+  return [ ...mockPlayers.value ]
+})
+const shiftPlayers = () => {
+  const first = mockPlayers.value.shift()
+  setTimeout(() => {
+    mockPlayers.value.push(first)
+  }, 200)
+}
 const publicStore = usePublicStore()
 const userStore = useUserStore()
 // const { consumer } = toRefs(publicStore)
@@ -347,11 +379,7 @@ const showTurnAnimation = ref(false)
     v-model="showTurnAnimation"
     :character="myCharacter"
   />
-  <TransitionGroup
-    name="avatars"
-    tag="div"
-    class="flex items-center flex-col fixed top-10 left-[50px] gap-3 z-10"
-  >
+  <div class="flex items-center flex-col fixed top-10 left-[50px] gap-3 z-10">
     <div
       key="title"
       class="p-3 text-text"
@@ -359,18 +387,32 @@ const showTurnAnimation = ref(false)
       當前回合
     </div>
     <div
-      v-for="player in orderedPlayers"
-      :key="player.id"
-      class="h-[106px] w-[106px] flex flex-col items-center relative"
+      class="p-3 bg-slate-500"
+      @click="shiftPlayers"
     >
-      <PlayerAvatar
-        :character="player.character"
-        :color="player.color"
-        :name="player.nickname"
-        :active="player.id === currentPlayer.id"
-      />
+      shiftPlayers
     </div>
-  </TransitionGroup>
+    <TransitionGroup
+      name="avatars"
+      tag="div"
+    >
+      <template
+        v-for="{ id, character, nickname, color }, i in orderedPlayers"
+        :key="id"
+      >
+        <div
+          class="h-[106px] w-[106px] flex flex-col items-center relative "
+        >
+          <PlayerAvatar
+            :character="character"
+            :color="color"
+            :name="nickname"
+            :active="i === 0"
+          />
+        </div>
+      </template>
+    </TransitionGroup>
+  </div>
   <div class="flex items-center flex-col fixed top-10 right-0 gap-3 z-10">
     <div class=" text-text h-6 w-[126px]">
       最新戰況
@@ -609,7 +651,25 @@ const showTurnAnimation = ref(false)
     box-shadow: 1px 1px 0px 0px #79bf00;
   }
 
-.avatars-move {
-  transition: transform 0.5s;
+  /* ref: https://vuejs.org/guide/built-ins/transition-group.html */
+.avatars-move, /* apply transition to moving elements */
+.avatars-enter-active,
+.avatars-leave-active {
+  transition: all 0.3s ease;
+}
+
+.avatars-enter-from{
+  opacity: 0;
+  transform: translateY(100%);
+}
+.avatars-leave-to {
+  opacity: 0;
+  transform: translateX(20%);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.avatars-leave-active {
+  position: absolute;
 }
 </style>

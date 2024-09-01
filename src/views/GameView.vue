@@ -322,29 +322,14 @@ const showTurnAnimation = ref(false)
 
 <template>
   <GameRuleModal v-model="showRule" />
-  <GameOverModal v-model="gameOver">
-    <div
-      class="w-[500px] flex flex-col items-center justify-around"
-    >
-      <div>遊戲結束</div>
-      <div
-        v-for="player in finalPlayers"
-        :key="player.name"
-        class="flex items-center justify-center gap-2"
-      >
-        <div>{{ player.name }}:</div>
-        <div>{{ player.score }}分</div>
-      </div>
-      <button
-        class="hexagon-div flex mt-4 justify-center rounded-md bg-blue-300 h-[100px] w-[100px] items-center text-sm font-semibold  shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        @click="handlebackRoom"
-      >
-        回到房間
-      </button>
-    </div>
-  </GameOverModal>
+  <GameOverModal
+    v-model="gameOver"
+    :final-players="finalPlayers"
+    @handleback-room="handlebackRoom"
+  />
   <TurnAnimation
-    v-model="showTurnAnimation"
+    v-model="
+      showTurnAnimation"
     :character="myCharacter"
   />
   <TransitionGroup
@@ -497,119 +482,119 @@ const showTurnAnimation = ref(false)
 </template>
 
 <style>
-  .ice {
-    background: linear-gradient(0deg, #b2efff -.01%, #def6ff 100.01%);
+.ice {
+  background: linear-gradient(0deg, #b2efff -.01%, #def6ff 100.01%);
 
-    /* background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3); */
+  /* background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3); */
+}
+
+.tux {
+  background-image: url('@/assets/images/1p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.gunter {
+  background-image: url('@/assets/images/2p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.abc {
+  background-image: url('@/assets/images/3p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.sin {
+  background-image: url('@/assets/images/4p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.stroke {
+  background-image: url('@/assets/images/stroke.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.zoom-in-out {
+  animation: animate-zoom-in-out 1.5s infinite;
+}
+@keyframes animate-zoom-in-out {
+  0% {
+    transform: scale(1);
   }
 
-  .tux {
-    background-image: url('@/assets/images/1p.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+  50% {
+    transform: scale(1.3);
   }
 
-  .gunter {
-    background-image: url('@/assets/images/2p.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+  100% {
+    transform: scale(1);
+  }
+}
+
+.confirm-in-out {
+  animation: animate-confirm-in-out 3s infinite;
+}
+@keyframes animate-confirm-in-out {
+  0% {
+    transform: scale(1);
   }
 
-  .abc {
-    background-image: url('@/assets/images/3p.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100% 100%;
+  50% {
+    transform: scale(1.1);
   }
 
-  .sin {
-    background-image: url('@/assets/images/4p.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+  100% {
+    transform: scale(1);
   }
+}
 
-  .stroke {
-    background-image: url('@/assets/images/stroke.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-  }
+.bg-from-owner {
+  background-image: linear-gradient(to bottom right, #b3d9ff, var(--player-coler));
+}
 
-  .zoom-in-out {
-    animation: animate-zoom-in-out 1.5s infinite;
-  }
-  @keyframes animate-zoom-in-out {
-    0% {
-      transform: scale(1);
-    }
+.hexagon-div {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
 
-    50% {
-      transform: scale(1.3);
-    }
+.question {
+  background-image: url('@/assets/images/icon-question.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
-    100% {
-      transform: scale(1);
-    }
-  }
+.score-yellow {
+  background: #ffc23b;
+  border: 3px solid #fff7ae;
+  box-shadow: 1px 1px 0px 0px #ffc23b;
+}
 
-  .confirm-in-out {
-    animation: animate-confirm-in-out 3s infinite;
-  }
-  @keyframes animate-confirm-in-out {
-    0% {
-      transform: scale(1);
-    }
+.score-blue {
+  background: #56b2f6;
+  border: 3px solid #b3d9ff;
+  box-shadow: 1px 1px 0px 0px #2b9cef;
+}
 
-    50% {
-      transform: scale(1.1);
-    }
+.score-red {
+  background: #fb8464;
+  border: 3px solid #fcc0b4;
+  box-shadow: 1px 1px 0px 0px #fb8464;
+}
 
-    100% {
-      transform: scale(1);
-    }
-  }
-
-  .bg-from-owner {
-    background-image: linear-gradient(to bottom right, #b3d9ff, var(--player-coler));
-  }
-
-  .hexagon-div {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
-
-  .question {
-    background-image: url('@/assets/images/icon-question.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-  }
-
-  .score-yellow {
-    background: #ffc23b;
-    border: 3px solid #fff7ae;
-    box-shadow: 1px 1px 0px 0px #ffc23b;
-  }
-
-  .score-blue {
-    background: #56b2f6;
-    border: 3px solid #b3d9ff;
-    box-shadow: 1px 1px 0px 0px #2b9cef;
-  }
-
-  .score-red {
-    background: #fb8464;
-    border: 3px solid #fcc0b4;
-    box-shadow: 1px 1px 0px 0px #fb8464;
-  }
-
-  .score-green {
-    background: #a1d548;
-    border: 3px solid #caf67e;
-    box-shadow: 1px 1px 0px 0px #79bf00;
-  }
+.score-green {
+  background: #a1d548;
+  border: 3px solid #caf67e;
+  box-shadow: 1px 1px 0px 0px #79bf00;
+}
 
 .avatars-move {
-  transition: transform 0.5s;
+  transition: transform .5s;
 }
 </style>

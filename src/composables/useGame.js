@@ -78,7 +78,8 @@ export default function useGame () {
       name: player.nickname,
       score: pastures.value.filter(pasture => pasture.owner?.id === player.id).length,
       largestPasture: getLargestPasture(player),
-      color: player.color
+      color: player.color,
+      character: player.character
     }
   }).sort((a, b) => b.score - a.score))
   const orderedPlayers = computed(() => {

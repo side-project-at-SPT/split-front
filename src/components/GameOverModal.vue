@@ -68,7 +68,7 @@ const otherPlayers = computed(() => {
           <div
             v-for="(player,i) in otherPlayers"
             :key="player.name"
-            class="flex items-center justify-center gap-2 banner"
+            class="flex items-baseline justify-center gap-2 banner"
           >
             <div
               class="rank" 
@@ -80,9 +80,21 @@ const otherPlayers = computed(() => {
               class="character"
               :class="player.character"
             ></div>
-            <div>{{ player.name }}:</div>
-            <div>{{ player.score }}分</div>
-            <div>最大區塊 {{ player.largestPasture }}</div>
+            <div class="name">
+              {{ player.name }}
+            </div>
+            <div class="flex gap-1 items-baseline">
+              <div class="text-xl font-bold">
+                {{ player.score }}
+              </div>
+              <div>分</div>
+            </div>
+            <div class="flex gap-1 items-baseline">
+              <div>最大區塊</div>
+              <div class="font-medium">
+                {{ player.largestPasture }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -97,233 +109,280 @@ const otherPlayers = computed(() => {
 </template>
 
 <style scoped>
-  .hexagon-ice {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3);
+
+  .score-board {
+    background: linear-gradient(180deg, #d6edf5 0%, #84ddf6 100%);
+    border: 4px solid #b2efff;
+    border-radius: 40px;
+    box-shadow: 0px 20px 0px 0px #27b8e0;
   }
 
-  .hexagon-div {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
-  .score-board {
-    background: linear-gradient(180deg, #D6EDF5 0%, #84DDF6 100%);
-    border: 4px solid #B2EFFF;
-    box-shadow: 0px 20px 0px 0px #27B8E0;
-    border-radius: 40px;
-  }
   .first-place-player {
+    position: absolute;
+    top: 60px;
+    left: 48px;
     display: flex;
     justify-content: center;
-    position: absolute;
-    left: 48px;
-    top: 60px;
+
     .bg {
+      gap: 0px;
       width: 280px;
       height: 332px;
-      gap: 0px;
+      background: linear-gradient(180deg, rgba(39, 184, 224, .9) 0%, rgba(39, 184, 224, 0) 100%);
       border-radius: 20px;
       opacity: 0px;
-      background: linear-gradient(180deg, rgba(39, 184, 224, 0.9) 0%, rgba(39, 184, 224, 0) 100%);
     }
+
     .shine {
       position: absolute;
-      z-index: 1;
       top: -22px;
       left: -48px;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
+      z-index: 1;
       width: 376px;
       height: 376px;
       background-image: url('@/assets/images/shine.svg');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
     }
+
     .character {
       position: absolute;
-      z-index: 1;
       top: 47px;
       left: 21px;
+      z-index: 1;
       width: 238px;
       height: 238px;
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
-      &.tux{
+
+      &.tux {
         background-image: url('@/assets/images/gameover/ranking-win-1.png');
       }
-      &.gunter{
+
+      &.gunter {
         background-image: url('@/assets/images/gameover/ranking-win-2.png');
       }
-      &.abc{
+
+      &.abc {
         background-image: url('@/assets/images/gameover/ranking-win-3.png');
       }
-      &.sin{
+
+      &.sin {
         background-image: url('@/assets/images/gameover/ranking-win-4.png');
       }
     }
+
     .rank {
       position: absolute;
-      z-index: 1;
       top: 4px;
       left: -40px;
+      z-index: 1;
       width: 100px;
       height: 100px;
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
-      &.blue{
-        background-image: url('@/assets/images/rank-blue-large.png');
+
+      &.blue {
+        background-image: url('@/assets/images/gameover/rank-blue-large.png');
+      }
+
+      &.yellow {
+        background-image: url('@/assets/images/gameover/rank-yellow-large.png');
+      }
+
+      &.green {
+        background-image: url('@/assets/images/gameover/rank-green-large.png');
+      }
+
+      &.red {
+        background-image: url('@/assets/images/gameover/rank-red-large.png');
       }
     }
-    .score-container{
+
+    .score-container {
       position: absolute;
-      z-index: 1;
       bottom: -12px;
+      z-index: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
       gap: 4px;
-      .name{
-        background: #0F2A30E5;
+      align-items: center;
+      justify-content: center;
+
+      .name {
+        width: 100%;
         padding: 8px 16px 8px 16px;
-        border-radius: 20px;
-        opacity: 0px;
-        color: #fff;
         font-size: 18px;
         font-weight: 700;
         line-height: 26.64px;
-        letter-spacing: 0.05em;
+        color: #fff;
         text-align: center;
-        width: 100%;
+        letter-spacing: .05em;
+        background: #0f2a30e5;
+        border-radius: 20px;
+        opacity: 0px;
       }
-      .score{
+
+      .score {
         display: flex;
+        gap: 4px;
         align-items: baseline;
         font-size: 18px;
         font-weight: 300;
         color: #006989;
-        gap: 4px;
-        :first-child{
+
+        :first-child {
           font-size: 28px;
           font-weight: 700;
         }
-        :last-child{
+
+        :last-child {
           font-size: 20px;
           font-weight: 500;
         }
       }
     }
   }
+
   .game-over-modal-container {
     position: relative;
+
     .title {
-      z-index: 1;
       position: absolute;
+      top: -40px;
+      z-index: 1;
       width: 454px;
       height: 80px;
-      top: -40px;
-      background-image: url('@/assets/images/gameover-title.png');
+      background-image: url('@/assets/images/gameover/gameover-title.png');
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
     }
+
     .snow-left {
-      z-index: 1;
       position: absolute;
-      width: 182px;
-      height: 84px;
       top: -28px;
       left: -16px;
-      background-image: url('@/assets/images/deco-snow-left.png');
+      z-index: 1;
+      width: 182px;
+      height: 84px;
+      background-image: url('@/assets/images/gameover/deco-snow-left.png');
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
     }
+
     .snow-right {
-      z-index: 1;
       position: absolute;
-      width: 206px;
-      height: 84px;
       top: -28px;
       right: -16px;
-      background-image: url('@/assets/images/deco-snow-right.png');
+      z-index: 1;
+      width: 206px;
+      height: 84px;
+      background-image: url('@/assets/images/gameover/deco-snow-right.png');
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
     }
   }
+
   .other-player-container {
     position: absolute;
     right: 48px;
-    width: 392px;
     display: flex;
     flex-direction: column;
     gap: 32px;
+    width: 392px;
+
     .banner {
-      background: linear-gradient(180deg, #FFFFFF 0%, #DAFFFF 100%);
-      color: #006989;
-      border-radius: 40px;
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 26.64px;
-      letter-spacing: 0.05em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 4px;
-      height: 64px;
       position: relative;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      font-size: 14px;
+      font-weight: 300;
+      padding-left: 128px;
+      padding-right: 20px;
+      color: #006989;
+      letter-spacing: .05em;
+      background: linear-gradient(180deg, #ffffff 0%, #daffff 100%);
+      border-radius: 40px;
+
       .rank {
         position: absolute;
-        left: 8px;
         top: -16px;
+        left: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 48px;
         height: 48px;
+        padding-bottom: 4px;
         background-repeat: no-repeat;
         background-position: center;
         background-size: contain;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding-bottom: 4px;
-        &.blue{
+
+        &.blue {
+          color: #2b9cef;
           background-image: url('@/assets/images/gameover/rank-blue.png');
-          color: #2B9CEF
         }
-        &.yellow{
+
+        &.yellow {
+          color: #ff9200;
           background-image: url('@/assets/images/gameover/rank-yellow.png');
-          color: #FF9200
         }
-        &.green{
+
+        &.green {
+          color: #79bf00;
           background-image: url('@/assets/images/gameover/rank-green.png');
-          color: #79BF00
         }
-        &.red{
+
+        &.red {
+          color: #e75027;
           background-image: url('@/assets/images/gameover/rank-red.png');
-          color: #E75027
         }
       }
+
       .character {
+        position: absolute;
+        top: -8px;
+        left: 48px;
         width: 80px;
         height: 80px;
         background-repeat: no-repeat;
         background-position: center;
         background-size: contain;
-        position: absolute;
-        left: 48px;
-        top: -8px;
-        &.tux{
+
+        &.tux {
           background-image: url('@/assets/images/gameover/ranking-other-1.png');
         }
-        &.gunter{
+
+        &.gunter {
           background-image: url('@/assets/images/gameover/ranking-other-2.png');
         }
-        &.abc{
+
+        &.abc {
           background-image: url('@/assets/images/gameover/ranking-other-3.png');
         }
-        &.sin{
+
+        &.sin {
           background-image: url('@/assets/images/gameover/ranking-other-4.png');
         }
+      }
+
+      .name {
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 23.68px;
+        letter-spacing: 0.05em;
+        width:104px;
+        flex-shrink: 0;
+        text-align: center;
       }
     }
   }

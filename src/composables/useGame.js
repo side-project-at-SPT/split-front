@@ -73,7 +73,7 @@ export default function useGame () {
   const myTurn = computed(() => {
     return currentPlayer.value.id === userStore.user.id
   })
-  const finalPlayers = computed(() => players.value.map(player => {
+  const finalPlayersWithoutRank = computed(() => players.value.map(player => {
     return {
       name: player.nickname,
       score: pastures.value.filter(pasture => pasture.owner?.id === player.id).length,
@@ -81,7 +81,37 @@ export default function useGame () {
       color: player.color,
       character: player.character
     }
-  }).sort((a, b) => b.score - a.score))
+  }).sort((a, b) => {
+    // 先比較分數
+    if (b.score !== a.score) {
+      return b.score - a.score 
+    }
+    else {
+      // 如果分數相同，再比較 largestPasture
+      if (b.largestPasture !== a.largestPasture){
+        return b.largestPasture - a.largestPasture 
+      }
+      return a.name === userStore.user.nickname ? -1 : b.name === userStore.user.nickname ? 1 : 0
+    }
+  }))
+  
+  const finalPlayers = computed(() => {
+    let prePlayer = null
+    return finalPlayersWithoutRank.value
+      .map((player, index) => {
+        let rank = index + 1
+        if (index !== 0) {
+          if (player.score === prePlayer.score && player.largestPasture === prePlayer.largestPasture){
+            rank = prePlayer.rank
+          }
+        }
+        prePlayer = {
+          ...player,
+          rank
+        }
+        return prePlayer
+      })
+  })
   const orderedPlayers = computed(() => {
     const playersOrder = []
     for (let i = 0; i < players.value.length; i++){

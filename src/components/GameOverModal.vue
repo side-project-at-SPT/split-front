@@ -66,7 +66,7 @@ const otherPlayers = computed(() => {
         </div>
         <div class="other-player-container">
           <div
-            v-for="(player,i) in otherPlayers"
+            v-for="player in otherPlayers"
             :key="player.name"
             class="flex items-baseline justify-center gap-2 banner"
           >
@@ -74,7 +74,7 @@ const otherPlayers = computed(() => {
               class="rank" 
               :class="player.color"
             >
-              {{ i+2 }}
+              {{ player.rank }}
             </div>
             <div
               class="character"
@@ -304,10 +304,10 @@ const otherPlayers = computed(() => {
       align-items: center;
       justify-content: space-between;
       height: 64px;
+      padding-right: 20px;
+      padding-left: 128px;
       font-size: 14px;
       font-weight: 300;
-      padding-left: 128px;
-      padding-right: 20px;
       color: #006989;
       letter-spacing: .05em;
       background: linear-gradient(180deg, #ffffff 0%, #daffff 100%);
@@ -376,13 +376,13 @@ const otherPlayers = computed(() => {
       }
 
       .name {
+        flex-shrink: 0;
+        width: 104px;
         font-size: 16px;
         font-weight: 500;
         line-height: 23.68px;
-        letter-spacing: 0.05em;
-        width:104px;
-        flex-shrink: 0;
         text-align: center;
+        letter-spacing: .05em;
       }
     }
   }

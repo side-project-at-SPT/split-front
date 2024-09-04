@@ -29,6 +29,7 @@ console.log(route.query.roomId)
 const gameId = ref(route.query.game_id)
 const roomId = route.query.room_id
 const initing = ref(false)
+const pastureScale = ref(1)
 // initialize pastures
 // for (let x = 0; x < 5; x++)
 //   for (let y = 0; y < 5; y++)
@@ -318,6 +319,14 @@ const handlebackRoom = () => {
   router.push(`/room/${ roomId }`)
 }
 const showTurnAnimation = ref(false)
+const handleZoomIn = () => {
+  if (pastureScale.value < 2)
+    pastureScale.value += 0.1
+}
+const handleZoomOut = () => {
+  if (pastureScale.value > 0.2)
+    pastureScale.value -= 0.1
+} 
 </script>
 
 <template>
@@ -425,13 +434,32 @@ const showTurnAnimation = ref(false)
     <div class="flex items-center gap-3">
       <div
         class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
+        @click="handleZoomIn"
+      >
+        <div class="h-[38px] w-[38px] flex items-center justify-center">
+          +
+        </div>
+      </div>
+      <div
+        class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
+        @click="handleZoomOut"
+      >
+        <div class="h-[38px] w-[38px] flex items-center justify-center">
+          -
+        </div>
+      </div>
+      <div
+        class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
         @click="showRule = true"
       >
         <div class="question h-[38px] w-[38px]"></div>
       </div>
     </div>
   </div>
-  <div class="text-white relative mt-32 pasture-table">
+  <div
+    class="text-white relative mt-32 pasture-table"
+    :style="{ '--scale': pastureScale }"
+  >
     <!-- <div
       v-for="pasture in pastures"
       :key="`${pasture.x}-${pasture.y}`"
@@ -596,5 +624,10 @@ const showTurnAnimation = ref(false)
 
 .avatars-move {
   transition: transform .5s;
+}
+
+.pasture-table {
+  --scale : 1;
+  transform: scale(var(--scale));
 }
 </style>

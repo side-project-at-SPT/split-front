@@ -446,17 +446,13 @@ const handleZoomOut = () => {
         class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
         @click="handleZoomIn"
       >
-        <div class="h-[38px] w-[38px] flex items-center justify-center">
-          +
-        </div>
+        <div class="zoom-in h-[38px] w-[38px]"></div>
       </div>
       <div
         class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
         @click="handleZoomOut"
       >
-        <div class="h-[38px] w-[38px] flex items-center justify-center">
-          -
-        </div>
+        <div class="zoom-out h-[38px] w-[38px]"></div>
       </div>
       <div
         class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
@@ -604,6 +600,18 @@ const handleZoomOut = () => {
 
 .question {
   background-image: url('@/assets/images/icon-question.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.zoom-in {
+  background-image: url('@/assets/images/icon-zoom-in.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.zoom-out {
+  background-image: url('@/assets/images/icon-zoom-out.svg');
   background-repeat: no-repeat;
   background-position: center;
 }

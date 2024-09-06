@@ -153,7 +153,7 @@ export default function useGame () {
     }
     let directionIndex = 0
     let count = 0 // 保護
-    while (!(cPoint.x == firstPoint.x && cPoint.y == firstPoint.y && directionIndex == 0 && edgePastures.value.length !== 1) && count < 100){
+    while (!(cPoint.x == firstPoint.x && cPoint.y == firstPoint.y && directionIndex == 0 && edgePastures.value.length !== 1) && count < 200){
       const testPoint = {
         x: cPoint.x + directions[directionIndex].x,
         y: cPoint.y + directions[directionIndex].y

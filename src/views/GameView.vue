@@ -190,6 +190,7 @@ const handleClick = (pasture) => {
     // console.log(pasture, currentPlayer.value)
     if (pasture.owner?.id !== currentPlayer.value.id) return
     if (pasture.amount < 2) return
+    if (pasture.is_blocked) return
     originPasure.value = { ...pasture }
     gameChannel.send({ type: 'set_origin_pasure', pasture, actionPlayer: user.value.id })
     originAmount = pasture.amount
@@ -327,6 +328,15 @@ const handleZoomOut = () => {
   if (pastureScale.value > 0.2)
     pastureScale.value -= 0.1
 } 
+// const handleWheel = (e) => {
+//   console.log(e.deltaY, 'wheel')
+//   if (e.deltaY > 0) {
+//     handleZoomOut()
+//   }
+//   else {
+//     handleZoomIn()
+//   }
+// }
 </script>
 
 <template>
@@ -627,7 +637,8 @@ const handleZoomOut = () => {
 }
 
 .pasture-table {
-  --scale : 1;
+  --scale: 1;
+  transition: transform .5s;
   transform: scale(var(--scale));
 }
 </style>

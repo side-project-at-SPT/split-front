@@ -82,12 +82,12 @@ const {
     <div
       :key="`${pasture.x}-${pasture.y}`"
       class="hexagon flex flex-col justify-center items-center text-black cursor-pointer"
-      :class="{ 'bg-green-500': pasture.selected || (needPutCharacter && pasture.isEdge),
-                'bg-active-pasture': pasture.isAllowTarget,
-                'ice': !pasture.selected && !pasture.isAllowTarget && !(needPutCharacter && pasture.isEdge),
-                [pasture.owner?.color]: pasture.owner,
-                'is-origin': isOrigin,
-                'is-target': isTarget,
+      :class="{ 
+        'bg-active-pasture': pasture.isAllowTarget || (needPutCharacter && pasture.isEdge) ,
+        'ice': !pasture.selected && !pasture.isAllowTarget && !(needPutCharacter && pasture.isEdge),
+        [pasture.owner?.color]: pasture.owner,
+        'is-origin': isOrigin,
+        'is-target': isTarget,
       }"
       @click="()=>handleClick(pasture)"
     >

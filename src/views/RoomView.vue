@@ -293,19 +293,19 @@ const buttonConfig = computed(() => [
 
 <style scoped>
 
-  .hexagon-ice {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3);
-  }
+.hexagon-ice {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3);
+}
 
-  .new-room {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background-image: linear-gradient(to bottom right, #cae5ff, #87b0ca);
-  }
+.new-room {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background-image: linear-gradient(to bottom right, #cae5ff, #87b0ca);
+}
 
-  .hexagon-div {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
+.hexagon-div {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
 
 .tux {
   background-image: url('@/assets/images/papua.png');

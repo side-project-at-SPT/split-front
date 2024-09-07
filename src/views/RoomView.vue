@@ -14,7 +14,7 @@ import Abc from '@/assets/images/abc.png'
 import ChangeNicknameModal from '@/components/ChangeNicknameModal.vue'
 import RoomButton from '@/components/RoomButton.vue'
 const penguins = [ Tux, Gunter, Sin, Abc ]
-const roles = [ 'tux', 'gunter', 'sin', 'abc' ]
+const roles = [ 'tux', 'gunter', 'abc', 'sin' ]
 const publicStore = usePublicStore()
 const userStore = useUserStore()
 const roomStore = useRoomStore()
@@ -236,10 +236,10 @@ const buttonConfig = computed(() => [
             v-if="roles.indexOf(player.character) != -1"
             class="h-8 w-8"
           >
-            <img
-              :src="penguins[roles.indexOf(player.character)]"
-              class="w-full h-full object-contain"
-            >
+            <div
+              :class="player.character"
+              class="h-8 w-8"
+            ></div>
           </div>
           <div
             v-else
@@ -271,10 +271,10 @@ const buttonConfig = computed(() => [
             class="h-8 w-8"
             @click="handleChangeRole(index - 1)"
           >
-            <img
-              :src="penguins[index - 1]"
-              class="w-6 h-6 object-contain"
-            >
+            <div
+              :class="roles[index - 1]"
+              class="h-8 w-8"
+            ></div>
           </div>
         </div>
       </div>
@@ -306,4 +306,32 @@ const buttonConfig = computed(() => [
   .hexagon-div {
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   }
+
+.tux {
+  background-image: url('@/assets/images/papua.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.gunter {
+  background-image: url('@/assets/images/eudyptula.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.abc {
+  background-image: url('@/assets/images/aptenodytes.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.sin {
+  background-image: url('@/assets/images/eudyptes.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
 </style>

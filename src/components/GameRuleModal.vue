@@ -16,7 +16,7 @@ const showRuleModal = computed({
 <template>
   <div
     v-if="showRuleModal"
-    class="absolute w-svw h-dvh bg-black bg-opacity-50 flex items-center justify-center z-10 selection:bg-blue-700 selection:text-white"
+    class="fixed top-0 left-0 w-svw h-dvh bg-black bg-opacity-50 flex items-center justify-center z-20 selection:bg-blue-700 selection:text-white"
   >
     <div class="relative flex flex-col gap-2 bg-ice p-10">
       <button

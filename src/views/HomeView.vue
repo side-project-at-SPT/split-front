@@ -47,6 +47,11 @@ const login = async () => {
     showErrorMessage(error.error)
   }
 }
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  isLogin.value = false
+  token = null
+}
 const loginAsVisitor = async () => {
   try {
     const data = await api.loginAsVisitor()
@@ -223,12 +228,21 @@ onMounted(() => {
       </div>
     </div>
     <div v-if="isLogin">
-      <div class="flex gap-2">
-        <div>您好: {{ user.nickname }}</div><button
+      <div class="flex justify-between">
+        <div class="flex gap-2">
+          <div>您好: {{ user.nickname }}</div>
+          <button
+            class="bg-blue-300 rounded-md px-2 text-xs hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            @click="showChangeNicknameModal = true, newNickname = user.nickname"
+          >
+            修改暱稱
+          </button>
+        </div>
+        <button
           class="bg-blue-300 rounded-md px-2 text-xs hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          @click="showChangeNicknameModal = true, newNickname = user.nickname"
+          @click="handleLogout"
         >
-          修改暱稱
+          登出
         </button>
       </div>
       <div class="flex gap-3 items-center">

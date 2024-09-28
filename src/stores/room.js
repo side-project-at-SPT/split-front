@@ -9,6 +9,7 @@ export const useRoomStore = defineStore('useRoomStore', () => {
   })
   const getRooms = () => {
     return api.getRooms().then((res) => {
+      console.log(res)
       rooms.value = res.rooms
     })
   }

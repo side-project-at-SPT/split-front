@@ -144,6 +144,7 @@ const otherPlayers = computed(() => {
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
+      animation: animate-shine 5s linear infinite;
     }
 
     .character {
@@ -246,6 +247,16 @@ const otherPlayers = computed(() => {
       }
     }
   }
+
+  @keyframes animate-shine {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
 
   .game-over-modal-container {
     position: relative;

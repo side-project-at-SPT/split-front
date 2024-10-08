@@ -7,13 +7,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { usePublicStore } from '../stores/public'
 import { useRoomStore } from '../stores/room'
-import Aptenodytes from '@/assets/roomPLayers/aptenodytes.png'
-import Eudyptes from '@/assets/roomPLayers/eudyptes.png'
-import Eudyptula from '@/assets/roomPLayers/eudyptula.png'
-import Papua from '@/assets/roomPLayers/papua.png'
+import Aptenodytes from '@/assets/images/3.png'
+import Eudyptes from '@/assets/images/4.png'
+import Eudyptula from '@/assets/images/2.png'
+import Papua from '@/assets/images/1.png'
 import ChangeNicknameModal from '@/components/ChangeNicknameModal.vue'
+import RoomPlayerSlide from '../components/RoomPlayerSlide.vue'
 
-const penguins = [ Aptenodytes, Eudyptes, Eudyptula, Papua ]
+const penguins = [ Aptenodytes, Papua, Eudyptula, Eudyptes ]
 const roles = [ 'Aptenodytes', 'Eudyptes', 'Eudyptula', 'Papua' ]
 const publicStore = usePublicStore()
 const userStore = useUserStore()
@@ -35,6 +36,7 @@ const { params, query } = useRoute()
 let { roomId } = params
 roomId = Number(roomId)
 const { token: queryGaasToken } = query
+const defaultChoseAvatar = ref()
 if (queryGaasToken){
   gaasToken.value = queryGaasToken
   localStorage.setItem('token', queryGaasToken)
@@ -46,6 +48,7 @@ const handleChangeRole = (index) => {
 const roomMe = computed(() => roomInfo.value.players?.find((player) => player.id === user.value.id) || {})
 const playerNum = computed(() => roomInfo.value.players?.length || 1)
 const showChangeNicknameModal = ref(false)
+const nameEditSwitch = computed(() => roomInfo.value.status !== 'starting')
 // const aiPlayerJoined = ref(false)
 const handleReadyChange = computed(() => { 
   if (roomMe.value.is_ready) {
@@ -114,6 +117,7 @@ const initRoomChannel = () => {
     connected () {
       // 隨機選一個角色
       const randomIndex = Math.floor(Math.random() * roles.length)
+      defaultChoseAvatar.value = randomIndex
       handleChangeRole(randomIndex)
       getRooms()
     },
@@ -188,6 +192,16 @@ const initRoomChannel = () => {
         請選擇你的企鵝
       </div>
     </div>
+    <div class="flex justify-center mt-[50px]">
+      <RoomPlayerSlide
+        :name="user.nickname"
+        :image-key="defaultChoseAvatar"
+        :name-edit-switch="nameEditSwitch"
+        :chose-lock="roomMe.is_ready"
+        @chose-player="(value)=>handleChangeRole(value)"
+        @change-name="()=> showChangeNicknameModal = true "
+      />
+    </div>
     <!-- <div class="flex flex-col gap-2 justify-center items-center ">
       <div>
         <div>選擇角色</div>
@@ -214,25 +228,37 @@ const initRoomChannel = () => {
           </p>
           <p
             class="font-medium text-xl "
-            style="text-align: justify; text-justify: distribute-all-lines; text-align-last: justify;"
+            style="text-align: justify; text-align-last: justify; text-justify: distribute-all-lines;"
           >
             共{{ playerNum }}名
           </p>
         </div>
-        <div class="w-[504px] h-full">
+        <div class="flex w-[504px] h-full">
           <div
-            v-for="(player,index) in roomInfo.players"
+            v-for="(player) in roomInfo.players"
             :key="player.id"
             class="w-32 h-32 flex flex-col justify-center items-center"
           >
+            {{ penguins.find((item)=> String(item) === player.character) }}
             <div
               :class="`overflow-hidden avatarBackground ${player.is_ready? 'bg-white':'notReadyBackground'}`"
             >
+              <!-- <img
+                class="avatarImage"
+                :src="penguins.includes(player.character)"
+                alt=""
+              > -->
               <img
                 class="avatarImage"
-                :src="penguins[index]"
+                :src="penguins[roles.indexOf(player.character)]"
                 alt=""
               >
+              
+              <!-- <img
+                class="avatarImage"
+                :src="roles.indexOf(player.character) !== -1 ?player.character: penguins[index % 4]"
+                alt=""
+              > -->
             </div>
           
             <div class="mt-2 w-full flex items-center justify-center">
@@ -258,7 +284,6 @@ const initRoomChannel = () => {
             </div>
           </div> -->
       </div>  
-      <!-- <div class="w-[600px] h-full"></div> -->
       <div
         v-if="roomInfo.status === 'starting'"
         class="text-[#83FFDC] flex items-center justify-between w-[500px]"
@@ -287,10 +312,10 @@ const initRoomChannel = () => {
             <p class="mr-5 text-xl font-medium">
               {{ roomInfo.name }}
             </p>
-            <button
+            <!-- <button
               class="bg-[url(@/assets/roomPlayers/edit.svg)] bg-center bg-cover w-5 h-5"
               @click="() => {showChangeNicknameModal = true}"
-            ></button>
+            ></button> -->
           </div>
         </div>
         <button
@@ -317,74 +342,77 @@ const initRoomChannel = () => {
 </template>
 
 <style scoped>
-.roomBackground{  
-  background: linear-gradient(180deg, #27B8E0 0%, #B2EFFF 100%);
+.roomBackground {
+  background: linear-gradient(180deg, #27b8e0 0%, #b2efff 100%);
 }
 
-.title{
+.title {
+  position: relative;
+  z-index: 1;
   width: 580px;
   height: 84px;
-  border-radius: 24px;
-  margin:0 auto 0 auto;
-  background: linear-gradient(180deg, #FFFFFFFF 0%, #DAFFFFFF 100%);
-  box-shadow: 0px 4px 0px 0px #27B8E0;
-  line-height: 84px;
-  text-align: center;
-  color:#006989;
+  margin: 0 auto 0 auto;
+  font-size: 30px;
   font-weight: 500;
-  font-size:30px;
-  position: relative;
-  z-index: 1;
+  line-height: 76px;
+  color: #006989;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffffff 0%, #daffffff 100%);
+  border-radius: 24px;
+  border: 4px solid #FFFFFF;
+  box-shadow: 0px 4px 0px 0px #27b8e0;
 }
 
-.title::before{
+.title::before {
+  content: '';
   position: absolute;
-  left:50%;
-  top:-40px;
-  transform: translate(-50%,0%);
-  width:312px;
-  height: 300px;
-  clip-path:polygon(10% 0%,90% 0%,100% 100%,0% 100%);
-  background: radial-gradient(134.28% 140.37% at 57.69% -38.05%, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 2%, rgba(255, 255, 255, 0.17) 6%, rgba(255, 255, 255, 0.36) 12%, rgba(255, 255, 255, 0.64) 18%, rgba(255, 255, 255, 0.98) 25%, #FFFFFF 26%, rgba(255, 255, 255, 0.76) 41%, rgba(255, 255, 255, 0.44) 62%, rgba(255, 255, 255, 0.2) 80%, rgba(255, 255, 255, 0.06) 93%, rgba(255, 255, 255, 0) 100%);
-  content:'';
+  top: -40px;
+  left: 50%;
   z-index: -1;
+  width: 312px;
+  height: 300px;
+  clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+  background: radial-gradient(134.28% 140.37% at 57.69% -38.05%, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .05) 2%, rgba(255, 255, 255, .17) 6%, rgba(255, 255, 255, .36) 12%, rgba(255, 255, 255, .64) 18%, rgba(255, 255, 255, .98) 25%, #ffffff 26%, rgba(255, 255, 255, .76) 41%, rgba(255, 255, 255, .44) 62%, rgba(255, 255, 255, .2) 80%, rgba(255, 255, 255, .06) 93%, rgba(255, 255, 255, 0) 100%);
+  transform: translate(-50%, 0%);
 }
+
 .avatarBackground {
-  clip-path: url('#avatarClip');
+  position: relative;
   width: 82px;
   height: 82px;
-  position: relative;
+  clip-path: url('#avatarClip');
 }
 
-.notReadyBackground::before{
-  background-color: #778b8f8a;
+.notReadyBackground::before {
   content: '未準備';
-  color: #ffffffc4;
+  position: absolute;
+  z-index: 1;
   width: 100%;
   height: 100%;
-  position: absolute;
-  text-align: center;
   font-size: 20px;
   line-height: 4;
-  z-index: 1;
+  color: #ffffffc4;
+  text-align: center;
+  background-color: #778b8f8a;
 }
 
-.avatarImage{
-  transform: translate(20%,35%) scale(1.7);
-}
+/* .avatarImage {
+  transform: translate(20%, 35%) scale(1.5);
+} */
 
-.readyButton{
-  background: linear-gradient(180deg, #FFFBD6 0%, #FFBA39 100%);
-  color:#982000;
-  border-radius: 30px;
-  box-shadow: 0px 4px 0px 0px #FF9200;
-  text-shadow: 0px 0px 4px 0px #FFF7AE;
+.readyButton {
   width: 140px;
   height: 50px;
+  color: #982000;
+  text-shadow: 0px 0px 4px 0px #fff7ae;
+  background: linear-gradient(180deg, #fffbd6 0%, #ffba39 100%);
+  border-radius: 30px;
+  box-shadow: 0px 4px 0px 0px #ff9200;
 }
-.cancelReadyButton{
-  background: linear-gradient(180deg, #AFB7B9 0%, #6B7375 100%);
-  border: 1px solid #DBDFE0;
-  color:#FFFF;
+
+.cancelReadyButton {
+  color: #ffff;
+  background: linear-gradient(180deg, #afb7b9 0%, #6b7375 100%);
+  border: 1px solid #dbdfe0;
 }
 </style>

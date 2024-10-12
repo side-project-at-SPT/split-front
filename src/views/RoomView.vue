@@ -27,7 +27,7 @@ const { user } = toRefs(userStore)
 const { getUserInfo } = userStore
 const { roomInfo } = toRefs(roomStore)
 const {
-  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData,
+  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom,
 } = roomStore
 // const {
 //   getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom, addAiPlayer
@@ -48,7 +48,6 @@ const handleChangeRole = (index) => {
 const roomMe = computed(() => roomInfo.value.players?.find((player) => player.id === user.value.id) || {})
 const playerNum = computed(() => roomInfo.value.players?.length || 1)
 const showChangeNicknameModal = ref(false)
-const nameEditSwitch = computed(() => roomInfo.value.status !== 'starting')
 // const aiPlayerJoined = ref(false)
 const handleReadyChange = computed(() => { 
   if (roomMe.value.is_ready) {
@@ -66,20 +65,20 @@ const handleLeaveRoom = async () => {
     consumer.subscriptions.remove(roomChannel)
     console.log(consumer, 'consumer')
   }
-  clearRoomInfo()
+  
   if (isGaasRoom.value){
     // Gaas room離開時要做什麼事？？？
   }
-  else {
+  else if (roomInfo.value?.players && roomInfo.value?.players.length <= 1) {
+    closeRoom().catch(() => {
+      // showErrorMessage(error.error)
+    })
+    console.log(roomInfo.value)
     router.push('/')
   }
+  clearRoomInfo()
 }
-// const handleCloseRoom = async () => {
-//   closeRoom().catch(() => {
-//     // showErrorMessage(error.error)
-//   })
-//   router.push('/')
-// }
+
 // const handleAddAiPlayer = async () => {
 //   await addAiPlayer()
 //   aiPlayerJoined.value = true
@@ -196,30 +195,12 @@ const initRoomChannel = () => {
       <RoomPlayerSlide
         :name="user.nickname"
         :image-key="defaultChoseAvatar"
-        :name-edit-switch="nameEditSwitch"
         :chose-lock="roomMe.is_ready"
         @chose-player="(value)=>handleChangeRole(value)"
         @change-name="()=> showChangeNicknameModal = true "
       />
     </div>
-    <!-- <div class="flex flex-col gap-2 justify-center items-center ">
-      <div>
-        <div>選擇角色</div>
-        <div class="flex">
-          <div
-            v-for="index in 4"
-            :key="index"
-            class="h-8 w-8"
-            @click="handleChangeRole(index - 1)"
-          >
-            <div
-              :class="roles[index - 1]"
-              class="h-8 w-8"
-            ></div>
-          </div>
-        </div>
-      </div>
-    </div> -->
+
     <div class="h-1/4 w-full bg-[#0F2A30E5] absolute bottom-0 flex items-center justify-evenly">
       <div class="flex items-center">
         <div class="text-white font-normal mr-10">
@@ -228,7 +209,9 @@ const initRoomChannel = () => {
           </p>
           <p
             class="font-medium text-xl "
-            style="text-align: justify; text-align-last: justify; text-justify: distribute-all-lines;"
+            style="text-align: justify;
+  text-align-last: justify;
+  text-justify: distribute-all-lines;"
           >
             共{{ playerNum }}名
           </p>
@@ -241,24 +224,13 @@ const initRoomChannel = () => {
           >
             {{ penguins.find((item)=> String(item) === player.character) }}
             <div
-              :class="`overflow-hidden avatarBackground ${player.is_ready? 'bg-white':'notReadyBackground'}`"
+              :class="`avatarBackground ${player.is_ready? 'bg-white':'notReadyBackground'}`"
             >
-              <!-- <img
-                class="avatarImage"
-                :src="penguins.includes(player.character)"
-                alt=""
-              > -->
               <img
                 class="avatarImage"
                 :src="penguins[roles.indexOf(player.character)]"
                 alt=""
               >
-              
-              <!-- <img
-                class="avatarImage"
-                :src="roles.indexOf(player.character) !== -1 ?player.character: penguins[index % 4]"
-                alt=""
-              > -->
             </div>
           
             <div class="mt-2 w-full flex items-center justify-center">
@@ -358,8 +330,8 @@ const initRoomChannel = () => {
   color: #006989;
   text-align: center;
   background: linear-gradient(180deg, #ffffffff 0%, #daffffff 100%);
+  border: 4px solid #ffffff;
   border-radius: 24px;
-  border: 4px solid #FFFFFF;
   box-shadow: 0px 4px 0px 0px #27b8e0;
 }
 
@@ -395,10 +367,6 @@ const initRoomChannel = () => {
   text-align: center;
   background-color: #778b8f8a;
 }
-
-/* .avatarImage {
-  transform: translate(20%, 35%) scale(1.5);
-} */
 
 .readyButton {
   width: 140px;

@@ -25,7 +25,7 @@ const handleSetNickname = () => {
 <template>
   <div
     v-if="showChangeNicknameModal"
-    class="absolute w-svw h-dvh bg-black bg-opacity-50 flex items-center justify-center z-10"
+    class="absolute w-svw h-dvh bg-black bg-opacity-50 flex items-center justify-center z-50"
   >
     <div class="hexagon-ice w-[300px] h-[300px] flex flex-col items-center justify-center">
       <div class="text-center text-white text-2xl font-semibold">

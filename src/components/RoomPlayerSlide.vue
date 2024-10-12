@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import Aptenodytes from '@/assets/roomPLayers/aptenodytes.png'
 import Eudyptes from '@/assets/roomPLayers/eudyptes.png'
 import Eudyptula from '@/assets/roomPLayers/eudyptula.png'
@@ -16,11 +16,6 @@ const props = defineProps({
     default: 0,
     required: true
   },
-  nameEditSwitch: {
-    type: Boolean,
-    default: true,
-    required: true,
-  },
   choseLock: {
     type: Boolean,
     default: false,
@@ -36,21 +31,30 @@ const handelChosePlayer = (index) => {
   emits('chosePlayer', index)
   playersRef.value.style = `transform:translate3D(-${ index * 200 }px,0px,20px); transition:all 1s;`
 }
+
+watch(() => props.imageKey, () => {
+  handelChosePlayer(props.imageKey)
+}, { once: true })
+
 </script>
 
 <template>
   <div class="w-[280px] h-[280px] relative">
     <div
       ref="playersRef"
-      :class="`flex relative z-10 ${props.choseLock? 'overflow-hidden':''}`"
+      class="flex relative z-10  h-[280px] "
     >
       <img
         v-for="(item,index) in players"
         :key="item"    
         :src="item"
         alt=""
-        class="avatar "
-        :class="{ 'focused': chosePlayer === index }"
+        class="avatar"
+        :class="{
+          'focused': chosePlayer === index,
+          'opacity-60': chosePlayer === index,
+          'opacity-0': props.choseLock
+        }"
         tabindex="0"
         @click="()=>handelChosePlayer(index)"
       >
@@ -65,7 +69,8 @@ const handelChosePlayer = (index) => {
         {{ props.name }}
       </p>
       <button
-        :class="`bg-[url(@/assets/roomPlayers/${props.nameEditSwitch?'edit':'editGray'}.svg)] bg-center bg-cover w-8 h-8`"
+        :class="`bg-[url(@/assets/roomPlayers/edit.svg)] bg-center bg-cover w-8 h-8 ${props.choseLock?'opacity-40':''}`"
+        :disabled="props.choseLock"
         @click="()=>emits('changeName')"
       ></button>
     </div>
@@ -73,33 +78,35 @@ const handelChosePlayer = (index) => {
 </template>
 
 <style scoped>
-  .stage{
-    width: 226px;
-    height: 124px;
+  .stage {
     position: absolute;
     bottom: -64px;
     left: 50%;
-    transform: translate(-50%,0%);
+    width: 226px;
+    height: 124px;
+    transform: translate(-50%, 0%);
   }
-  .inputBox{
-    width:200px;
-    height:48px;
-    border-radius: 30px;
-    background: #0F2A30E5;
+
+  .inputBox {
     position: absolute;
-    left:50%;
-    top:325px;
-    transform: translate(-50%,0%);
+    top: 325px;
+    left: 50%;
     z-index: 1;
+    width: 200px;
+    height: 48px;
+    background: #0f2a30e5;
+    border-radius: 30px;
+    transform: translate(-50%, 0%);
   }
-  .avatar{
+
+  .avatar {
     width: 200px;
     height: 200px;
-    transition: all 0.4s ease;
-    opacity: 0.6;
+    transition: all .4s ease;
   }
+
   .avatar:focus,
-  .avatar.focused{
+  .avatar.focused {
     width: 280px;
     height: 280px;
     opacity: 1;

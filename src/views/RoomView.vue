@@ -55,27 +55,25 @@ const handleReadyChange = computed(() => {
   }
   return function (){ return roomChannel.send({ action: 'ready' })}
 })
-const isGaasRoom = computed(() => {
-  return !!gaasToken.value
-})
+// const isGaasRoom = computed(() => {
+//   return !!gaasToken.value
+// })
 const handleLeaveRoom = async () => {
   // roomChannel.send({ action: 'leave_room' })
   // roomChannel.unsubscribe()
-  if (consumer){
-    consumer.subscriptions.remove(roomChannel)
-    console.log(consumer, 'consumer')
+
+  // if (isGaasRoom.value){
+  //   // Gaas room離開時要做什麼事？？？
+  // }
+  const aiPlayer = roomInfo.value?.players?.find((item) => item?.role === 'ai')
+  if (roomInfo.value?.players && roomInfo.value?.players.length <= 2 && aiPlayer) {
+    closeRoom()
   }
-  
-  if (isGaasRoom.value){
-    // Gaas room離開時要做什麼事？？？
-  }
-  else if (roomInfo.value?.players && roomInfo.value?.players.length <= 1) {
-    closeRoom().catch(() => {
-      // showErrorMessage(error.error)
-    })
-    console.log(roomInfo.value)
-    router.push('/')
-  }
+  else
+    if (consumer){
+      consumer.subscriptions.remove(roomChannel)
+    }
+  router.push('/')
   clearRoomInfo()
 }
 

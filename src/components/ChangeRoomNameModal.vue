@@ -1,14 +1,15 @@
 <script setup>
 import { ref, computed, toRefs } from 'vue'
-import { useUserStore } from '../stores/user'
+import { useRoomStore } from '../stores/room'
+
 const props = defineProps({
   modelValue: Boolean
 })
 const emit = defineEmits([ 'update:modelValue' ])
-const userStore = useUserStore()
-const { user } = toRefs(userStore)
-const { setNickname } = userStore
-const newNickname = ref(user.value.nickname)
+const roomStore = useRoomStore()
+const { roomInfo } = toRefs(roomStore)
+const { setRoomName } = roomStore
+const newRoomName = ref(roomInfo.value.name)
 const showChangeNicknameModal = computed({
   get: () => props.modelValue,
   set: (value) => {
@@ -16,7 +17,7 @@ const showChangeNicknameModal = computed({
   }
 })
 const handleSetNickname = () => {
-  setNickname(newNickname.value).then(() => {
+  setRoomName(newRoomName.value).then(() => {
     showChangeNicknameModal.value = false
   })
 }
@@ -29,13 +30,13 @@ const handleSetNickname = () => {
   >
     <div class="hexagon-ice w-[300px] h-[300px] flex flex-col items-center justify-center">
       <div class="text-center text-white text-2xl font-semibold">
-        修改暱稱
+        修改房名
       </div>
       <div class="mt-5">
         <input
-          v-model="newNickname"
+          v-model="newRoomName"
           class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-2"
-          placeholder="暱稱"
+          placeholder="房名"
         >
       </div>
       <div class="mt-5 flex gap-2">

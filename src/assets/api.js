@@ -148,6 +148,18 @@ const api = {
       throw error.response.data
     }
   },
+  setRoomPreferences: async ({ id, name } = param) => {
+    try {
+      const response = await axiosInstance.patch(`/api/v1/rooms/${ id }`, { name })
+      return response.data
+    }
+    catch (error) {
+      if (error.response.status === 304) {
+        return { status: 304 }
+      }
+      throw error.response.data
+    }
+  },
   startGame: async (id) => {
     try {
       const response = await axiosInstance.post('/api/v1/rooms/' + id + '/game')

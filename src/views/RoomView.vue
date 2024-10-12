@@ -13,6 +13,7 @@ import Eudyptula from '@/assets/images/2.png'
 import Papua from '@/assets/images/1.png'
 import ChangeNicknameModal from '@/components/ChangeNicknameModal.vue'
 import RoomPlayerSlide from '../components/RoomPlayerSlide.vue'
+import ChangeRoomNameModal from '../components/ChangeRoomNameModal.vue'
 
 const penguins = [ Aptenodytes, Papua, Eudyptula, Eudyptes ]
 const roles = [ 'Aptenodytes', 'Eudyptes', 'Eudyptula', 'Papua' ]
@@ -26,12 +27,12 @@ const { initConnection } = publicStore
 const { user } = toRefs(userStore)
 const { getUserInfo } = userStore
 const { roomInfo } = toRefs(roomStore)
-const {
-  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom,
-} = roomStore
 // const {
-//   getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom, addAiPlayer
+//   getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom,
 // } = roomStore
+const {
+  getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom, addAiPlayer
+} = roomStore
 const { params, query } = useRoute()
 let { roomId } = params
 roomId = Number(roomId)
@@ -42,31 +43,32 @@ if (queryGaasToken){
   localStorage.setItem('token', queryGaasToken)
 }
 const trueToken = ref(localStorage.getItem('token'))
-const handleChangeRole = (index) => {
-  roomChannel.send({ action: 'set_character', character: roles[index] }) 
-}
 const roomMe = computed(() => roomInfo.value.players?.find((player) => player.id === user.value.id) || {})
 const playerNum = computed(() => roomInfo.value.players?.length || 1)
 const showChangeNicknameModal = ref(false)
-// const aiPlayerJoined = ref(false)
+const showChangeRoomNameModal = ref(false)
+const aiPlayerJoined = computed(() => roomInfo.value?.players?.some((item) => item?.role === 'ai'))
+const homeowner = computed(() => roomInfo.value.owner_id === user.value.id)
 const handleReadyChange = computed(() => { 
   if (roomMe.value.is_ready) {
-    return function (){ return roomChannel.send({ action: 'cancel_ready' })}
+    return function (){ roomChannel.send({ action: 'cancel_ready' })}
   }
-  return function (){ return roomChannel.send({ action: 'ready' })}
+  return function (){ roomChannel.send({ action: 'ready' })}
 })
+const handleChangeRole = (index) => {
+  roomChannel.send({ action: 'set_character', character: roles[index] }) 
+}
 // const isGaasRoom = computed(() => {
 //   return !!gaasToken.value
 // })
 const handleLeaveRoom = async () => {
   // roomChannel.send({ action: 'leave_room' })
   // roomChannel.unsubscribe()
-
   // if (isGaasRoom.value){
   //   // Gaas room離開時要做什麼事？？？
   // }
-  const aiPlayer = roomInfo.value?.players?.find((item) => item?.role === 'ai')
-  if (roomInfo.value?.players && roomInfo.value?.players.length <= 2 && aiPlayer) {
+  const aiPlayer = roomInfo.value?.players?.some((item) => item?.role === 'ai')
+  if (roomInfo.value?.players?.length <= 1 || roomInfo.value?.players?.length <= 2 && aiPlayer) {
     closeRoom()
   }
   else
@@ -77,10 +79,6 @@ const handleLeaveRoom = async () => {
   clearRoomInfo()
 }
 
-// const handleAddAiPlayer = async () => {
-//   await addAiPlayer()
-//   aiPlayerJoined.value = true
-// }
 let roomChannel = null
 
 onMounted(async () => {
@@ -178,6 +176,7 @@ const initRoomChannel = () => {
 <template>
   <div class="roomBackground w-screen h-screen relative pt-10">
     <ChangeNicknameModal v-model="showChangeNicknameModal" />
+    <ChangeRoomNameModal v-model="showChangeRoomNameModal" />
     <div class="relative">
       <button
         class="w-[62px] h-[62px] absolute  left-10 rounded-[50%] bg-[url(@/assets/roomPLayers/goBackButton.jpg)]"
@@ -244,15 +243,6 @@ const initRoomChannel = () => {
             </div>
           </div>
         </div>
-        <!-- <div class="text-sm flex items-center justify-center gap-1">
-            <div
-              v-if="!aiPlayerJoined"
-              class="cursor-pointer px-5 py-3"
-              @click="handleAddAiPlayer"
-            >
-              加入 AI
-            </div>
-          </div> -->
       </div>  
       <div
         v-if="roomInfo.status === 'starting'"
@@ -282,19 +272,31 @@ const initRoomChannel = () => {
             <p class="mr-5 text-xl font-medium">
               {{ roomInfo.name }}
             </p>
-            <!-- <button
-              class="bg-[url(@/assets/roomPlayers/edit.svg)] bg-center bg-cover w-5 h-5"
-              @click="() => {showChangeNicknameModal = true}"
-            ></button> -->
+            <button
+              v-if="homeowner"
+              :class="`bg-[url(@/assets/roomPlayers/edit.svg)] bg-center bg-cover w-5 h-5 ${roomMe.is_ready?'opacity-40':''}`"
+              :disabled="roomMe.is_ready"
+              @click="() => {showChangeRoomNameModal = true}"
+            ></button>
           </div>
         </div>
-        <button
-          v-if="roomInfo.status !== 'starting'"
-          :class="`${roomMe.is_ready?'cancelReadyButton':'readyButton'} text-xl ml-24 w-[140px] h-[50px] rounded-[30px]`"
-          @click="handleReadyChange"
-        >
-          {{ roomMe.is_ready?'取消準備':'我準備好了' }}
-        </button>
+        <div class="flex flex-col items-center ml-24">
+          <button
+            v-if="roomInfo.status !== 'starting'"
+            :class="`${roomMe.is_ready?'cancelReadyButton':'readyButton'} text-xl  w-[140px] h-[50px] rounded-[30px]`"
+            @click="handleReadyChange"
+          >
+            {{ roomMe.is_ready?'取消準備':'我準備好了' }}
+          </button>
+          <button
+            v-if="homeowner" 
+            :class="`${aiPlayerJoined? 'cancelReadyButton':'readyButton'} w-[140px] h-[50px] rounded-[30px] mt-5 text-xl`" 
+            :disabled="aiPlayerJoined"
+            @click="addAiPlayer"
+          >
+            加 入 A I
+          </button>
+        </div>
       </div>
     </div>
     
@@ -367,8 +369,6 @@ const initRoomChannel = () => {
 }
 
 .readyButton {
-  width: 140px;
-  height: 50px;
   color: #982000;
   text-shadow: 0px 0px 4px 0px #fff7ae;
   background: linear-gradient(180deg, #fffbd6 0%, #ffba39 100%);

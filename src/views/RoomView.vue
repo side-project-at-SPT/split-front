@@ -11,9 +11,9 @@ import Aptenodytes from '@/assets/images/3.png'
 import Eudyptes from '@/assets/images/4.png'
 import Eudyptula from '@/assets/images/2.png'
 import Papua from '@/assets/images/1.png'
-import ChangeNicknameModal from '@/components/ChangeNicknameModal.vue'
 import RoomPlayerSlide from '../components/RoomPlayerSlide.vue'
-import ChangeRoomNameModal from '../components/ChangeRoomNameModal.vue'
+import ChangeNameModal from '../components/ChangeNameModal.vue'
+import DefaultButton from '../components/DefaultButton.vue'
 
 const penguins = [ Aptenodytes, Papua, Eudyptula, Eudyptes ]
 const roles = [ 'Aptenodytes', 'Eudyptes', 'Eudyptula', 'Papua' ]
@@ -25,8 +25,9 @@ const { gaasToken } = toRefs(publicStore)
 let consumer = toRaw(publicStore.consumer)
 const { initConnection } = publicStore
 const { user } = toRefs(userStore)
-const { getUserInfo } = userStore
+const { getUserInfo, setNickname } = userStore
 const { roomInfo } = toRefs(roomStore)
+const { setRoomName } = roomStore
 // const {
 //   getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom,
 // } = roomStore
@@ -47,8 +48,9 @@ const roomMe = computed(() => roomInfo.value.players?.find((player) => player.id
 const playerNum = computed(() => roomInfo.value.players?.length || 1)
 const showChangeNicknameModal = ref(false)
 const showChangeRoomNameModal = ref(false)
-const aiPlayerJoined = computed(() => roomInfo.value?.players?.some((item) => item?.role === 'ai'))
+const showLeaveModel = ref(false)
 const homeowner = computed(() => roomInfo.value.owner_id === user.value.id)
+const aiPlayerJoined = computed(() => roomInfo.value?.players?.some((item) => item?.role === 'ai'))
 const handleReadyChange = computed(() => { 
   if (roomMe.value.is_ready) {
     return function (){ roomChannel.send({ action: 'cancel_ready' })}
@@ -67,6 +69,7 @@ const handleLeaveRoom = async () => {
   // if (isGaasRoom.value){
   //   // Gaas room離開時要做什麼事？？？
   // }
+  console.log('1234')
   const aiPlayer = roomInfo.value?.players?.some((item) => item?.role === 'ai')
   if (roomInfo.value?.players?.length <= 1 || roomInfo.value?.players?.length <= 2 && aiPlayer) {
     closeRoom()
@@ -81,26 +84,6 @@ const handleLeaveRoom = async () => {
 
 let roomChannel = null
 
-onMounted(async () => {
-  if (!gaasToken.value && sessionStorage.getItem('gaasToken')){
-    gaasToken.value = sessionStorage.getItem('gaasToken')
-  }
-  if (gaasToken.value) {
-    api.setToken(gaasToken.value)
-    trueToken.value = gaasToken.value
-  }
-  if (!consumer){
-    initConnection(trueToken.value)
-    consumer = toRaw(publicStore.consumer)
-    getUserInfo()
-    getRooms()
-    initRoomChannel()
-  }
-  else {
-    initRoomChannel()
-  }
-  joinRoom({ id: roomId })
-})
 const initRoomChannel = () => {
   // 檢查是否已經訂閱過該房間
   if (consumer.subscriptions.findAll(`{"channel":"RoomChannel","room_id":${ roomId }}`).length > 0){
@@ -170,17 +153,69 @@ const initRoomChannel = () => {
     }
   })
 }
+const handelEditRoomName = (newName) => {
+  setRoomName(newName).then(() => { 
+    showChangeRoomNameModal.value = false
+  })
+}
+const handelEditNickname = (newName) => {
+  setNickname(newName).then(() => { 
+    showChangeNicknameModal.value = false
+  })
+}
 
+onMounted(async () => {
+  if (!gaasToken.value && sessionStorage.getItem('gaasToken')){
+    gaasToken.value = sessionStorage.getItem('gaasToken')
+  }
+  if (gaasToken.value) {
+    api.setToken(gaasToken.value)
+    trueToken.value = gaasToken.value
+  }
+  if (!consumer){
+    initConnection(trueToken.value)
+    consumer = toRaw(publicStore.consumer)
+    getUserInfo()
+    getRooms()
+    initRoomChannel()
+  }
+  else {
+    initRoomChannel()
+  }
+  joinRoom({ id: roomId })
+})
 </script>
 
 <template>
-  <div class="roomBackground w-screen h-screen relative pt-10">
-    <ChangeNicknameModal v-model="showChangeNicknameModal" />
-    <ChangeRoomNameModal v-model="showChangeRoomNameModal" />
+  <div class="roomBackground w-screen h-screen relative pt-10 overflow-hidden">
+    <ChangeNameModal
+      v-if="showLeaveModel"
+      v-model="showLeaveModel"
+      :title="homeowner?'關閉房間':'離開房間'"
+      :input-default-value="user.nickname"
+      :content-text="homeowner?'所有玩家將強制離開房間，是否確認關閉？':'是否確認離開這個房間？'"
+      @on-check="handleLeaveRoom"
+    />
+    <ChangeNameModal
+      v-if="showChangeNicknameModal"
+      v-model="showChangeNicknameModal"
+      :title="'修改暱稱'"
+      :input-default-value="user.nickname"
+      is-edit
+      @on-check="handelEditNickname"
+    />
+    <ChangeNameModal
+      v-if="showChangeRoomNameModal"
+      v-model="showChangeRoomNameModal"
+      :title="'修改房間名稱'"
+      :input-default-value="roomInfo.name"
+      is-edit
+      @on-check="handelEditRoomName"
+    />
     <div class="relative">
       <button
         class="w-[62px] h-[62px] absolute  left-10 rounded-[50%] bg-[url(@/assets/roomPLayers/goBackButton.jpg)]"
-        @click="handleLeaveRoom"
+        @click="showLeaveModel = true"
       ></button>
       <div
         class="title"
@@ -242,6 +277,13 @@ const initRoomChannel = () => {
               </p>
             </div>
           </div>
+          <button
+            v-if="homeowner && roomInfo.players?.length < 4"
+            class="w-32 h-32 bg-[url(@/assets/roomPlayers/addAi.svg)] bg-center bg-cover"
+            :disabled="aiPlayerJoined"
+            @click="addAiPlayer"
+          >
+          </button>
         </div>
       </div>  
       <div
@@ -281,21 +323,12 @@ const initRoomChannel = () => {
           </div>
         </div>
         <div class="flex flex-col items-center ml-24">
-          <button
+          <DefaultButton 
             v-if="roomInfo.status !== 'starting'"
-            :class="`${roomMe.is_ready?'cancelReadyButton':'readyButton'} text-xl  w-[140px] h-[50px] rounded-[30px]`"
-            @click="handleReadyChange"
-          >
-            {{ roomMe.is_ready?'取消準備':'我準備好了' }}
-          </button>
-          <button
-            v-if="homeowner" 
-            :class="`${aiPlayerJoined? 'cancelReadyButton':'readyButton'} w-[140px] h-[50px] rounded-[30px] mt-5 text-xl`" 
-            :disabled="aiPlayerJoined"
-            @click="addAiPlayer"
-          >
-            加 入 A I
-          </button>
+            :button-type="roomMe.is_ready?'cancel':'confirm'"
+            :text="roomMe.is_ready?'取消準備':'我準備好了'"
+            @on-click="handleReadyChange"
+          />
         </div>
       </div>
     </div>
@@ -355,6 +388,14 @@ const initRoomChannel = () => {
   clip-path: url('#avatarClip');
 }
 
+/* .addAiBackground {
+  position: relative;
+  width: 82px;
+  height: 82px;
+
+  clip-path: url('#avatarClip');
+} */
+
 .notReadyBackground::before {
   content: '未準備';
   position: absolute;
@@ -368,17 +409,4 @@ const initRoomChannel = () => {
   background-color: #778b8f8a;
 }
 
-.readyButton {
-  color: #982000;
-  text-shadow: 0px 0px 4px 0px #fff7ae;
-  background: linear-gradient(180deg, #fffbd6 0%, #ffba39 100%);
-  border-radius: 30px;
-  box-shadow: 0px 4px 0px 0px #ff9200;
-}
-
-.cancelReadyButton {
-  color: #ffff;
-  background: linear-gradient(180deg, #afb7b9 0%, #6b7375 100%);
-  border: 1px solid #dbdfe0;
-}
 </style>

@@ -12,7 +12,7 @@ import Eudyptes from '@/assets/images/4.png'
 import Eudyptula from '@/assets/images/2.png'
 import Papua from '@/assets/images/1.png'
 import RoomPlayerSlide from '../components/RoomPlayerSlide.vue'
-import ChangeNameModal from '../components/ChangeNameModal.vue'
+import RoomDialog from '../components/RoomDialog.vue'
 import DefaultButton from '../components/DefaultButton.vue'
 
 const penguins = [ Aptenodytes, Papua, Eudyptula, Eudyptes ]
@@ -188,7 +188,7 @@ onMounted(async () => {
 
 <template>
   <div class="roomBackground w-screen h-screen relative pt-10 overflow-hidden">
-    <ChangeNameModal
+    <RoomDialog
       v-if="showLeaveModel"
       v-model="showLeaveModel"
       :title="homeowner?'關閉房間':'離開房間'"
@@ -196,7 +196,7 @@ onMounted(async () => {
       :content-text="homeowner?'所有玩家將強制離開房間，是否確認關閉？':'是否確認離開這個房間？'"
       @on-check="handleLeaveRoom"
     />
-    <ChangeNameModal
+    <RoomDialog
       v-if="showChangeNicknameModal"
       v-model="showChangeNicknameModal"
       :title="'修改暱稱'"
@@ -204,7 +204,7 @@ onMounted(async () => {
       is-edit
       @on-check="handelEditNickname"
     />
-    <ChangeNameModal
+    <RoomDialog
       v-if="showChangeRoomNameModal"
       v-model="showChangeRoomNameModal"
       :title="'修改房間名稱'"

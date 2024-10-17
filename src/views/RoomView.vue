@@ -28,9 +28,6 @@ const { user } = toRefs(userStore)
 const { getUserInfo, setNickname } = userStore
 const { roomInfo } = toRefs(roomStore)
 const { setRoomName } = roomStore
-// const {
-//   getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom,
-// } = roomStore
 const {
   getRooms, updateRoomPlayers, clearRoomInfo, joinRoom, updateRoomData, closeRoom, addAiPlayer
 } = roomStore
@@ -44,12 +41,13 @@ if (queryGaasToken){
   localStorage.setItem('token', queryGaasToken)
 }
 const trueToken = ref(localStorage.getItem('token'))
+const roomToken = ref(localStorage.getItem('roomToken'))
 const roomMe = computed(() => roomInfo.value.players?.find((player) => player.id === user.value.id) || {})
 const playerNum = computed(() => roomInfo.value.players?.length || 1)
 const showChangeNicknameModal = ref(false)
 const showChangeRoomNameModal = ref(false)
 const showLeaveModel = ref(false)
-const homeowner = computed(() => roomInfo.value.owner_id === user.value.id)
+const roomOwner = computed(() => roomInfo.value.owner_id === user.value.id)
 const aiPlayerJoined = computed(() => roomInfo.value?.players?.some((item) => item?.role === 'ai'))
 const handleReadyChange = computed(() => { 
   if (roomMe.value.is_ready) {
@@ -64,22 +62,23 @@ const handleChangeRole = (index) => {
 //   return !!gaasToken.value
 // })
 const handleLeaveRoom = async () => {
-  // roomChannel.send({ action: 'leave_room' })
-  // roomChannel.unsubscribe()
-  // if (isGaasRoom.value){
-  //   // Gaas room離開時要做什麼事？？？
+  // 還有剩餘玩家時，僅離開房間非關閉房間
+  // const aiPlayer = roomInfo.value?.players?.some((item) => item?.role === 'ai')
+  // if (roomOwner.value && (roomInfo.value?.players?.length <= 1 || roomInfo.value?.players?.length <= 2 && aiPlayer)) {
+  //   closeRoom()
   // }
-  console.log('1234')
-  const aiPlayer = roomInfo.value?.players?.some((item) => item?.role === 'ai')
-  if (roomInfo.value?.players?.length <= 1 || roomInfo.value?.players?.length <= 2 && aiPlayer) {
+  // else {
+  //     consumer.subscriptions.remove(roomChannel)
+  //   }
+
+  if (roomOwner.value) {
     closeRoom()
   }
-  else
-    if (consumer){
-      consumer.subscriptions.remove(roomChannel)
-    }
-  router.push('/')
+  else {
+    consumer.subscriptions.remove(roomChannel)
+  }
   clearRoomInfo()
+  router.push('/')
 }
 
 let roomChannel = null
@@ -91,7 +90,7 @@ const initRoomChannel = () => {
     roomChannel.send({ action: 'cancel_ready' }) 
     return
   }
-  roomChannel = consumer.subscriptions.create({ channel: 'RoomChannel', room_id: roomId }, {
+  roomChannel = consumer.subscriptions.create({ channel: 'RoomChannel', room_id: roomId, token: roomToken.value }, {
     connected () {
       // 隨機選一個角色
       const randomIndex = Math.floor(Math.random() * roles.length)
@@ -100,10 +99,16 @@ const initRoomChannel = () => {
       getRooms()
     },
     disconnected () {
-      console.log('disconnected room channel', roomId)
+      
     },
     received (data) {
       if (data.event === 'room_updated') {
+        const isPlayer = data.players.find(({ id }) => id === user.value.id)
+        if (!isPlayer) {
+          consumer.subscriptions.remove(roomChannel)
+          // localStorage.removeItem('roomToken')
+          return router.push('/')
+        }
         const roomData = {
           id: roomId,
           // gameStartInSeconds: data.seconds,
@@ -120,7 +125,7 @@ const initRoomChannel = () => {
         }
         updateRoomData(roomData)
       }
-      else if (data.event === 'starting_game_is_cancelled'){
+      else if (data.event === 'starting_game_is_cancelled') {
         const roomData = {
           id: roomId,
           gameStartInSeconds: 5,
@@ -136,7 +141,7 @@ const initRoomChannel = () => {
           }
         })
       }
-      else if (data.event === 'set_character'){
+      else if (data.event === 'set_character') {
         const roomData = {
           id: roomId,
           players: data.players
@@ -148,7 +153,8 @@ const initRoomChannel = () => {
         router.push(`/game/?game_id=${ gameId }&room_id=${ roomId }`)
       }
       else if (data.event === 'room_closed') {
-        handleLeaveRoom()
+        consumer.subscriptions.remove(roomChannel)
+        router.push('/')
       }
     }
   })
@@ -162,6 +168,10 @@ const handelEditNickname = (newName) => {
   setNickname(newName).then(() => { 
     showChangeNicknameModal.value = false
   })
+}
+
+const deletePlayer = (id) => { 
+  roomChannel.send({ action: 'kick_player', player_id: id })
 }
 
 onMounted(async () => {
@@ -191,9 +201,10 @@ onMounted(async () => {
     <RoomDialog
       v-if="showLeaveModel"
       v-model="showLeaveModel"
-      :title="homeowner?'關閉房間':'離開房間'"
+      :title="roomOwner?'關閉房間':'離開房間'"
       :input-default-value="user.nickname"
-      :content-text="homeowner?'所有玩家將強制離開房間，是否確認關閉？':'是否確認離開這個房間？'"
+      :submit-button-text="roomOwner?'確認關閉':'確認離開'"
+      :content-text="roomOwner?'所有玩家將強制離開房間，是否確認關閉？':'是否確認離開這個房間？'"
       @on-check="handleLeaveRoom"
     />
     <RoomDialog
@@ -252,8 +263,15 @@ onMounted(async () => {
           <div
             v-for="(player) in roomInfo.players"
             :key="player.id"
-            class="w-32 h-32 flex flex-col justify-center items-center"
+            class="w-32 flex flex-col justify-center items-center relative"
           >
+            <img
+              v-if="roomOwner && roomInfo.status !== 'starting' && roomInfo.owner_id !== player.id"
+              src="@/assets/roomPlayers/delete.svg"
+              alt=""
+              class="absolute w-7 h-7 right-[12px] top-[2px] z-20"
+              @click="deletePlayer(player.id)"
+            >
             {{ penguins.find((item)=> String(item) === player.character) }}
             <div
               :class="`avatarBackground ${player.is_ready? 'bg-white':'notReadyBackground'}`"
@@ -264,7 +282,6 @@ onMounted(async () => {
                 alt=""
               >
             </div>
-          
             <div class="mt-2 w-full flex items-center justify-center">
               <img
                 v-if="player.is_ready"
@@ -272,13 +289,13 @@ onMounted(async () => {
                 alt="ready"
                 class="max-w-5 max-h-5 mr-2"
               >
-              <p class="text-white">
+              <p class="text-white ">
                 {{ player.nickname }}
               </p>
             </div>
           </div>
           <button
-            v-if="homeowner && roomInfo.players?.length < 4"
+            v-if="roomOwner && roomInfo.players?.length < 4"
             class="w-32 h-32 bg-[url(@/assets/roomPlayers/addAi.svg)] bg-center bg-cover"
             :disabled="aiPlayerJoined"
             @click="addAiPlayer"
@@ -315,7 +332,7 @@ onMounted(async () => {
               {{ roomInfo.name }}
             </p>
             <button
-              v-if="homeowner"
+              v-if="roomOwner"
               :class="`bg-[url(@/assets/roomPlayers/edit.svg)] bg-center bg-cover w-5 h-5 ${roomMe.is_ready?'opacity-40':''}`"
               :disabled="roomMe.is_ready"
               @click="() => {showChangeRoomNameModal = true}"

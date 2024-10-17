@@ -24,6 +24,11 @@ const props = defineProps({
     type: String,
     require: false,
     default: '是否確認離開這個房間？'
+  },
+  submitButtonText: {
+    type: String,
+    required: false,
+    default: '確認修改'
   }
 })
 const emits = defineEmits([ 'onCheck' ])
@@ -54,7 +59,7 @@ const showChangeNameModal = defineModel({ type: Boolean })
             @on-click="showChangeNameModal = false, newName = ''"
           />
           <DefaultButton
-            :text="'確認修改'"
+            :text="submitButtonText"
             :button-type="'confirm'"
             @on-click="()=>emits('onCheck',newName)"
           />
@@ -66,7 +71,7 @@ const showChangeNameModal = defineModel({ type: Boolean })
         </p>
         <div class="flex gap-2">
           <DefaultButton
-            :text="'確認離開'"
+            :text="submitButtonText"
             :button-type="'cancel'"
             @on-click="()=>emits('onCheck')"
           />

@@ -9,6 +9,7 @@ const axiosInstance = axios.create({
     'Authorization': 'Bearer ' + token.value
   },
 })
+
 axiosInstance.interceptors.response.use(response => {
   return response
 }, error => {
@@ -95,6 +96,15 @@ const api = {
   getRooms: async () => {
     try {
       const response = await axiosInstance.get('/api/v1/rooms')
+      return response.data
+    }
+    catch (error) {
+      return error.response.data
+    }
+  },
+  getRoomToken: async (roomId) => { 
+    try { 
+      const response = await axiosInstance.get('/api/v1/rooms/' + roomId + '/knock-knock')
       return response.data
     }
     catch (error) {
@@ -198,6 +208,5 @@ const api = {
     axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + newToken
     token.value = newToken
   },
-
 }
 export default api

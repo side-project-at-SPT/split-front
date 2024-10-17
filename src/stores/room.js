@@ -9,7 +9,6 @@ export const useRoomStore = defineStore('useRoomStore', () => {
   })
   const getRooms = () => {
     return api.getRooms().then((res) => {
-      console.log('123', res)
       rooms.value = res.rooms
     })
   }
@@ -36,9 +35,12 @@ export const useRoomStore = defineStore('useRoomStore', () => {
       }
     }
   }
+  const getRoomToken = (roomId) => { 
+    console.log(roomInfo.value)
+    return api.getRoomToken(roomId)
+  }
   const joinRoom = (room) => {
     joinedRoomId.value = room.id
-    // return api.joinRoom(roomInfo.value.id)
   }
   const leaveRoom = () => {
     return api.leaveRoom(roomInfo.value.id)
@@ -73,6 +75,7 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     getRooms,
     // getRoomInfo,
     updateRoomData,
+    getRoomToken,
     joinRoom,
     updateRoomPlayers,
     leaveRoom,

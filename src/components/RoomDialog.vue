@@ -49,7 +49,7 @@ const showChangeNameModal = defineModel({ type: Boolean })
       <template v-if="isEdit">
         <input
           v-model="newName"
-          class="w-full h-12 rounded-full border bg-transparent  placeholder:text-gray-400 text-center text-white focus:outline-none text-xl font-medium"
+          class="w-full h-12 rounded-full border bg-transparent  placeholder:text-gray-400 text-center text-[#006989] focus:outline-none text-xl font-medium bg-white"
           :placeholder="'請輸入'+title.replace('修改','')"
         >
         <div class="flex gap-2">

@@ -75,6 +75,10 @@ const handleSeeRoom = async (room) => {
     router.push(`/game/?game_id=${ room.game_id }&room_id=${ room.id }`)
     return
   }
+  if (room.players.length >= 4){
+    showErrorMessage('房間已滿')
+    return
+  }
   getRoomToken(room.id).then((data) => {
     // 跳轉到room頁面
     localStorage.setItem('roomToken', data.token)

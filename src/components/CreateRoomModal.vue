@@ -1,17 +1,21 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoomStore } from '../stores/room'
+import { useRouter } from 'vue-router'
 const props = defineProps({
   modelValue: Boolean
 })
 const emit = defineEmits([ 'update:modelValue' ])
 const roomStore = useRoomStore()
+const router = useRouter()
 const { createRoom } = roomStore
 const roomName = ref('')
 const handleCreateRoom = async () => {
-  const data = await createRoom(roomName.value)
+  const { room } = await createRoom(roomName.value)
   showCreateRoomModal.value = false
   roomName.value = ''
+  // 跳轉到room頁面
+  router.push(`/room/${ room.id }`)
   return data
 }
 const showCreateRoomModal = computed({

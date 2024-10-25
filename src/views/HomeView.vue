@@ -20,7 +20,7 @@ const { rooms } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 let consumer = toRaw(publicStore.consumer)
 const {
-  getRooms, updateRoomPlayers,
+  getRooms, updateRoomPlayers, getRoomToken
 } = roomStore
 const { getUsers, getUserInfo } = userStore
 const { initConnection } = publicStore
@@ -79,8 +79,11 @@ const handleSeeRoom = async (room) => {
     showErrorMessage('房間已滿')
     return
   }
-  // 跳轉到room頁面
-  router.push(`/room/${ room.id }`)
+  getRoomToken(room.id).then((data) => {
+    // 跳轉到room頁面
+    localStorage.setItem('roomToken', data.token)
+    router.push(`/room/${ room.id }`)
+  })
 }
 const showErrorMessage = (message) => {
   errorMessage.value = message
@@ -116,7 +119,6 @@ const doAfterLogin = () => {
         if (data.event === 'join_room' || data.event === 'leave_room'){
           updateRoomPlayers(data.room)
         }
-        console.log(data, 'data')
       }
     })
   } 
@@ -145,7 +147,6 @@ const doAfterLogin = () => {
           if (data.event === 'game_started'){
             getRooms()
           }
-          console.log(data, 'data')
         }
       })
     }

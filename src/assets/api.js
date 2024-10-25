@@ -9,6 +9,7 @@ const axiosInstance = axios.create({
     'Authorization': 'Bearer ' + token.value
   },
 })
+
 axiosInstance.interceptors.response.use(response => {
   return response
 }, error => {
@@ -101,6 +102,15 @@ const api = {
       return error.response.data
     }
   },
+  getRoomToken: async (roomId) => { 
+    try { 
+      const response = await axiosInstance.get('/api/v1/rooms/' + roomId + '/knock-knock')
+      return response.data
+    }
+    catch (error) {
+      return error.response.data
+    }
+  },
   getRoomInfo: async (id) => {
     try {
       const response = await axiosInstance.get('/api/v1/rooms/' + id)
@@ -148,6 +158,18 @@ const api = {
       throw error.response.data
     }
   },
+  setRoomPreferences: async ({ id, name } = param) => {
+    try {
+      const response = await axiosInstance.patch(`/api/v1/rooms/${ id }`, { name })
+      return response.data
+    }
+    catch (error) {
+      if (error.response.status === 304) {
+        return { status: 304 }
+      }
+      throw error.response.data
+    }
+  },
   startGame: async (id) => {
     try {
       const response = await axiosInstance.post('/api/v1/rooms/' + id + '/game')
@@ -186,6 +208,5 @@ const api = {
     axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + newToken
     token.value = newToken
   },
-
 }
 export default api

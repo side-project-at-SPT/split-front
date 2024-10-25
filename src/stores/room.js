@@ -17,11 +17,6 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     getRooms()
     return data
   }
-  // const getRoomInfo = (roomId) => {
-  //   return api.getRoomInfo(roomId).then((res) => {
-  //     roomInfo.value = res.room
-  //   })
-  // }
   const updateRoomPlayers = (roomData) => {
     const room = rooms.value.find((room) => room.id === roomData.id)
     if (room) {
@@ -40,9 +35,12 @@ export const useRoomStore = defineStore('useRoomStore', () => {
       }
     }
   }
+  const getRoomToken = (roomId) => { 
+    console.log(roomInfo.value)
+    return api.getRoomToken(roomId)
+  }
   const joinRoom = (room) => {
     joinedRoomId.value = room.id
-    // return api.joinRoom(roomInfo.value.id)
   }
   const leaveRoom = () => {
     return api.leaveRoom(roomInfo.value.id)
@@ -59,6 +57,17 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     api.addAiPlayer(roomInfo.value.id)
     return undefined
   }
+  const setRoomName = async (roomName) => {
+    const params = {
+      id: roomInfo.value.id,
+      name: roomName
+    }
+    return api.setRoomPreferences(params).then(res => {
+      if (res.status === 304) return
+      getRooms()
+    })
+  }
+  
   return {
     rooms,
     roomInfo,
@@ -66,12 +75,14 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     getRooms,
     // getRoomInfo,
     updateRoomData,
+    getRoomToken,
     joinRoom,
     updateRoomPlayers,
     leaveRoom,
     closeRoom,
     createRoom,
     clearRoomInfo,
-    addAiPlayer
+    addAiPlayer,
+    setRoomName
   }
 })

@@ -225,7 +225,7 @@ onMounted(async () => {
     />
     <div class="relative">
       <button
-        class="w-[62px] h-[62px] absolute  left-10 rounded-[50%] bg-[url(@/assets/roomPLayers/goBackButton.jpg)]"
+        class="w-[62px] h-[62px] absolute  left-10 rounded-[50%] bg-[url(@/assets/roomPlayers/goBackButton.jpg)]"
         @click="showLeaveModel = true"
       ></button>
       <div
@@ -285,7 +285,7 @@ onMounted(async () => {
             <div class="mt-2 w-full flex items-center justify-center">
               <img
                 v-if="player.is_ready"
-                src="@/assets/roomPLayers/ready.svg"
+                src="@/assets/roomPlayers/ready.svg"
                 alt="ready"
                 class="max-w-5 max-h-5 mr-2"
               >

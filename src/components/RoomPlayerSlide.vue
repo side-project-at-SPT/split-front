@@ -1,9 +1,9 @@
 <script setup>
 import { ref, watch } from 'vue'
-import Aptenodytes from '@/assets/roomPLayers/aptenodytes.png'
-import Eudyptes from '@/assets/roomPLayers/eudyptes.png'
-import Eudyptula from '@/assets/roomPLayers/eudyptula.png'
-import Papua from '@/assets/roomPLayers/papua.png'
+import Aptenodytes from '@/assets/roomPlayers/aptenodytes.png'
+import Eudyptes from '@/assets/roomPlayers/eudyptes.png'
+import Eudyptula from '@/assets/roomPlayers/eudyptula.png'
+import Papua from '@/assets/roomPlayers/papua.png'
 
 const props = defineProps({
   name: {
@@ -60,7 +60,7 @@ watch(() => props.imageKey, () => {
       >
     </div>
     <img
-      src="@/assets/roomPLayers/stage.svg"
+      src="@/assets/roomPlayers/stage.svg"
       alt=""
       class="stage"
     >

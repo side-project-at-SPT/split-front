@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import DefaultButton from './DefaultButton.vue'
-import EditPenguin from '@/assets/images/Dialog/editName.svg'
-import LeavePenguin from '@/assets/images/Dialog/closeRoom.svg'
+import EditPenguin from '@/assets/images/dialog/editName.svg'
+import LeavePenguin from '@/assets/images/dialog/closeRoom.svg'
 
 const props = defineProps({
   title: {

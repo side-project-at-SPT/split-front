@@ -128,28 +128,32 @@ const gradientEnd = computed(() => {
 </template>
 
 <style scoped>
-.tux {
+.tux,
+.papua {
   background-image: url('@/assets/images/1.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
-.gunter {
+.gunter,
+.eudyptula {
   background-image: url('@/assets/images/2.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
-.abc {
+.abc,
+.aptenodytes {
   background-image: url('@/assets/images/3.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
 }
 
-.sin {
+.sin,
+.eudyptes {
   background-image: url('@/assets/images/4.png');
   background-repeat: no-repeat;
   background-position: center;

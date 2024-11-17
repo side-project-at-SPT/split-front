@@ -7,16 +7,16 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { usePublicStore } from '../stores/public'
 import { useRoomStore } from '../stores/room'
+import Papua from '@/assets/images/1.png'
+import Eudyptula from '@/assets/images/2.png'
 import Aptenodytes from '@/assets/images/3.png'
 import Eudyptes from '@/assets/images/4.png'
-import Eudyptula from '@/assets/images/2.png'
-import Papua from '@/assets/images/1.png'
 import RoomPlayerSlide from '../components/RoomPlayerSlide.vue'
 import RoomDialog from '../components/RoomDialog.vue'
 import DefaultButton from '../components/DefaultButton.vue'
 
-const penguins = [ Aptenodytes, Papua, Eudyptula, Eudyptes ]
-const roles = [ 'Aptenodytes', 'Eudyptes', 'Eudyptula', 'Papua' ]
+const penguins = [ Papua, Eudyptula, Aptenodytes, Eudyptes ]
+const roles = [ 'papua', 'eudyptula', 'aptenodytes', 'eudyptes' ]
 const publicStore = usePublicStore()
 const userStore = useUserStore()
 const roomStore = useRoomStore()

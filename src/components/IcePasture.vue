@@ -162,6 +162,34 @@ const {
   background-size: contain;
 }
 
+.pasture.papua {
+  background-image: url('@/assets/images/1p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.pasture.eudyptula {
+  background-image: url('@/assets/images/2p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.pasture.aptenodytes {
+  background-image: url('@/assets/images/3p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.pasture.eudyptes {
+  background-image: url('@/assets/images/4p.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
 /* .bg-active-pasture:hover {
   background-image: url('@/assets/images/3p.png');
   background-repeat: no-repeat;

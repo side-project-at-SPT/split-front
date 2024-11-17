@@ -23,7 +23,7 @@ const props = defineProps({
   }
 })
 const emits = defineEmits([ 'chosePlayer', 'changeName' ])
-const players = [ Aptenodytes, Papua, Eudyptula, Eudyptes ]
+const players = [ Papua, Eudyptula, Aptenodytes, Eudyptes ]
 const playersRef = ref()
 const chosePlayer = ref(props.imageKey)
 const handelChosePlayer = (index) => { 

@@ -522,28 +522,32 @@ const handleZoomOut = () => {
   /* background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3); */
 }
 
-.tux {
+.tux,
+.papua {
   background-image: url('@/assets/images/1p.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
-.gunter {
+.gunter,
+.eudyptula {
   background-image: url('@/assets/images/2p.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
-.abc {
+.abc,
+.aptenodytes {
   background-image: url('@/assets/images/3p.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
 }
 
-.sin {
+.sin,
+.eudyptes {
   background-image: url('@/assets/images/4p.png');
   background-repeat: no-repeat;
   background-position: center;

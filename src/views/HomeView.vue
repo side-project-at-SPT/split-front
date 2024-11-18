@@ -11,6 +11,7 @@ import Tux from '@/assets/images/tux.png'
 import Gunter from '@/assets/images/gunter.png'
 import Sin from '@/assets/images/sin.png'
 import Abc from '@/assets/images/abc.png'
+import DefaultButton from '../components/DefaultButton.vue'
 const penguins = [ Tux, Gunter, Sin, Abc ]
 const roles = [ 'tux', 'gunter', 'sin', 'abc' ]
 const roomStore = useRoomStore()
@@ -166,7 +167,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="relative">
+  <div
+    class="relative"
+    :class="{ 'login-page': !isLogin }"
+  >
     <CreateRoomModal v-model="showCreateRoomModal" />
     <ChangeNicknameModal v-model="showChangeNicknameModal" />
     <div class="flex gap-2">
@@ -177,57 +181,49 @@ onMounted(() => {
         {{ errorMessage }}
       </div>
     </div>
-    <div v-if="!isLogin">
-      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm flex flex-col gap-3 px-10">
-        <div>
-          <label
-            for="email"
-            class="block text-sm font-medium leading-6 text-gray-900"
-          >Name</label>
-          <div class="mt-2">
-            <input
-              id="email"
-              v-model="userName"
-              name="email"
-              required
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-2"
-            >
-          </div>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between">
-            <label
-              for="password"
-              class="block text-sm font-medium leading-6 text-gray-900"
-            >Password</label>
-          </div>
-          <div class="mt-2">
-            <input
-              id="password"
-              v-model="password"
-              name="password"
-              type="password"
-              required
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-2"
-            >
-          </div>
+    <div
+      v-if="!isLogin"
+      class="flex h-full items-center justify-end"
+    >
+      <div
+        id="login-panel"
+        class="flex flex-col items-center px-10"
+      >
+        <div class="snow-left"></div>
+        <div class="snow-right"></div>
+        <div class="logo2"></div>
+        <div class="mt-8 flex flex-col gap-5 w-full">
+          <input
+            id="username"
+            v-model="userName"
+            name="username"
+            required
+            placeholder="玩家暱稱"
+            class="w-full input"
+          >          
+          <input
+            id="password"
+            v-model="password"
+            name="password"
+            type="password"
+            required
+            placeholder="密碼"
+            class="w-full input"
+          >
         </div>
         <div class="text-red">
           {{ errorMessage }}
         </div>
-        <div class="mt-7">
-          <button
-            class="flex w-full justify-center rounded-md bg-blue-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        <div class="mt-8">
+          <DefaultButton
+            text="登入遊戲"
             @click="login"
-          >
-            Sign in
-          </button>
+          />
           <button
-            class="mt-7 flex w-full justify-center rounded-md bg-blue-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-3 h-[50px] flex w-full justify-center items-center text-xl text-text "
             @click="loginAsVisitor"
           >
-            Sign in as visitor
+            訪客身份登入
           </button>
         </div>
       </div>
@@ -328,5 +324,75 @@ onMounted(() => {
 
   .hexagon-div {
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+
+  .login-page {
+    height: 100vh;
+    background-image: url('@/assets/images/login-bg.webp');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
+  }
+
+  #login-panel {
+    position: relative;
+    box-sizing: border-box;
+    width: 440px;
+    height: 570px;
+    margin-right: 148px;
+    padding-right: 72px;
+    padding-left: 72px;
+    background: linear-gradient(180deg, #d6edf5 0%, #84ddf6 100%);
+    border: 4px solid #b2efff;
+    border-radius: 40px;
+
+    .logo2 {
+      width: 296px;
+      height: 198px;
+      margin-top: 60px;
+      background-image: url('@/assets/images/logo2.webp');
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+
+    .snow-left {
+      position: absolute;
+      top: -28px;
+      left: -16px;
+      z-index: 1;
+      width: 182px;
+      height: 84px;
+      background-image: url('@/assets/images/gameover/deco-snow-left.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+
+    .snow-right {
+      position: absolute;
+      top: -28px;
+      right: -16px;
+      z-index: 1;
+      width: 206px;
+      height: 84px;
+      background-image: url('@/assets/images/gameover/deco-snow-right.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+
+    .input {
+      gap: 12px;
+      width: 100%;
+      height: 48px;
+      padding: 4px 8px 4px 8px;
+      color: #006989;
+      text-align: center;
+      border-radius: 48px;
+
+      &:focus {
+        outline-color: #006989;
+      }
+    }
   }
 </style>

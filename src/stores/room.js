@@ -67,6 +67,13 @@ export const useRoomStore = defineStore('useRoomStore', () => {
       getRooms()
     })
   }
+  const sortedRooms = computed(() => {
+    const sortRank = [ 'waiting', 'starting', 'playing' ]
+    return rooms.value.sort((a, b) => {
+      if (sortRank.indexOf(a.status) < sortRank.indexOf(b.status)) return -1
+      return 0
+    })
+  })
   
   return {
     rooms,
@@ -83,6 +90,7 @@ export const useRoomStore = defineStore('useRoomStore', () => {
     createRoom,
     clearRoomInfo,
     addAiPlayer,
-    setRoomName
+    setRoomName,
+    sortedRooms
   }
 })

@@ -6,24 +6,20 @@ import { useRoomStore } from '../stores/room'
 import { useUserStore } from '../stores/user'
 import { usePublicStore } from '../stores/public'
 import CreateRoomModal from '@/components/CreateRoomModal.vue'
-import ChangeNicknameModal from '../components/ChangeNicknameModal.vue'
-import Tux from '@/assets/images/tux.png'
-import Gunter from '@/assets/images/gunter.png'
-import Sin from '@/assets/images/sin.png'
-import Abc from '@/assets/images/abc.png'
+// import ChangeNicknameModal from '../components/ChangeNicknameModal.vue'
 import DefaultButton from '../components/DefaultButton.vue'
-const penguins = [ Tux, Gunter, Sin, Abc ]
-const roles = [ 'tux', 'gunter', 'sin', 'abc' ]
+import RoomDialog from '../components/RoomDialog.vue'
+import RoomBox from '../components/RoomBox.vue'
 const roomStore = useRoomStore()
 const userStore = useUserStore()
 const publicStore = usePublicStore()
-const { rooms } = toRefs(roomStore)
+const { sortedRooms } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 let consumer = toRaw(publicStore.consumer)
 const {
   getRooms, updateRoomPlayers, getRoomToken
 } = roomStore
-const { getUsers, getUserInfo } = userStore
+const { getUsers, getUserInfo, setNickname } = userStore
 const { initConnection } = publicStore
 const router = useRouter()
 const isLogin = ref(false)
@@ -32,7 +28,7 @@ const password = ref('')
 const errorMessage = ref('')
 const showCreateRoomModal = ref(false)
 const showChangeNicknameModal = ref(false)
-const newNickname = ref('')
+const showLeaveModel = ref(false)
 let token = localStorage.getItem('token')
 
 const login = async () => {
@@ -52,6 +48,7 @@ const handleLogout = () => {
   localStorage.removeItem('token')
   isLogin.value = false
   token = null
+  showLeaveModel.value = false
 }
 const loginAsVisitor = async () => {
   try {
@@ -153,26 +150,44 @@ const doAfterLogin = () => {
     }
   }
 }
-const roomStatus = {
-  'waiting': '等待中',
-  'starting': '即將開始',
-  'playing': '進行中',
-}
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token) {
     doAfterLogin()
   }
 })
+const handelEditNickname = (newName) => {
+  setNickname(newName).then(() => { 
+    showChangeNicknameModal.value = false
+  })
+}
 </script>
 
 <template>
   <div
     class="relative"
-    :class="{ 'login-page': !isLogin }"
+    :class="{ 'login-page': !isLogin,
+              'room-page': isLogin }"
   >
     <CreateRoomModal v-model="showCreateRoomModal" />
-    <ChangeNicknameModal v-model="showChangeNicknameModal" />
+    <!-- <ChangeNicknameModal v-model="showChangeNicknameModal" /> -->
+    <RoomDialog
+      v-if="showChangeNicknameModal"
+      v-model="showChangeNicknameModal"
+      :title="'修改暱稱'"
+      :input-default-value="user.nickname"
+      is-edit
+      @on-check="handelEditNickname"
+    />
+    <RoomDialog
+      v-if="showLeaveModel"
+      v-model="showLeaveModel"
+      title="登出"
+      :input-default-value="user.nickname"
+      submit-button-text="確認離開"
+      content-text="要說再見了嗎？"
+      @on-check="handleLogout"
+    />
     <div class="flex gap-2">
       <div
         v-if="errorMessage && isLogin"
@@ -228,171 +243,163 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <div v-if="isLogin">
+    <div
+      v-if="isLogin"
+      class="px-10 pt-10"
+    >
       <div class="flex justify-between">
-        <div class="flex gap-2">
-          <div>您好: {{ user.nickname }}</div>
-          <button
-            class="bg-blue-300 rounded-md px-2 text-xs hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            @click="showChangeNicknameModal = true, newNickname = user.nickname"
+        <div class="flex gap-2 items-center">
+          <div
+            class="inputBox flex items-center justify-center px-5 mr-4"
+            @click="showChangeNicknameModal = true"
           >
-            修改暱稱
-          </button>
+            <p class="text-white font-bold text-lg mr-4 grow">
+              {{ user.nickname }}
+            </p>
+            <button
+              class="bg-[url(@/assets/roomPlayers/edit.svg)] bg-center bg-cover w-6 h-6"
+            ></button>
+          </div>
+          <div class="text-text">
+            在線人數: {{ onlineUsers.length }} 人
+          </div>
         </div>
         <button
-          class="bg-blue-300 rounded-md px-2 text-xs hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          @click="handleLogout"
-        >
-          登出
-        </button>
-      </div>
-      <div class="flex gap-3 items-center">
-        <div>在線人數: {{ onlineUsers.length }} 人:</div>
-        <div
-          v-for="onlineUser in onlineUsers"
-          :key="onlineUser.id"
-          class=""
-        >
-          {{ onlineUser.nickname }}
-        </div>
+          class="w-[62px] h-[62px] rounded-[50%] bg-[url(@/assets/roomPlayers/goBackButton.jpg)]"
+          @click="showLeaveModel = true"
+        ></button>
       </div>
       <div
-        class="flex gap-2 flex-wrap"
+        class="flex gap-y-10 gap-x-7 flex-wrap mt-10 justify-center"
       >
         <div
-          v-for="room in rooms"
-          :key="room.id"
-          class="text-center border-2 shrink-0 border-blue-300 w-[150px] h-[150px] bg-blue-50 rounded-md cursor-pointer flex flex-col justify-center hexagon-ice items-center hover:scale-105 transition-transform duration-300"
-          @click="handleSeeRoom(room)"
-        >
-          <div class="py-2">
-            {{ room.name }}
-            <div class="text-sm">
-              {{ roomStatus[room.status] }}
-            </div>
-          </div>
-
-          <div
-            v-for="(player, index) in room.players"
-            :key="player.id"
-            class="text-sm flex items-center"
-          >
-            <div
-              v-if="roles.indexOf(player.character) != -1"
-              class="h-5 w-5"
-            >
-              <img
-                :src="penguins[roles.indexOf(player.character)]"
-                class="w-full h-full object-contain"
-              >
-            </div>
-            <div
-              v-else
-              class="h-5 w-5"
-            >
-              <img
-                :src="penguins[index]"
-                class="w-full h-full object-contain"
-              >
-            </div>
-            <div>
-              {{ player.nickname }}
-            </div> 
-          </div>
-        </div>
-        <div
-          class="w-[150px] h-[150px] new-room flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+          class="add-room text-text"
           @click="openCreateRoomModal"
         >
           新增房間
         </div>
+        <RoomBox
+          v-for="room in sortedRooms"
+          :key="room.id"
+          :room="room"
+          @click="handleSeeRoom(room)"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-  .hexagon-ice {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3);
-  }
+.hexagon-ice {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background-image: linear-gradient(to bottom right, #b3d9ff, #218ed3);
+}
 
-  .new-room {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background-image: linear-gradient(to bottom right, #cae5ff, #87b0ca);
-  }
+.new-room {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background-image: linear-gradient(to bottom right, #cae5ff, #87b0ca);
+}
 
-  .hexagon-div {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
+.hexagon-div {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
 
-  .login-page {
-    height: 100vh;
-    background-image: url('@/assets/images/login-bg.webp');
+.login-page {
+  height: 100vh;
+  background-image: url('@/assets/images/login-bg.webp');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 100%;
+}
+
+.room-page {
+  height: 100vh;
+  background-image: url('@/assets/images/room-bg.webp');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 100%;
+}
+
+.inputBox {
+  width: 200px;
+  height: 48px;
+  background: #0f2a30e5;
+  border-radius: 30px;
+}
+
+#login-panel {
+  position: relative;
+  box-sizing: border-box;
+  width: 440px;
+  height: 570px;
+  margin-right: 148px;
+  padding-right: 72px;
+  padding-left: 72px;
+  background: linear-gradient(180deg, #d6edf5 0%, #84ddf6 100%);
+  border: 4px solid #b2efff;
+  border-radius: 40px;
+
+  .logo2 {
+    width: 296px;
+    height: 198px;
+    margin-top: 60px;
+    background-image: url('@/assets/images/logo2.webp');
     background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: 100% 100%;
+    background-size: contain;
   }
 
-  #login-panel {
-    position: relative;
-    box-sizing: border-box;
-    width: 440px;
-    height: 570px;
-    margin-right: 148px;
-    padding-right: 72px;
-    padding-left: 72px;
-    background: linear-gradient(180deg, #d6edf5 0%, #84ddf6 100%);
-    border: 4px solid #b2efff;
-    border-radius: 40px;
+  .snow-left {
+    position: absolute;
+    top: -28px;
+    left: -16px;
+    z-index: 1;
+    width: 182px;
+    height: 84px;
+    background-image: url('@/assets/images/gameover/deco-snow-left.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
 
-    .logo2 {
-      width: 296px;
-      height: 198px;
-      margin-top: 60px;
-      background-image: url('@/assets/images/logo2.webp');
-      background-repeat: no-repeat;
-      background-size: contain;
-    }
+  .snow-right {
+    position: absolute;
+    top: -28px;
+    right: -16px;
+    z-index: 1;
+    width: 206px;
+    height: 84px;
+    background-image: url('@/assets/images/gameover/deco-snow-right.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
 
-    .snow-left {
-      position: absolute;
-      top: -28px;
-      left: -16px;
-      z-index: 1;
-      width: 182px;
-      height: 84px;
-      background-image: url('@/assets/images/gameover/deco-snow-left.png');
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-    }
+  .input {
+    gap: 12px;
+    width: 100%;
+    height: 48px;
+    padding: 4px 8px 4px 8px;
+    color: #006989;
+    text-align: center;
+    border-radius: 48px;
 
-    .snow-right {
-      position: absolute;
-      top: -28px;
-      right: -16px;
-      z-index: 1;
-      width: 206px;
-      height: 84px;
-      background-image: url('@/assets/images/gameover/deco-snow-right.png');
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-    }
-
-    .input {
-      gap: 12px;
-      width: 100%;
-      height: 48px;
-      padding: 4px 8px 4px 8px;
-      color: #006989;
-      text-align: center;
-      border-radius: 48px;
-
-      &:focus {
-        outline-color: #006989;
-      }
+    &:focus {
+      outline-color: #006989;
     }
   }
+}
+
+.add-room {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 260px;
+  height: 200px;
+  font-size: 20px;
+  font-weight: medium;
+  cursor: pointer;
+  border-color: #ffffff;
+  border-width: 4px;
+  border-radius: 24px;
+}
 </style>

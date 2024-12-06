@@ -71,7 +71,7 @@ const handleLeaveRoom = async () => {
   //     consumer.subscriptions.remove(roomChannel)
   //   }
 
-  if (roomOwner.value) {
+  if (roomOwner.value || roomInfo.value?.players?.length <= 1) {
     closeRoom()
   }
   else {

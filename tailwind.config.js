@@ -35,6 +35,7 @@ export default {
         confirm: '0px 4px 0px 0px #FF9200',
         cancel: '0px 4px 0px 0px #919A9C',
         button: '0px 4px 0px 0px #27B8E0',
+        buttonOff: '0px 4px 0px 0px #ADADAD',
       }
 
     },

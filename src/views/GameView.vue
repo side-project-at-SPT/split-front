@@ -1,7 +1,7 @@
 <script setup>
 import {
   ref, onMounted, toRefs,
-  toRaw, watchEffect
+  toRaw, watchEffect,
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePublicStore } from '../stores/public'
@@ -337,9 +337,33 @@ const handleZoomOut = () => {
 //     handleZoomIn()
 //   }
 // }
+const audioPlayer = ref(null)
+const musicPlaying = ref(true)
+const toggleAudio = () => {
+  if (audioPlayer.value.paused) {
+    audioPlayer.value.play()
+    musicPlaying.value = true
+  }
+  else {
+    audioPlayer.value.pause()
+    musicPlaying.value = false
+  }
+}
 </script>
 
 <template>
+  <audio
+    ref="audioPlayer"
+    autoplay
+    loop
+    volume="0.1"
+  >
+    <source
+      src="/game.mp3"
+      type="audio/mpeg"
+    >
+    你的瀏覽器不支援 audio 元素。
+  </audio>
   <GameRuleModal v-model="showRule" />
   <GameOverModal
     v-model="gameOver"
@@ -441,7 +465,7 @@ const handleZoomOut = () => {
   <div
     class="flex items-center justify-center fixed bottom-10 right-10 pointer-events-none z-10"
   >
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-4">
       <div
         class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
         @click="handleZoomIn"
@@ -449,7 +473,7 @@ const handleZoomOut = () => {
         <div class="zoom-in h-[38px] w-[38px]"></div>
       </div>
       <div
-        class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
+        class="w-[50px] h-[50px] mr-8 p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center"
         @click="handleZoomOut"
       >
         <div class="zoom-out h-[38px] w-[38px]"></div>
@@ -459,6 +483,16 @@ const handleZoomOut = () => {
         @click="showRule = true"
       >
         <div class="question h-[38px] w-[38px]"></div>
+      </div>
+      <div
+        class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b  border border-[#DBDFEO] flex justify-center items-center"
+        :class="musicPlaying ? 'shadow-button from-[#FFFFFF] to-[#DAFFFF]' : 'shadow-buttonOff from-[#FFFFFF] to-[#DBDFE0]'"
+        @click="toggleAudio"
+      >
+        <div
+          class=" h-[38px] w-[38px]"
+          :class="musicPlaying ? 'music-on' : 'music-off'"
+        ></div>
       </div>
     </div>
   </div>
@@ -604,6 +638,18 @@ const handleZoomOut = () => {
 
 .question {
   background-image: url('@/assets/images/icon-question.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.music-on {
+  background-image: url('@/assets/images/icon-music-on.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.music-off {
+  background-image: url('@/assets/images/icon-music-off.svg');
   background-repeat: no-repeat;
   background-position: center;
 }

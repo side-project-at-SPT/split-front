@@ -20,7 +20,8 @@ const {
   getRooms, updateRoomPlayers, getRoomToken
 } = roomStore
 const { getUsers, getUserInfo, setNickname } = userStore
-const { initConnection } = publicStore
+const { initConnection, toggleAudio } = publicStore
+const { musicPlaying } = toRefs(publicStore)
 const router = useRouter()
 const isLogin = ref(false)
 const userName = ref('')
@@ -285,6 +286,16 @@ const handelEditNickname = (newName) => {
           @click="handleSeeRoom(room)"
         />
       </div>
+    </div>
+    <div
+      class="w-[62px] h-[62px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b  border border-[#DBDFEO] flex justify-center items-center fixed right-10 bottom-10"
+      :class="musicPlaying ? 'shadow-button from-[#FFFFFF] to-[#DAFFFF]' : 'shadow-buttonOff from-[#FFFFFF] to-[#DBDFE0]'"
+      @click="toggleAudio"
+    >
+      <div
+        class=" h-[38px] w-[38px]"
+        :class="musicPlaying ? 'music-on' : 'music-off'"
+      ></div>
     </div>
   </div>
 </template>

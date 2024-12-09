@@ -20,7 +20,8 @@ const publicStore = usePublicStore()
 const userStore = useUserStore()
 // const { consumer } = toRefs(publicStore)
 let consumer = toRaw(publicStore.consumer)
-const { initConnection } = publicStore
+const { initConnection, toggleAudio } = publicStore
+const { musicPlaying } = toRefs(publicStore)
 const { user } = toRefs(userStore)
 const { getUserInfo } = userStore
 const route = useRoute()
@@ -337,22 +338,10 @@ const handleZoomOut = () => {
 //     handleZoomIn()
 //   }
 // }
-const audioPlayer = ref(null)
-const musicPlaying = ref(true)
-const toggleAudio = () => {
-  if (audioPlayer.value.paused) {
-    audioPlayer.value.play()
-    musicPlaying.value = true
-  }
-  else {
-    audioPlayer.value.pause()
-    musicPlaying.value = false
-  }
-}
 </script>
 
 <template>
-  <audio
+  <!-- <audio
     ref="audioPlayer"
     autoplay
     loop
@@ -363,7 +352,7 @@ const toggleAudio = () => {
       type="audio/mpeg"
     >
     你的瀏覽器不支援 audio 元素。
-  </audio>
+  </audio> -->
   <GameRuleModal v-model="showRule" />
   <GameOverModal
     v-model="gameOver"
@@ -487,7 +476,7 @@ const toggleAudio = () => {
       <div
         class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b  border border-[#DBDFEO] flex justify-center items-center"
         :class="musicPlaying ? 'shadow-button from-[#FFFFFF] to-[#DAFFFF]' : 'shadow-buttonOff from-[#FFFFFF] to-[#DBDFE0]'"
-        @click="toggleAudio"
+        @click="()=>toggleAudio()"
       >
         <div
           class=" h-[38px] w-[38px]"

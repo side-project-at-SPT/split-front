@@ -1,11 +1,13 @@
+<script setup>
+import GameAudio from './components/GameAudio.vue'
+</script>
+
 <template>
   <div>
+    <GameAudio />
     <router-view />
   </div>
 </template>
-
-<script setup>
-</script>
 
 <style>
 :root {

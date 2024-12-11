@@ -320,6 +320,13 @@ const handlebackRoom = () => {
   }
   router.push(`/room/${ roomId }`)
 }
+const handleBackHome = () => {
+  // 斷線
+  if (consumer){
+    consumer.subscriptions.remove(gameChannel)
+  }
+  router.push('/')
+}
 const showTurnAnimation = ref(false)
 const handleZoomIn = () => {
   if (pastureScale.value < 2)
@@ -367,7 +374,7 @@ const handleZoomOut = () => {
   <TransitionGroup
     name="avatars"
     tag="div"
-    class="flex items-center flex-col fixed top-10 left-[50px] gap-3 z-10"
+    class="flex items-center flex-col fixed top-28 left-[50px] gap-3 z-10"
   >
     <div
       key="title"
@@ -388,8 +395,15 @@ const handleZoomOut = () => {
       />
     </div>
   </TransitionGroup>
-  <div class="flex items-center flex-col fixed top-10 right-0 gap-3 z-10">
-    <div class=" text-text h-6 w-[126px]">
+  <div
+    v-if="isObserver"
+    class="w-[50px] h-[50px] p-2 cursor-pointer pointer-events-auto rounded-full bg-gradient-to-b from-[#FFFFFF] to-[#DAFFFF] border border-[#DBDFEO] shadow-button flex justify-center items-center fixed top-10 left-10"
+    @click="handleBackHome"
+  >
+    <div class="icon-back h-[38px] w-[38px]"></div>
+  </div>
+  <div class="flex items-center flex-col fixed top-28 right-0 gap-3 z-10">
+    <div class="text-text py-3 w-[126px]">
       最新戰況
     </div>
     <div
@@ -651,6 +665,12 @@ const handleZoomOut = () => {
 
 .zoom-out {
   background-image: url('@/assets/images/icon-zoom-out.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-back {
+  background-image: url('@/assets/images/icon-back.svg');
   background-repeat: no-repeat;
   background-position: center;
 }

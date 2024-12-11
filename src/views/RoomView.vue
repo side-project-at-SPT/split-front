@@ -74,9 +74,7 @@ const handleLeaveRoom = async () => {
   if (roomOwner.value || roomInfo.value?.players?.length <= 1) {
     closeRoom()
   }
-  else {
-    consumer.subscriptions.remove(roomChannel)
-  }
+  consumer.subscriptions.remove(roomChannel)
   clearRoomInfo()
   router.push('/')
 }

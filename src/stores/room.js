@@ -9,7 +9,7 @@ export const useRoomStore = defineStore('useRoomStore', () => {
   })
   const getRooms = () => {
     return api.getRooms().then((res) => {
-      rooms.value = res.rooms
+      rooms.value = res.rooms || []
     })
   }
   const createRoom = async (roomName) => {

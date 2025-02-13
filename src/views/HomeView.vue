@@ -17,7 +17,7 @@ const { sortedRooms } = toRefs(roomStore)
 const { user, onlineUsers } = toRefs(userStore)
 let consumer = toRaw(publicStore.consumer)
 const {
-  getRooms, updateRoomPlayers, getRoomToken
+  getRooms, updateRoomPlayers
 } = roomStore
 const { getUsers, getUserInfo, setNickname } = userStore
 const { initConnection, toggleAudio } = publicStore
@@ -78,11 +78,13 @@ const handleSeeRoom = async (room) => {
     showErrorMessage('房間已滿')
     return
   }
-  getRoomToken(room.id).then((data) => {
-    // 跳轉到room頁面
-    localStorage.setItem('roomToken', data.token)
-    router.push(`/room/${ room.id }`)
-  })
+  // roomToken 改到room內再取得
+  // getRoomToken(room.id).then((data) => {
+  //   // 跳轉到room頁面
+  //   localStorage.setItem('roomToken', data.token)
+  // })
+  // 跳轉到room頁面
+  router.push(`/room/${ room.id }`)
 }
 const showErrorMessage = (message) => {
   errorMessage.value = message

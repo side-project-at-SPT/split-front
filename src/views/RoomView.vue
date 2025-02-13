@@ -41,7 +41,7 @@ if (queryGaasToken){
   localStorage.setItem('token', queryGaasToken)
 }
 const trueToken = ref(localStorage.getItem('token'))
-const roomToken = ref(localStorage.getItem('roomToken'))
+// const roomToken = ref(localStorage.getItem('roomToken'))
 const roomMe = computed(() => roomInfo.value.players?.find((player) => player.id === user.value.id) || {})
 const playerNum = computed(() => roomInfo.value.players?.length || 1)
 const showChangeNicknameModal = ref(false)
@@ -81,14 +81,15 @@ const handleLeaveRoom = async () => {
 
 let roomChannel = null
 
-const initRoomChannel = () => {
+const initRoomChannel = async () => {
   // 檢查是否已經訂閱過該房間
   if (consumer.subscriptions.findAll(`{"channel":"RoomChannel","room_id":${ roomId }}`).length > 0){
     roomChannel = consumer.subscriptions.findAll(`{"channel":"RoomChannel","room_id":${ roomId }}`)[0]
     roomChannel.send({ action: 'cancel_ready' }) 
     return
   }
-  roomChannel = consumer.subscriptions.create({ channel: 'RoomChannel', room_id: roomId, token: roomToken.value }, {
+  const { token } = await roomStore.getRoomToken(roomId)
+  roomChannel = consumer.subscriptions.create({ channel: 'RoomChannel', room_id: roomId, token: token }, {
     connected () {
       // 隨機選一個角色
       const randomIndex = Math.floor(Math.random() * roles.length)

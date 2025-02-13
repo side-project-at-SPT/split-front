@@ -8,15 +8,12 @@ const props = defineProps({
 const emit = defineEmits([ 'update:modelValue' ])
 const roomStore = useRoomStore()
 const router = useRouter()
-const { createRoom, getRoomToken } = roomStore
+const { createRoom } = roomStore
 const roomName = ref('')
 const handleCreateRoom = async () => {
   const { room } = await createRoom(roomName.value)
   showCreateRoomModal.value = false
   roomName.value = ''
-  // 取得room token
-  const { token } = await getRoomToken(room.id)
-  localStorage.setItem('roomToken', token)
   // 跳轉到room頁面
   router.push(`/room/${ room.id }`)
 }

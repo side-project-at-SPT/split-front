@@ -59,14 +59,14 @@ npm install
 
 ### 2. 環境變數設定
 
-專案包含 `.env` 檔案用於環境配置：
+專案包含 `.env` 檔案，但目前專案中的環境變數並未實際使用。
 
 ```bash
 # .env
 VITE_SOCKET_IO_URL=https://magician-socketio.onrender.com
 ```
 
-> **注意**: 雖然環境變數名稱為 `VITE_SOCKET_IO_URL`，但專案實際使用 ActionCable (Rails WebSocket) 進行即時通訊。WebSocket 連線 URL 配置在 `src/stores/public.js` 中。
+> **注意**: WebSocket 連線配置目前是直接寫在程式碼中（`src/stores/public.js` 的 `initConnection` 函數），使用 ActionCable (Rails WebSocket) 連接到 `wss://spt-games-split.zeabur.app/cable`。
 
 ### 3. 啟動開發伺服器
 
@@ -187,9 +187,9 @@ if (condition) {
   console.log('Hello')
 }
 
-// ❌ 錯誤
-const obj={name:'John'}  // 缺少空格
-if(condition){           // 缺少空格
+// ❌ 錯誤 - 缺少空格
+const obj={name:'John'}
+if(condition){
   console.log('Hello')
 }
 ```

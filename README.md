@@ -59,12 +59,14 @@ npm install
 
 ### 2. 環境變數設定
 
-複製 `.env` 檔案並根據需要修改：
+專案包含 `.env` 檔案用於環境配置：
 
 ```bash
 # .env
 VITE_SOCKET_IO_URL=https://magician-socketio.onrender.com
 ```
+
+> **注意**: 雖然環境變數名稱為 `VITE_SOCKET_IO_URL`，但專案實際使用 ActionCable (Rails WebSocket) 進行即時通訊。WebSocket 連線 URL 配置在 `src/stores/public.js` 中。
 
 ### 3. 啟動開發伺服器
 
@@ -80,7 +82,7 @@ npm run dev
 |------|------|
 | `npm run dev` | 啟動開發伺服器 (Vite) |
 | `npm run build` | 建構生產環境版本 |
-| `npm run build-github-page` | 建構 GitHub Pages 版本 (base: /magician/) |
+| `npm run build-github-page` | 建構 GitHub Pages 版本 (base path: /magician/) |
 | `npm run preview` | 預覽生產環境建構結果 |
 | `npm run lint` | 執行所有程式碼檢查 (ESLint + Stylelint) |
 | `npm run lint:script` | 只執行 JavaScript/Vue 檢查 (ESLint) |
@@ -120,6 +122,8 @@ split-front/
 ├── tailwind.config.js    # TailwindCSS 配置
 └── vite.config.js        # Vite 配置
 ```
+
+> **專案命名說明**: 專案在 package.json 中的名稱為 "magician"，這是歷史遺留命名。對外顯示的專案名稱為 "Split Sheep - 企鵝搶地"。
 
 ### 目錄說明
 

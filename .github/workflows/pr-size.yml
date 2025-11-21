@@ -11,6 +11,8 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
+      # Using @v1 for automatic minor/patch updates. For enhanced security,
+      # consider pinning to a specific commit SHA instead of a version tag.
       - uses: codelytv/pr-size-labeler@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

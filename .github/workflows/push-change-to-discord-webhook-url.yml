@@ -43,12 +43,24 @@ jobs:
             const { messages } = process.env;
             const iconMessages = messages.split('\n').map(m => {
               const [commitType, message, ...rest]= m.split(': ');
-              if (commitType !== 'feat' && commitType !== 'fix' && commitType !== 'mockup') {
+              if (commitType !== 'feat' && commitType !== 'fix' && commitType !== 'mockup' && commitType !== 'ci') {
                 return;
               }
-              const icon = commitType === 'feat' ? '<:thumb:1239951662832156752>' : commitType === 'fix' ? ':construction_site:' : ':womans_clothes:';
+              const iconMap = {
+                'feat': '<:thumb:1239951662832156752>',
+                'fix': ':construction_site:',
+                'mockup': ':womans_clothes:',
+                'ci': ':gear:'
+              };
+              const icon = iconMap[commitType];
               return icon + ' ' + message;
             }).filter(Boolean);
+
+            // Skip if no relevant commits
+            if (iconMessages.length === 0) {
+              console.log('No feat/fix/mockup commits found, skipping Discord notification');
+              return;
+            }
 
             const availableAvatarUrls = [
               'https://raw.githubusercontent.com/side-project-at-SPT/split-front/main/src/assets/images/1.png',

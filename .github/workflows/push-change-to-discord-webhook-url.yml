@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
+      - 'features/**'
+      - '*.md'
+      - '.vscode/**'
+      - '.husky/**'
+      - '.eslintrc.cjs'
+      - '.stylelintrc.cjs'
 
   # Allow manual trigger
   workflow_dispatch:

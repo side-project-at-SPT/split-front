@@ -1,4 +1,4 @@
-# Issue #019: [規劃] Discord Activity 遷移
+# Issue #020: [規劃] Discord Activity 遷移
 
 ## 目標
 
